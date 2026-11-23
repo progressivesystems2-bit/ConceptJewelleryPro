@@ -470,6 +470,10 @@
             <views:SoftwareUpdateView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type vm:LicenseInfoViewModel}">
+            <views:LicenseInfoView />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type vm:ModulePlaceholderViewModel}">
             <Border HorizontalAlignment="Center"
                     VerticalAlignment="Center"

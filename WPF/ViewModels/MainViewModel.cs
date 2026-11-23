@@ -61,6 +61,7 @@ public sealed class MainViewModel : ViewModelBase
     private readonly Lazy<StockTransferViewModel>? _stockTransferViewModel;
     private readonly Lazy<CouponEngineViewModel>? _couponEngineViewModel;
     private readonly Lazy<SoftwareUpdateViewModel>? _softwareUpdateViewModel;
+    private readonly Lazy<LicenseInfoViewModel>? _licenseInfoViewModel;
     private readonly List<MenuEntry> _allMenuItems = new();
     private CancellationTokenSource? _globalSearchCts;
     private IReadOnlyList<Account>? _searchAccounts;
@@ -120,6 +121,7 @@ public sealed class MainViewModel : ViewModelBase
         Lazy<StockTransferViewModel>? stockTransferViewModel = null,
         Lazy<CouponEngineViewModel>? couponEngineViewModel = null,
         Lazy<SoftwareUpdateViewModel>? softwareUpdateViewModel = null,
+        Lazy<LicenseInfoViewModel>? licenseInfoViewModel = null,
         IAccountRepository? accountRepository = null,
         ICustomerRepository? customerRepository = null,
         IItemRepository? itemRepository = null,
@@ -180,6 +182,7 @@ public sealed class MainViewModel : ViewModelBase
         _stockTransferViewModel = stockTransferViewModel;
         _couponEngineViewModel = couponEngineViewModel;
         _softwareUpdateViewModel = softwareUpdateViewModel ?? new Lazy<SoftwareUpdateViewModel>(() => new SoftwareUpdateViewModel());
+        _licenseInfoViewModel = licenseInfoViewModel;
 
         SelectModuleCommand = new RelayCommand(parameter => SelectModule(parameter as string));
         OpenGlobalSearchResultCommand = new RelayCommand(parameter => OpenGlobalSearchResult(parameter as GlobalSearchResultViewModel ?? SelectedSearchResult));
@@ -496,6 +499,10 @@ public sealed class MainViewModel : ViewModelBase
         else if ((moduleTitle is "Software Updates" or "Software Update" or "Update" or "Updates" or "Check for Updates") && _softwareUpdateViewModel is not null)
         {
             document = new ModuleDocument("Software Updates", AppIcons.SoftwareUpdates, _softwareUpdateViewModel.Value);
+        }
+        else if ((moduleTitle is "License Information" or "License" or "Licensing" or "License Info") && _licenseInfoViewModel is not null)
+        {
+            document = new ModuleDocument("License Information", "\uE8D7", _licenseInfoViewModel.Value);
         }
         else if ((moduleTitle is "Payments" or "Payment" or "PAYMENTS") && _paymentsViewModel is not null)
         {
@@ -1532,6 +1539,7 @@ public sealed class MainViewModel : ViewModelBase
         var securitySettings = CreateSection("Security & Software", AppIcons.UserPermission, FilterEntries(new[]
         {
             new MenuEntry("User Permission", "Manage user roles, rights and security permissions", AppIcons.UserPermission),
+            new MenuEntry("License Information", "View active license status, expiry, and authorized computers", "\uE8D7"),
             new MenuEntry("Software Updates", "Check for updates and version information", AppIcons.SoftwareUpdates)
         }));
         if (securitySettings.Items.Count > 0) settingSections.Add(securitySettings);

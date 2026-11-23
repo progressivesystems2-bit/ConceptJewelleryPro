@@ -13,6 +13,7 @@ public sealed class AppSettings
     public string StoreID { get; set; } = "1";
     public MastersIndiaSettings MastersIndia { get; set; } = new();
     public UpdateSettings Updates { get; set; } = new();
+    public LicensingOptions Licensing { get; set; } = new();
 
     public static string GetInstalledVersion()
     {
@@ -88,4 +89,12 @@ public sealed class UpdateSettings
     public bool IncludePreReleases { get; set; } = false;
     public string AssetNamePattern { get; set; } = "ConceptJewelleryPro-WPF";
     public string GitHubToken { get; set; } = string.Empty;
+}
+
+public sealed class LicensingOptions
+{
+    public string SupabaseUrl { get; set; } = string.Empty;
+    public string SupabaseKey { get; set; } = string.Empty;
+    public int OfflineGraceDays { get; set; } = 7;
+    public bool EnforceLicensing { get; set; } = true;
 }

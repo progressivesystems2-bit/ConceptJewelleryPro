@@ -1,0 +1,197 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.LicenseInfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinWidth" Value="120" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="AccentToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <controls:ToastNotification Grid.Row="0"
+                                     Grid.RowSpan="2"
+                                     Panel.ZIndex="99"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"
+                                     Message="{Binding ToastMessage}"
+                                     ToastType="{Binding ToastType}" />
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="8" Background="{DynamicResource PanelBrush}">
+                        <TextBlock Text="&#xE8D7;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="18"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="License Information"
+                                   FontSize="17"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="Managed via Concept License Manager (RSA-signed cloud &amp; node-locked licensing)"
+                                   FontSize="11.5"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <telerik:RadButton Grid.Column="1"
+                                   Content="Refresh License"
+                                   Style="{StaticResource AccentToolbarButtonStyle}"
+                                   Command="{Binding RefreshLicenseCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- Body -->
+        <telerik:RadBusyIndicator Grid.Row="1"
+                                  IsBusy="{Binding IsBusy, Mode=OneWay}"
+                                  BusyContent="{Binding BusyMessage}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="24,20,24,30" MaxWidth="920" HorizontalAlignment="Left">
+
+                    <!-- License Summary Card -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="22"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CompanyName}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                    <TextBlock Text="{Binding StatusMessage}"
+                                               FontSize="12.5"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,16,0" />
+                                </StackPanel>
+                                <Border Grid.Column="1"
+                                        Background="{DynamicResource PanelBrush}"
+                                        BorderBrush="{DynamicResource AccentBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="14,8"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding LicenseStatus}"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                </Border>
+                            </Grid>
+
+                            <Border Background="{DynamicResource PanelBrush}"
+                                    CornerRadius="6"
+                                    Padding="16,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="14" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="14" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                        <TextBlock Text="License Type" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding LicenseType}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="1">
+                                        <TextBlock Text="Edition" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding EditionText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,8,0" TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="2">
+                                        <TextBlock Text="Branch / Store Allowance" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding MaxBranchesText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="0">
+                                        <TextBlock Text="Valid From" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding ValidFromText}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="1">
+                                        <TextBlock Text="Valid Until" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding ValidToText}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="Days Remaining" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding DaysRemainingText}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4" Grid.Column="0">
+                                        <TextBlock Text="Computer Node Quota" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding MaxNodesText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4" Grid.Column="1">
+                                        <TextBlock Text="Current Computer" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding CurrentMachineText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4" Grid.Column="2">
+                                        <TextBlock Text="Last Verified Online" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding LastVerifiedOnlineText}" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Margin="0,14,0,0">
+                                <TextBlock Text="Authorized Computers / Nodes" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding RegisteredMachinesText}" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </telerik:RadBusyIndicator>
+    </Grid>
+</UserControl>

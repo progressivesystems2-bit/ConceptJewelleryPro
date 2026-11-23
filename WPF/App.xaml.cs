@@ -6,7 +6,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using ConceptJewelleryPro.Application.Authentication;
+using ConceptJewelleryPro.Application.Licensing;
 using ConceptJewelleryPro.Application.Services;
+using ConceptJewelleryPro.Shared;
+using Microsoft.Win32;
 using ConceptJewelleryPro.Data.Access.Repositories;
 using ConceptJewelleryPro.Domain.Entities;
 using ConceptJewelleryPro.Infrastructure.Accounts;
@@ -34,6 +37,8 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        DeviceFingerprintHelper.WindowsMachineGuidProvider = () =>
+            Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography", "MachineGuid", null)?.ToString();
 
         AppDomain.CurrentDomain.AssemblyResolve += (s, args) =>
         {
@@ -163,6 +168,45 @@ public partial class App : System.Windows.Application
                 : ResolveProjectDatabasePath(_settingsStore);
             DateRangeService.SetDatabasePath(activeDbPath);
 
+            var settingsRepo = CreateSettingsRepository(connectionSettings);
+
+            // Validate cloud/node license via Concept License Manager before opening MainWindow
+            var appConfig = AppSettings.Load();
+            var licenseService = new LicenseValidationService(async ct =>
+            {
+                try
+                {
+                    var companyInfo = await DateRangeService.GetCompanyDetailsAsync(ct);
+                    if (!string.IsNullOrWhiteSpace(companyInfo?.CompanyName))
+                        return companyInfo.CompanyName.Trim();
+                }
+                catch { }
+
+                try
+                {
+                    var fromSettings = await settingsRepo.GetValueAsync("CompanyName", ct)
+                                       ?? await settingsRepo.GetValueAsync("ShopName", ct);
+                    if (!string.IsNullOrWhiteSpace(fromSettings))
+                        return fromSettings.Trim();
+                }
+                catch { }
+
+                return null;
+            }, appConfig.Licensing);
+
+            var licenseResult = await licenseService.ValidateLicenseAsync();
+            if (!licenseResult.IsValid)
+            {
+                var lockedVm = new LicenseLockedViewModel(licenseService, licenseResult);
+                var lockedWin = new LicenseLockedWindow(lockedVm);
+                var unlocked = lockedWin.ShowDialog() == true;
+                if (!unlocked)
+                {
+                    Shutdown();
+                    return;
+                }
+            }
+
             var accountRepo = CreateAccountRepository(connectionSettings);
             var customerRepo = CreateCustomerRepository(connectionSettings);
             var itemRepo = CreateItemRepository(connectionSettings);
@@ -176,7 +220,6 @@ public partial class App : System.Windows.Application
             var karigharRepo = CreateKarigharRepository(connectionSettings);
             var staffRepo = CreateStaffRepository(connectionSettings);
             var schemeRepo = CreateSchemeCreationRepository(connectionSettings);
-            var settingsRepo = CreateSettingsRepository(connectionSettings);
             var voucherRepo = CreateVoucherRepository(connectionSettings);
             var barcodeReportRepo = CreateBarcodeReportRepository(connectionSettings, barcodeCreationRepo);
             var nonBarcodeReportRepo = CreateNonBarcodeReportRepository(connectionSettings);
@@ -295,6 +338,7 @@ public partial class App : System.Windows.Application
                 stockTransferViewModel: new Lazy<StockTransferViewModel>(() => new StockTransferViewModel(stockTransferRepo, user.Username)),
                 couponEngineViewModel: new Lazy<CouponEngineViewModel>(() => new CouponEngineViewModel(couponRepo, couponEngineService, user.Username)),
                 softwareUpdateViewModel: new Lazy<SoftwareUpdateViewModel>(() => new SoftwareUpdateViewModel()),
+                licenseInfoViewModel: new Lazy<LicenseInfoViewModel>(() => new LicenseInfoViewModel(licenseService)),
                 accountRepository: accountRepo,
                 customerRepository: customerRepo,
                 itemRepository: itemRepo,
