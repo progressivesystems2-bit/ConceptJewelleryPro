@@ -1,0 +1,47 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.BoxPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:views="clr-namespace:ConceptJewelleryPro.WPF.Views"
+        Title="Box Master - Select / Manage Boxes"
+        Width="850"
+        Height="560"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <views:BoxMasterView Grid.Row="0" DataContext="{Binding}" />
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource FooterBackgroundBrush}"
+                BorderBrush="{DynamicResource FooterBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <telerik:RadButton Content="Select Box"
+                                   Command="{Binding SelectBoxCommand}"
+                                   MinWidth="110"
+                                   Height="34"
+                                   Margin="0,0,8,0"
+                                   Background="{DynamicResource AccentBrush}"
+                                   Foreground="{DynamicResource AccentTextBrush}"
+                                   FontWeight="SemiBold" />
+
+                <telerik:RadButton Content="Close"
+                                   Click="CloseButton_Click"
+                                   MinWidth="85"
+                                   Height="34"
+                                   Background="{DynamicResource PanelBrush}"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   BorderBrush="{DynamicResource CardBorderBrush}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

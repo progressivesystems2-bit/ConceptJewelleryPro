@@ -1,0 +1,94 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>ConceptJewelleryPro.WPF</RootNamespace>
+    <AssemblyName>ConceptJewelleryPro.WPF</AssemblyName>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>Concept Jewellery Pro</Product>
+    <Company>Concept Jewellery Pro</Company>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TelerikInstallDir Condition="'$(TelerikInstallDir)' == ''">C:\Program Files (x86)\Progress\Telerik UI for WPF 2024 Q4</TelerikInstallDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\ConceptJewelleryPro.Application.csproj" />
+    <ProjectReference Include="..\Data.Access\ConceptJewelleryPro.Data.Access.csproj" />
+    <ProjectReference Include="..\Data.SqlServer\ConceptJewelleryPro.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\Domain\ConceptJewelleryPro.Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\ConceptJewelleryPro.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared\ConceptJewelleryPro.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExcelDataReader" Version="3.8.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\pincodeJSON.json" Link="pincodeJSON.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\RGRG2526.mdb" Link="RGRG2526.mdb" Condition="Exists('..\RGRG2526.mdb')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="appsettings.json" Condition="Exists('appsettings.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="appsettings.example.json" Condition="Exists('appsettings.example.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PrintTemplates\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Telerik.Windows.Controls">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Controls.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.Input">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Controls.Input.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.Navigation">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Controls.Navigation.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Controls.GridView">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Controls.GridView.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Data">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Data.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Themes.Windows11">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Themes.Windows11.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Core">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Documents.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Fixed">
+      <HintPath>$(TelerikInstallDir)\Binaries.NoXaml\WPF80\Telerik.Windows.Documents.Fixed.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

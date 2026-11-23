@@ -1,0 +1,1161 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.PurchaseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             xmlns:helpers="clr-namespace:ConceptJewelleryPro.WPF.Helpers"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display"
+             PreviewKeyDown="Root_PreviewKeyDown">
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding AddNewCommand}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="F10" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="M" Modifiers="Alt" Command="{Binding ModifyCommand}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding DeleteCommand}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="P" Modifiers="Alt" Command="{Binding PrintCommand}"/>
+        <KeyBinding Key="L" Modifiers="Alt" Command="{Binding OpenListCommand}"/>
+        <KeyBinding Key="OemMinus" Modifiers="Ctrl" Command="{Binding RemoveSelectedGridLineCommand}"/>
+        <KeyBinding Key="Subtract" Modifiers="Ctrl" Command="{Binding RemoveSelectedGridLineCommand}"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Clean Theme-Aware Card Container Style -->
+        <Style x:Key="ModernCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="10,8"/>
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="Border" BasedOn="{StaticResource ModernCardStyle}"/>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="HeaderLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <Style x:Key="HeaderMicroTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="InvoiceToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="82"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource InvoiceToolbarButtonStyle}"/>
+
+        <Style x:Key="DangerToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource InvoiceToolbarButtonStyle}">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#991B1B"/>
+        </Style>
+
+        <!-- Customer/Supplier Section Pill Tab RadioButton Style (Matching Invoice Image 1) -->
+        <Style x:Key="CustomerPillTabStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="Padding" Value="9,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="PillBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PillBorder" Property="Background" Value="{DynamicResource PanelBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="PillBorder" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                                <Setter TargetName="PillBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadDatePicker}" BasedOn="{StaticResource RadDateTimePickerStyle}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Padding" Value="6,0,4,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="CompactNumericUpDown" TargetType="telerik:RadNumericUpDown">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="2,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="ShowButtons" Value="False"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Top"
+                                     Margin="0,16,24,0"/>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <!-- ROW 0: Top Action Bar -->
+                <RowDefinition Height="Auto"/>
+                <!-- ROW 1: Main Form Body -->
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ========================================================= -->
+            <!-- ROW 0: TOP ACTION BAR HEADER (Matching InvoiceView.xaml)   -->
+            <!-- ========================================================= -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource HeaderBackgroundBrush}"
+                    BorderBrush="{DynamicResource HeaderBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="12,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Screen Icon & Title -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="32"
+                                Height="32"
+                                Background="{DynamicResource PanelBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="&#xE7BF;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Purchase Entry"
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Right: Action Buttons and Purchase Selector -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <telerik:RadButton Content="Add New (Alt+A)"
+                                           Style="{StaticResource InvoiceToolbarButtonStyle}"
+                                           Command="{Binding AddNewCommand}"
+                                           IsEnabled="{Binding IsNotEditing}"
+                                           IsTabStop="True" TabIndex="0" />
+                        <telerik:RadButton Content="Modify (Alt+M)"
+                                           Style="{StaticResource InvoiceToolbarButtonStyle}"
+                                           Command="{Binding ModifyCommand}"
+                                           IsEnabled="{Binding CanModify}"
+                                           IsTabStop="False" />
+                        <telerik:RadButton Content="Cancel (Alt+C)"
+                                           Style="{StaticResource InvoiceToolbarButtonStyle}"
+                                           Command="{Binding CancelCommand}"
+                                           IsEnabled="{Binding CanEdit}"
+                                           IsTabStop="False" />
+                        <telerik:RadButton Content="Delete (Alt+D)"
+                                           Style="{StaticResource DangerToolbarButtonStyle}"
+                                           Command="{Binding DeleteCommand}"
+                                           IsEnabled="{Binding CanModify}"
+                                           IsTabStop="False" />
+                        <Border Width="1"
+                                Background="{DynamicResource SeparatorBrush}"
+                                Margin="4,2,6,2" />
+                        <telerik:RadButton Content="Save (Alt+S / F10)"
+                                           Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                           MinWidth="115"
+                                           Height="36"
+                                           FontWeight="Bold"
+                                           Command="{Binding SaveCommand}"
+                                           IsEnabled="{Binding CanEdit}"
+                                           IsTabStop="True" TabIndex="99" />
+                        <telerik:RadButton Content="Print (Alt+P)"
+                                           Style="{StaticResource InvoiceToolbarButtonStyle}"
+                                           Command="{Binding PrintCommand}"
+                                           IsEnabled="{Binding CanModify}"
+                                           IsTabStop="False" />
+                        <telerik:RadButton Content="List (Alt+L)"
+                                           Style="{StaticResource InvoiceToolbarButtonStyle}"
+                                           Command="{Binding OpenListCommand}"
+                                           IsEnabled="{Binding IsNotEditing}"
+                                           IsTabStop="False" />
+                        <Border Width="1"
+                                Background="{DynamicResource SeparatorBrush}"
+                                Margin="4,2,6,2" />
+
+                        <!-- Purchase Search / Selector -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Purchase:"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,6,0" />
+                            <telerik:RadComboBox Width="160"
+                                                 Height="36"
+                                                 ItemsSource="{Binding Purchases}"
+                                                 SelectedItem="{Binding SelectedPurchase, Mode=TwoWay}"
+                                                 DisplayMemberPath="VouNo"
+                                                 IsEditable="True"
+                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                 StaysOpenOnEdit="True"
+                                                 IsFilteringEnabled="True"
+                                                 IsEnabled="{Binding IsNotEditing}"
+                                                 FontSize="13"
+                                                 FontWeight="SemiBold"
+                                                 IsTabStop="False"
+                                                 VirtualizingPanel.IsVirtualizing="True"
+                                                 VirtualizingPanel.VirtualizationMode="Recycling">
+                                <telerik:RadComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </telerik:RadComboBox.ItemsPanel>
+                            </telerik:RadComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- ROW 1: MAIN FORM BODY                                     -->
+            <!-- ========================================================= -->
+            <telerik:RadBusyIndicator Grid.Row="1"
+                                      IsBusy="{Binding IsBusy, Mode=OneWay}"
+                                      BusyContent="Processing...">
+                <Grid Margin="10,8,10,8">
+                    <Grid.RowDefinitions>
+                        <!-- Row 0: 4 Responsive Header Cards (matching Image 1) -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Row 1: Purchase Items Grid (Expands) -->
+                        <RowDefinition Height="*" MinHeight="220" />
+                        <!-- Row 2: Payments & Summary Bottom Section -->
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- ========================================================= -->
+                    <!-- SECTION 1: 4 RESPONSIVE HEADER CARDS (Matching Image 1)    -->
+                    <!-- ========================================================= -->
+                    <Border Grid.Row="0"
+                            Style="{StaticResource ModernCardStyle}"
+                            Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <!-- Group 1: Purchase Details -->
+                                <ColumnDefinition Width="1.0*" MinWidth="220" />
+                                <ColumnDefinition Width="Auto" />
+                                <!-- Group 2: Supplier / Party Details -->
+                                <ColumnDefinition Width="2.0*" MinWidth="440" />
+                                <ColumnDefinition Width="Auto" />
+                                <!-- Group 3: Tax & Billing Details -->
+                                <ColumnDefinition Width="1.0*" MinWidth="220" />
+                                <ColumnDefinition Width="Auto" />
+                                <!-- Group 4: Live Purchase Metrics Summary -->
+                                <ColumnDefinition Width="190" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- GROUP 1: PURCHASE DETAILS -->
+                            <Grid Grid.Column="0" IsHitTestVisible="{Binding CanEdit}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="70" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Micro Header -->
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="PURCHASE DETAILS" Style="{StaticResource HeaderMicroTitleStyle}" />
+
+                                <!-- Purchase Type -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Pur Type:" Style="{StaticResource HeaderLabelStyle}" />
+                                <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadComboBox Grid.Column="0"
+                                                         ItemsSource="{Binding PurchaseTypes}"
+                                                         SelectedItem="{Binding VouType, Mode=TwoWay}"
+                                                         Text="{Binding VouType, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                         IsEditable="True"
+                                                         IsFilteringEnabled="True"
+                                                         TextSearchMode="StartsWith"
+                                                         Height="32"
+                                                         VerticalAlignment="Center"
+                                                         FontSize="13"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         IsEnabled="{Binding CanEdit}" />
+                                    <CheckBox Grid.Column="1"
+                                              IsChecked="{Binding Check, Mode=TwoWay}"
+                                              VerticalAlignment="Center"
+                                              Margin="6,0,0,0"
+                                              ToolTip="Direct Mode"
+                                              IsEnabled="{Binding CanEdit}">
+                                        <TextBlock Text="Direct" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                    </CheckBox>
+                                </Grid>
+
+                                <!-- Voucher No -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Vou No:" Style="{StaticResource HeaderLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="2" Grid.Column="1"
+                                                             Text="{Binding VouNo, UpdateSourceTrigger=PropertyChanged}"
+                                                             FontWeight="Bold"
+                                                             Height="32"
+                                                             VerticalAlignment="Center"
+                                                             FontSize="13.5"
+                                                             Foreground="{DynamicResource PrimaryTextBrush}"
+                                                             Margin="0,0,0,5"
+                                                             IsReadOnly="True"
+                                                             IsTabStop="False" />
+
+                                <!-- Entry Date -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Entry Date:" Style="{StaticResource HeaderLabelStyle}" />
+                                <telerik:RadDatePicker Grid.Row="3" Grid.Column="1"
+                                                       InputMode="DatePicker"
+                                                       Height="32"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,0,2"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       SelectedDate="{Binding BillDate, Mode=TwoWay}"
+                                                       IsEnabled="{Binding CanEdit}" />
+                            </Grid>
+
+                            <!-- SEPARATOR 1 -->
+                            <Border Grid.Column="1" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="8,2" />
+
+                            <!-- GROUP 2: SUPPLIER / PARTY DETAILS (WITH OVERVIEW & HISTORY TABS) -->
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="66" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="Auto" MinWidth="62" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Tab Selector: Overview & History (Matching Image 1) -->
+                                <StackPanel Grid.Row="0" Grid.ColumnSpan="5" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                    <!-- Overview Tab Pill -->
+                                    <RadioButton GroupName="SupplierTabGroup"
+                                                 IsChecked="{Binding IsCustomerOverviewTabSelected, Mode=TwoWay}"
+                                                 Style="{StaticResource CustomerPillTabStyle}">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentPresenter}}"
+                                                  Width="11" Height="11" Stretch="Uniform" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                            <TextBlock Text="Overview" FontSize="11.5" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </RadioButton>
+
+                                    <!-- History Tab Pill -->
+                                    <RadioButton GroupName="SupplierTabGroup"
+                                                 IsChecked="{Binding IsCustomerHistoryTabSelected, Mode=TwoWay}"
+                                                 Style="{StaticResource CustomerPillTabStyle}"
+                                                 Margin="6,0,0,0">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path Data="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentPresenter}}"
+                                                  Width="11" Height="11" Stretch="Uniform" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                            <TextBlock Text="History" FontSize="11.5" VerticalAlignment="Center" />
+                                            <Border Background="{DynamicResource AccentBrush}" CornerRadius="7" Padding="4,0" Margin="5,0,0,0"
+                                                    Visibility="{Binding HasCustomerHistory, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding CustomerPurchaseHistory.Count}" FontSize="9.5" FontWeight="Bold" Foreground="White" />
+                                            </Border>
+                                        </StackPanel>
+                                    </RadioButton>
+                                </StackPanel>
+
+                                <!-- OVERVIEW TAB CONTENT (Inputs + Metrics Summary Strip) -->
+                                <Grid Grid.Row="1" Grid.RowSpan="4" Grid.ColumnSpan="5"
+                                      Visibility="{Binding IsCustomerOverviewTabSelected, Converter={StaticResource BoolToVis}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" MinWidth="66" />
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="Auto" MinWidth="62" />
+                                        <ColumnDefinition Width="1*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Row 0: Mobile (Left) & Pincode (Right) -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Mobile:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadWatermarkTextBox Grid.Row="0" Grid.Column="1"
+                                                                 Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="10-digit mobile"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Margin="0,0,0,5"
+                                                                 IsEnabled="{Binding CanEdit}" />
+
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Pincode:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadWatermarkTextBox Grid.Row="0" Grid.Column="4"
+                                                                 Text="{Binding Pincode, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="Pincode"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Margin="0,0,0,5"
+                                                                 IsEnabled="{Binding CanEdit}" />
+
+                                    <!-- Row 1: Supplier Name (Left) & City (Right) -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Supplier:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadComboBox Grid.Row="1" Grid.Column="1"
+                                                         ItemsSource="{Binding AvailableSuppliers}"
+                                                         SelectedItem="{Binding SelectedSupplier, Mode=TwoWay}"
+                                                         Text="{Binding AccountName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                         TextSearch.TextPath="Name"
+                                                         IsEditable="True"
+                                                         IsFilteringEnabled="True"
+                                                         TextSearchMode="Contains"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         IsTextSearchEnabled="True"
+                                                         ClearSelectionButtonVisibility="Collapsed"
+                                                         FontWeight="SemiBold"
+                                                         DropDownWidth="400"
+                                                         Height="32"
+                                                         VerticalAlignment="Center"
+                                                         FontSize="13"
+                                                         Margin="0,0,0,5"
+                                                         IsEnabled="{Binding CanEdit}"
+                                                         VirtualizingPanel.IsVirtualizing="True"
+                                                         VirtualizingPanel.VirtualizationMode="Recycling">
+                                        <telerik:RadComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="2,3">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="13" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Phone}" Margin="8,0,6,0" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" FontSize="12" />
+                                                    <Border Grid.Column="2" Background="{DynamicResource PanelBrush}" CornerRadius="3" Padding="4,1" Margin="2,0,0,0">
+                                                        <TextBlock Text="{Binding HeadCategory}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" FontSize="10.5" />
+                                                    </Border>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </telerik:RadComboBox.ItemTemplate>
+                                        <telerik:RadComboBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel />
+                                            </ItemsPanelTemplate>
+                                        </telerik:RadComboBox.ItemsPanel>
+                                    </telerik:RadComboBox>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="City:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadComboBox Grid.Row="1" Grid.Column="4"
+                                                         ItemsSource="{Binding Cities}"
+                                                         SelectedItem="{Binding City, Mode=TwoWay}"
+                                                         Text="{Binding City, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         IsEditable="True"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Height="32"
+                                                         VerticalAlignment="Center"
+                                                         FontSize="13"
+                                                         Margin="0,0,0,5"
+                                                         IsEnabled="{Binding CanEdit}" />
+
+                                    <!-- Row 2: Address (Left) & State (Right) -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Address:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadWatermarkTextBox Grid.Row="2" Grid.Column="1"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="Street address"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Margin="0,0,0,2"
+                                                                 IsEnabled="{Binding CanEdit}" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="3" Text="State:" Style="{StaticResource HeaderLabelStyle}" />
+                                    <telerik:RadWatermarkTextBox Grid.Row="2" Grid.Column="4"
+                                                                 Text="{Binding State, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="State"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Margin="0,0,0,2"
+                                                                 IsEnabled="{Binding CanEdit}" />
+
+                                    <!-- Row 3: Supplier Summary Metrics Strip -->
+                                    <Border Grid.Row="3" Grid.ColumnSpan="5"
+                                            Background="{DynamicResource PanelBrush}"
+                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="8,4"
+                                            Margin="0,4,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Group / Category -->
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                <TextBlock Text="Group: " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CustomerGroupDisplay}" FontWeight="Bold" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="95" />
+                                            </StackPanel>
+
+                                            <Border Grid.Column="1" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="4,2" />
+
+                                            <!-- Party Print / Display Name -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,6,0">
+                                                <TextBlock Text="Party: " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CustomerName}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="110" ToolTip="{Binding CustomerName}" />
+                                            </StackPanel>
+
+                                            <Border Grid.Column="3" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="4,2" />
+
+                                            <!-- Last Purchase Date -->
+                                            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                                                <TextBlock Text="Last: " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding LastPurchaseDateFormatted}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <Border Grid.Column="5" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="4,2" />
+
+                                            <!-- Avg Purchase Value -->
+                                            <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                                                <TextBlock Text="Avg: " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding AvgPurchaseValueFormatted}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <Border Grid.Column="7" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="4,2" />
+
+                                            <!-- Total Purchase Value -->
+                                            <StackPanel Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                                                <TextBlock Text="Total: " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TotalPurchaseValueFormatted}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <!-- HISTORY TAB CONTENT -->
+                                <Grid Grid.Row="1" Grid.RowSpan="4" Grid.ColumnSpan="5"
+                                      Visibility="{Binding IsCustomerHistoryTabSelected, Converter={StaticResource BoolToVis}}"
+                                      Margin="0,2,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Header Row with Cyan Accent Bar (Exact replica of Reference Image) -->
+                                    <Border Grid.Row="0"
+                                            Background="#F0F7FF"
+                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                            BorderThickness="0,1,0,1"
+                                            Height="28">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="85" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="40" />
+                                                <ColumnDefinition Width="90" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Cyan Accent Line -->
+                                            <Rectangle Grid.Column="0" Width="3.5" Fill="#00B4D8" Margin="0,1,6,1" VerticalAlignment="Stretch" />
+
+                                            <TextBlock Grid.Column="1" Text="Date" FontWeight="SemiBold" FontSize="11.5" Foreground="#1E3A8A" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="Vou#" FontWeight="SemiBold" FontSize="11.5" Foreground="#1E3A8A" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="3" Text="Ref / Inv" FontWeight="SemiBold" FontSize="11.5" Foreground="#1E3A8A" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="4" Text="Qty" FontWeight="SemiBold" FontSize="11.5" Foreground="#1E3A8A" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0" />
+                                            <TextBlock Grid.Column="5" Text="Amount" FontWeight="SemiBold" FontSize="11.5" Foreground="#1E3A8A" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0" />
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- History Items List -->
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="115" Margin="0,1,0,0">
+                                        <ItemsControl ItemsSource="{Binding CustomerPurchaseHistory}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,3">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="9.5" />
+                                                                <ColumnDefinition Width="80" />
+                                                                <ColumnDefinition Width="85" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="40" />
+                                                                <ColumnDefinition Width="90" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Date, StringFormat='dd/MM/yyyy'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2" Text="{Binding VouNo}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="3" Text="{Binding ItemName}" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                            <TextBlock Grid.Column="4" Text="{Binding Qty}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0" />
+                                                            <TextBlock Grid.Column="5" Text="{Binding Amount, StringFormat='₹ {0:N2}'}" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+
+                                    <!-- Empty State -->
+                                    <TextBlock Grid.Row="1"
+                                               Text="No previous purchase history for this supplier"
+                                               FontSize="11.5" FontStyle="Italic"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Margin="0,25"
+                                               Visibility="{Binding HasNoCustomerHistory, Converter={StaticResource BoolToVis}}" />
+                                </Grid>
+                            </Grid>
+
+                            <!-- SEPARATOR 2 -->
+                            <Border Grid.Column="3" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="8,2" />
+
+                            <!-- GROUP 3: TAX & BILLING -->
+                            <Grid Grid.Column="4" IsHitTestVisible="{Binding CanEdit}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" MinWidth="70" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Micro Header -->
+                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="TAX &amp; BILLING" Style="{StaticResource HeaderMicroTitleStyle}" />
+
+                                <!-- Supplier Inv No & Date -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Supp Inv:" Style="{StaticResource HeaderLabelStyle}" />
+                                <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="105" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                 Text="{Binding SuppBillNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="Inv #"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 IsEnabled="{Binding CanEdit}" />
+                                    <telerik:RadDatePicker Grid.Column="1"
+                                                           SelectedDate="{Binding SuppDate, Mode=TwoWay}"
+                                                           Height="32"
+                                                           VerticalAlignment="Center"
+                                                           Margin="4,0,0,0"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                                           ToolTip="Supplier Invoice Date"
+                                                           IsEnabled="{Binding CanEdit}" />
+                                </Grid>
+
+                                <!-- Tax Type & ID -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Tax / ID:" Style="{StaticResource HeaderLabelStyle}" />
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadComboBox Grid.Column="0"
+                                                         ItemsSource="{Binding VatTypes}"
+                                                         SelectedItem="{Binding VatType, Mode=TwoWay}"
+                                                         Height="32"
+                                                         VerticalAlignment="Center"
+                                                         FontSize="12"
+                                                         Margin="0,0,4,0"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         IsEnabled="{Binding CanEdit}" />
+                                    <telerik:RadWatermarkTextBox Grid.Column="1"
+                                                                 Text="{Binding VatNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 WatermarkContent="GSTIN / PAN"
+                                                                 Height="32"
+                                                                 VerticalAlignment="Center"
+                                                                 FontSize="13"
+                                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                 IsEnabled="{Binding CanEdit}" />
+                                </Grid>
+
+                                <!-- Due Date -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Due Date:" Style="{StaticResource HeaderLabelStyle}" />
+                                <telerik:RadDatePicker x:Name="PurchaseDueDateDatePicker"
+                                                       Grid.Row="3" Grid.Column="1"
+                                                       InputMode="DatePicker"
+                                                       SelectedDate="{Binding DueDate, Mode=TwoWay}"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       Height="32"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,0,2"
+                                                       FontSize="13"
+                                                       PreviewKeyDown="DueDateDatePicker_PreviewKeyDown"
+                                                       IsEnabled="{Binding CanEdit}" />
+                            </Grid>
+
+                            <!-- SEPARATOR 3 -->
+                            <Border Grid.Column="5" Width="1" Background="{DynamicResource SeparatorBrush}" Margin="8,2" />
+
+                            <!-- GROUP 4: LIVE METRICS SUMMARY -->
+                            <Border Grid.Column="6"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="10,6">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Header Title -->
+                                    <TextBlock Grid.Row="0"
+                                               Text="⚡ LIVE METRICS"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,6" />
+
+                                    <!-- Metrics Grid -->
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Total Items -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Qty:" Style="{StaticResource HeaderLabelStyle}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalQty, Mode=OneWay}" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" />
+
+                                        <!-- Gross Weight -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Gr Wt:" Style="{StaticResource HeaderLabelStyle}" Margin="0,3,0,0" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TotalGrWt, Mode=OneWay, StringFormat='{}{0:N3} g'}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,3,0,0" HorizontalAlignment="Right" />
+
+                                        <!-- Net Weight Highlight Badge -->
+                                        <Border Grid.Row="2" Grid.ColumnSpan="2"
+                                                Background="{DynamicResource AccentBrush}"
+                                                CornerRadius="4"
+                                                Padding="6,2"
+                                                Margin="0,3,0,0"
+                                                Opacity="0.12" />
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Nt Wt:" FontWeight="Bold" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" Margin="6,3,0,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalNtWt, Mode=OneWay, StringFormat='{}{0:N3} g'}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource AccentBrush}" Margin="0,3,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+                                        <!-- Making / Metal Value Total -->
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Making:" Style="{StaticResource HeaderLabelStyle}" Margin="0,4,0,0" />
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TotalMaking, Mode=OneWay, StringFormat='₹ {0:N2}'}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ========================================================= -->
+                    <!-- SECTION 2: PURCHASE SUBFORM ITEMS GRID                    -->
+                    <!-- ========================================================= -->
+                    <Border Grid.Row="1" Style="{StaticResource ModernCardStyle}" Padding="6" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="4,0,4,6">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="PURCHASE ITEMS" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                    <TextBlock Text=" (Supports multi-rate GST per line item)" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <telerik:RadButton Grid.Column="1" HorizontalAlignment="Right" Content="+ Add Line Item"
+                                                   Command="{Binding AddItemRowCommand}"
+                                                   IsEnabled="{Binding CanEdit}"
+                                                   Height="28" Padding="12,0" FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <telerik:RadGridView x:Name="PurchaseItemsGrid"
+                                                 Grid.Row="1"
+                                                 ItemsSource="{Binding Items}"
+                                                 AutoGenerateColumns="False"
+                                                 CanUserSortColumns="False"
+                                                 RowIndicatorVisibility="Collapsed"
+                                                 ShowGroupPanel="False"
+                                                 RowHeight="34"
+                                                 FontSize="12.5"
+                                                 ActionOnLostFocus="CommitEdit"
+                                                 EditTriggers="CellClick,Default"
+                                                 PreviewKeyDown="PurchaseItemsGrid_PreviewKeyDown"
+                                                 IsEnabled="{Binding CanEdit}">
+                                <telerik:RadGridView.Columns>
+                                    <!-- SlNo -->
+                                    <telerik:GridViewDataColumn Header="#" DataMemberBinding="{Binding SlNo}" Width="45" IsReadOnly="True"/>
+
+                                    <!-- Item Name -->
+                                    <telerik:GridViewDataColumn Header="Item Name *" DataMemberBinding="{Binding ItemName, Mode=TwoWay}" Width="*">
+                                        <telerik:GridViewDataColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="4,0">
+                                                    <TextBlock Text="{Binding ItemName}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <Path Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </telerik:GridViewDataColumn.CellTemplate>
+                                        <telerik:GridViewDataColumn.CellEditTemplate>
+                                            <DataTemplate>
+                                                <telerik:RadComboBox x:Name="ItemNameCombo"
+                                                                     ItemsSource="{Binding DataContext.AvailableItemNames, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                     Text="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                                     IsEditable="True"
+                                                                     IsFilteringEnabled="True"
+                                                                     TextSearchMode="Contains"
+                                                                     IsTextSearchEnabled="True"
+                                                                     CanKeyboardNavigationSelectItems="True"
+                                                                     OpenDropDownOnFocus="True"
+                                                                     Loaded="ItemNameCombo_Loaded"
+                                                                     PreviewKeyDown="ItemNameCombo_PreviewKeyDown"/>
+                                            </DataTemplate>
+                                        </telerik:GridViewDataColumn.CellEditTemplate>
+                                    </telerik:GridViewDataColumn>
+
+                                    <!-- Purity -->
+                                    <telerik:GridViewDataColumn Header="Purity" DataMemberBinding="{Binding Purity, Mode=TwoWay}" Width="130">
+                                        <telerik:GridViewDataColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="4,0">
+                                                    <TextBlock Text="{Binding Purity}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <Path Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </telerik:GridViewDataColumn.CellTemplate>
+                                        <telerik:GridViewDataColumn.CellEditTemplate>
+                                            <DataTemplate>
+                                                <telerik:RadComboBox x:Name="PurityCombo"
+                                                                     ItemsSource="{Binding DataContext.AvailablePurityNames, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                     Text="{Binding Purity, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                                     IsEditable="True"
+                                                                     IsFilteringEnabled="True"
+                                                                     TextSearchMode="Contains"
+                                                                     IsTextSearchEnabled="True"
+                                                                     CanKeyboardNavigationSelectItems="True"
+                                                                     Loaded="PurityCombo_Loaded"
+                                                                     PreviewKeyDown="PurityCombo_PreviewKeyDown"/>
+                                            </DataTemplate>
+                                        </telerik:GridViewDataColumn.CellEditTemplate>
+                                    </telerik:GridViewDataColumn>
+
+                                    <!-- HSN Code -->
+                                    <telerik:GridViewDataColumn Header="HSN Code" DataMemberBinding="{Binding Hsncode, Mode=TwoWay}" Width="110"/>
+
+                                    <!-- Qty -->
+                                    <telerik:GridViewDataColumn Header="Qty" DataMemberBinding="{Binding Qty, Mode=TwoWay, StringFormat={}{0:0.###}}" Width="80"/>
+
+                                    <!-- Rate -->
+                                    <telerik:GridViewDataColumn Header="Rate" DataMemberBinding="{Binding Rate, Mode=TwoWay, StringFormat=N2}" Width="120"/>
+
+                                    <!-- Taxable Value (Qty * Rate) -->
+                                    <telerik:GridViewDataColumn Header="Taxable Value" DataMemberBinding="{Binding TaxableValue, StringFormat=N2}" Width="130" IsReadOnly="True"/>
+
+                                    <!-- GST % (GstPer) -->
+                                    <telerik:GridViewDataColumn Header="GST %" DataMemberBinding="{Binding GstPer, Mode=TwoWay, StringFormat=N2}" Width="85"/>
+
+                                    <!-- GST Amt (GstAmt) -->
+                                    <telerik:GridViewDataColumn Header="GST Amt" DataMemberBinding="{Binding GstAmt, StringFormat=N2}" Width="120" IsReadOnly="True"/>
+
+                                    <!-- Total Amt -->
+                                    <telerik:GridViewDataColumn Header="Total Amt" DataMemberBinding="{Binding TotalAmt, StringFormat=N2}" Width="130" IsReadOnly="True"/>
+
+                                    <!-- Delete -->
+                                    <telerik:GridViewColumn Width="45">
+                                        <telerik:GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <telerik:RadButton Content="&#xE74D;"
+                                                                   FontFamily="Segoe MDL2 Assets"
+                                                                   Foreground="Firebrick"
+                                                                   Height="24"
+                                                                   Width="26"
+                                                                   Padding="0"
+                                                                   Command="{Binding DataContext.RemoveItemRowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   ToolTip="Delete Item Row (Ctrl+-)"/>
+                                            </DataTemplate>
+                                        </telerik:GridViewColumn.CellTemplate>
+                                    </telerik:GridViewColumn>
+                                </telerik:RadGridView.Columns>
+                            </telerik:RadGridView>
+                        </Grid>
+                    </Border>
+
+                    <!-- ========================================================= -->
+                    <!-- SECTION 3: PAYMENTS & SUMMARY BOTTOM SECTION              -->
+                    <!-- ========================================================= -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Payment Breakup -->
+                        <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}" Margin="0,0,8,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,6">
+                                    <TextBlock Text="PAYMENT / SETTLEMENT" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <telerik:RadButton HorizontalAlignment="Right" Content="+ Add Pay Mode"
+                                                       Command="{Binding AddPaymentRowCommand}"
+                                                       IsEnabled="{Binding CanEdit}"
+                                                       Height="26" Padding="8,0"/>
+                                </Grid>
+
+                                <telerik:RadGridView x:Name="PurchasePaymentGrid"
+                                                     Grid.Row="1"
+                                                     ItemsSource="{Binding Payments}"
+                                                     AutoGenerateColumns="False"
+                                                     RowIndicatorVisibility="Collapsed"
+                                                     ShowGroupPanel="False"
+                                                     CanUserSortColumns="False"
+                                                     RowHeight="32"
+                                                     Height="110"
+                                                     ActionOnLostFocus="CommitEdit"
+                                                     EditTriggers="CellClick,Default"
+                                                     PreviewKeyDown="PurchasePaymentGrid_PreviewKeyDown"
+                                                     IsEnabled="{Binding CanEdit}">
+                                    <telerik:RadGridView.Columns>
+                                        <telerik:GridViewDataColumn Header="Payment A/c" DataMemberBinding="{Binding AccountName, Mode=TwoWay}" Width="150">
+                                            <telerik:GridViewDataColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="4,0">
+                                                        <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                        <Path Data="M 0 0 L 4 4 L 8 0 Z" Fill="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </telerik:GridViewDataColumn.CellTemplate>
+                                            <telerik:GridViewDataColumn.CellEditTemplate>
+                                                <DataTemplate>
+                                                    <telerik:RadComboBox x:Name="PaymentAccountCombo"
+                                                                         ItemsSource="{Binding DataContext.PaymentAccountNames, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                         Text="{Binding AccountName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                                         IsEditable="True"
+                                                                         IsFilteringEnabled="True"
+                                                                         TextSearchMode="Contains"
+                                                                         IsTextSearchEnabled="True"
+                                                                         CanKeyboardNavigationSelectItems="True"
+                                                                         Loaded="PaymentAccountCombo_Loaded"
+                                                                         PreviewKeyDown="PaymentAccountCombo_PreviewKeyDown"/>
+                                                </DataTemplate>
+                                            </telerik:GridViewDataColumn.CellEditTemplate>
+                                        </telerik:GridViewDataColumn>
+                                        <telerik:GridViewDataColumn Header="Amount" DataMemberBinding="{Binding Amount, Mode=TwoWay, StringFormat=N2}" Width="100"/>
+                                        <telerik:GridViewDataColumn Header="Narration / Ref" DataMemberBinding="{Binding Narration, Mode=TwoWay}" Width="*"/>
+                                        <telerik:GridViewColumn Width="40">
+                                            <telerik:GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <telerik:RadButton Content="&#xE74D;"
+                                                                       FontFamily="Segoe MDL2 Assets"
+                                                                       Foreground="Firebrick"
+                                                                       Height="22" Width="24" Padding="0"
+                                                                       Command="{Binding DataContext.RemovePaymentRowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                       CommandParameter="{Binding}"
+                                                                       ToolTip="Delete Payment Row (Ctrl+-)"/>
+                                                </DataTemplate>
+                                            </telerik:GridViewColumn.CellTemplate>
+                                        </telerik:GridViewColumn>
+                                    </telerik:RadGridView.Columns>
+                                </telerik:RadGridView>
+                            </Grid>
+                        </Border>
+
+                        <!-- Right: Summary Card -->
+                        <Border Grid.Column="1" Style="{StaticResource ModernCardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left summary column -->
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Total Quantity:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalQty, StringFormat={}{0:0.###}}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,4,0,0">
+                                        <TextBlock Text="Remarks / Notes" Style="{StaticResource FieldLabelStyle}"/>
+                                    </Grid>
+                                    <telerik:RadWatermarkTextBox Text="{Binding Remarks, Mode=TwoWay}" Height="72" TextWrapping="Wrap" AcceptsReturn="True" IsEnabled="{Binding CanEdit}"/>
+                                </StackPanel>
+
+                                <!-- Right totals column -->
+                                <StackPanel Grid.Column="1">
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Gross Amount:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <TextBlock Text="{Binding GrossAmt, StringFormat={}{0:N2}}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Discount Allowed:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <telerik:RadNumericUpDown Value="{Binding DiscountAllowed, Mode=TwoWay}" Style="{StaticResource CompactNumericUpDown}" Width="100" HorizontalAlignment="Right" IsEnabled="{Binding CanEdit}"/>
+                                    </Grid>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Taxable Amount:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <TextBlock Text="{Binding TaxableAmount, StringFormat={}{0:N2}}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Total GST Amt:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <TextBlock Text="{Binding TaxAmt, StringFormat={}{0:N2}}" FontWeight="Bold" Foreground="DarkBlue" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Round Off (+/-):" Style="{StaticResource FieldLabelStyle}"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <telerik:RadButton Content="Auto"
+                                                               Command="{Binding AutoRoundOffCommand}"
+                                                               ToolTip="Auto calculate round-off to nearest whole Rupee"
+                                                               Height="26" Width="38" Margin="0,0,4,0"
+                                                               FontSize="11" Padding="0"
+                                                               IsEnabled="{Binding CanEdit}"/>
+                                            <telerik:RadNumericUpDown Value="{Binding AddLess, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      Style="{StaticResource CompactNumericUpDown}"
+                                                                      Minimum="-99999999"
+                                                                      Maximum="99999999"
+                                                                      SmallChange="0.05"
+                                                                      NumberDecimalDigits="2"
+                                                                      Width="85"
+                                                                      IsEnabled="{Binding CanEdit}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Separator Margin="0,4"/>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="NET AMOUNT:" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                        <TextBlock Text="{Binding NetAmt, StringFormat={}{0:N2}}" FontWeight="Bold" FontSize="15" Foreground="ForestGreen" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,2">
+                                        <TextBlock Text="Total Paid / Bal:" Style="{StaticResource FieldLabelStyle}"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding TotalPaid, StringFormat={}{0:N2}}" FontWeight="SemiBold"/>
+                                            <TextBlock Text=" / " Margin="4,0"/>
+                                            <TextBlock Text="{Binding BalanceAmt, StringFormat={}{0:N2}}" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </telerik:RadBusyIndicator>
+        </Grid>
+    </Grid>
+</UserControl>

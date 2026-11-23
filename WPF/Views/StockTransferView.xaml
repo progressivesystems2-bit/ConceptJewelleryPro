@@ -1,0 +1,538 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.StockTransferView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="750" d:DesignWidth="1100"
+             Background="{DynamicResource WindowBackgroundBrush}"
+             PreviewKeyDown="StockTransferView_PreviewKeyDown">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <Style x:Key="TotalBadgeStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="TotalLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TotalValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <!-- Header Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Content TabControl -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notification Banner -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                   Grid.RowSpan="2"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Top"
+                                   Margin="0,6,15,0"
+                                   Panel.ZIndex="1000"/>
+
+        <!-- Top Action Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="10,6"
+                Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <telerik:RadButton Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                       Command="{Binding NewCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Add New (Alt+A)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding SaveCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Save (Alt+S)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding ModifyCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Modify (Alt+M)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}"
+                                       Command="{Binding DeleteCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Delete (Alt+D)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding CancelCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Cancel (Alt+C)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding RefreshCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding PrintCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Print" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+                </StackPanel>
+
+                <!-- Document Badges -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#EFF6FF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="4" Padding="8,4" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding TransferNo, StringFormat='Voucher: {0}'}" FontWeight="Bold" FontSize="13" Foreground="#1D4ED8"/>
+                    </Border>
+                    <Border Background="{Binding ModeBadgeBackground}" CornerRadius="4" Padding="8,4">
+                        <TextBlock Text="{Binding ModeBadgeText}" FontWeight="Bold" FontSize="11.5" Foreground="White"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Tab Control -->
+        <telerik:RadTabControl Grid.Row="1"
+                               SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+            <!-- TAB 1: TRANSFER ENTRY -->
+            <telerik:RadTabItem Header="Transfer Entry" FontSize="13" FontWeight="SemiBold">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Header Metadata -->
+                        <RowDefinition Height="Auto"/> <!-- Barcode Scanner Input -->
+                        <RowDefinition Height="*"/>    <!-- Items Grid -->
+                        <RowDefinition Height="Auto"/> <!-- Totals Footer -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: Transfer Metadata Card -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="160"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Transfer Date -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Transfer Date:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadDatePicker Grid.Row="0" Grid.Column="1"
+                                                   SelectedDate="{Binding TransferDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                   IsEnabled="{Binding IsFormEnabled}"
+                                                   Height="28"
+                                                   VerticalAlignment="Center"/>
+
+                            <!-- Transfer Type -->
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Transfer Type:" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Grid.Row="0" Grid.Column="4"
+                                     Text="{Binding TransferType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsFormEnabled}"
+                                     Height="28"
+                                     VerticalContentAlignment="Center"
+                                     VerticalAlignment="Center"/>
+
+                            <!-- From Location -->
+                            <TextBlock Grid.Row="0" Grid.Column="6" Text="From Location:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadComboBox Grid.Row="0" Grid.Column="7"
+                                                 ItemsSource="{Binding Locations}"
+                                                 SelectedItem="{Binding FromLocation, Mode=TwoWay}"
+                                                 IsEditable="True"
+                                                 IsEnabled="{Binding IsFormEnabled}"
+                                                 Height="28"
+                                                 VerticalAlignment="Center"/>
+
+                            <!-- To Location -->
+                            <TextBlock Grid.Row="0" Grid.Column="9" Text="To Location:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadComboBox Grid.Row="0" Grid.Column="10"
+                                                 ItemsSource="{Binding Locations}"
+                                                 SelectedItem="{Binding ToLocation, Mode=TwoWay}"
+                                                 IsEditable="True"
+                                                 IsEnabled="{Binding IsFormEnabled}"
+                                                 Height="28"
+                                                 VerticalAlignment="Center"/>
+
+                            <!-- Remarks (Row 1) -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Remarks / Note:" Style="{StaticResource FieldLabel}" Margin="0,10,8,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="10"
+                                     Text="{Binding Remarks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsFormEnabled}"
+                                     Height="28"
+                                     Margin="0,10,0,0"
+                                     VerticalContentAlignment="Center"
+                                     VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 1: Barcode Scan Bar -->
+                    <Border Grid.Row="1"
+                            Background="{DynamicResource HeaderBackgroundBrush}"
+                            BorderBrush="{DynamicResource HeaderBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="8,5"
+                            Margin="0,0,0,8"
+                            IsEnabled="{Binding IsFormEnabled}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Scan / Enter Barcode:"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+
+                            <telerik:RadWatermarkTextBox Grid.Column="1"
+                                                         x:Name="ScanTextBox"
+                                                         Text="{Binding ScanBarcodeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Scan barcode or type #..."
+                                                         Height="28"
+                                                         FontSize="12"
+                                                         VerticalAlignment="Center"
+                                                         Margin="0,0,8,0"
+                                                         PreviewKeyDown="ScanTextBox_PreviewKeyDown"
+                                                         KeyDown="ScanTextBox_KeyDown"/>
+
+                            <telerik:RadButton Grid.Column="2"
+                                               x:Name="ScanButton"
+                                               Command="{Binding ScanBarcodeCommand}"
+                                               CommandParameter="{Binding ElementName=ScanTextBox, Path=Text}"
+                                               Click="ScanButton_Click"
+                                               Height="28"
+                                               Padding="12,2"
+                                               Background="{DynamicResource AccentBrush}"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"
+                                               FontSize="11.5"
+                                               VerticalAlignment="Center"
+                                               ToolTip="Scan or add barcode (Press Enter)">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets" FontSize="11" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Add Barcode" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <!-- Clear All Button -->
+                            <telerik:RadButton Grid.Column="4"
+                                               Command="{Binding ClearItemsCommand}"
+                                               Height="26"
+                                               Padding="10,2"
+                                               Background="#FEE2E2"
+                                               Foreground="#991B1B"
+                                               BorderBrush="#FCA5A5"
+                                               BorderThickness="1"
+                                               FontWeight="SemiBold"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Cursor="Hand"
+                                               ToolTip="Clear all barcode items from this transfer">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Clear Items" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 2: Transfer Items Grid -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <telerik:RadGridView ItemsSource="{Binding Items}"
+                                             SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                                             AutoGenerateColumns="False"
+                                             IsReadOnly="True"
+                                             IsSynchronizedWithCurrentItem="False"
+                                             RowIndicatorVisibility="Collapsed"
+                                             ShowGroupPanel="False"
+                                             CanUserFreezeColumns="False"
+                                             SelectionMode="Single"
+                                             FontSize="12"
+                                             RowHeight="28">
+                            <telerik:RadGridView.Columns>
+                                <telerik:GridViewDataColumn Header="Barcode" DataMemberBinding="{Binding Barcode}" Width="100" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Item Name" DataMemberBinding="{Binding ItemName}" Width="160"/>
+                                <telerik:GridViewDataColumn Header="Box No" DataMemberBinding="{Binding BoxNo}" Width="85" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Qty" DataMemberBinding="{Binding Qty, StringFormat='{}{0:N0}'}" Width="60" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Gross Wt" DataMemberBinding="{Binding GrossWt, StringFormat='{}{0:N3}'}" Width="95" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Stone Wt" DataMemberBinding="{Binding StoneWt, StringFormat='{}{0:N3}'}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Net Wt" DataMemberBinding="{Binding NetWt, StringFormat='{}{0:N3}'}" Width="95" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Stone Vl" DataMemberBinding="{Binding StoneValue, StringFormat='{}{0:N2}'}" Width="95" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Making" DataMemberBinding="{Binding Making, StringFormat='{}{0:N2}'}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Making/g" DataMemberBinding="{Binding MakingPerGram, StringFormat='{}{0:N2}'}" Width="85" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="MRP" DataMemberBinding="{Binding MRP, StringFormat='{}{0:N2}'}" Width="95" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Purity" DataMemberBinding="{Binding Purity}" Width="90" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Description" DataMemberBinding="{Binding Description}" Width="140"/>
+                                <telerik:GridViewColumn Header="Action" Width="65" IsVisible="{Binding DataContext.IsFormEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                    <telerik:GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <telerik:RadButton Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                               CommandParameter="{Binding}"
+                                                               ToolTip="Remove from transfer"
+                                                               Height="22"
+                                                               Padding="6,1"
+                                                               Background="Transparent"
+                                                               BorderThickness="0"
+                                                               Cursor="Hand">
+                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="11" Foreground="{DynamicResource DangerBrush}"/>
+                                            </telerik:RadButton>
+                                        </DataTemplate>
+                                    </telerik:GridViewColumn.CellTemplate>
+                                </telerik:GridViewColumn>
+                            </telerik:RadGridView.Columns>
+                        </telerik:RadGridView>
+                    </Border>
+
+                    <!-- Row 3: Totals Footer -->
+                    <Border Grid.Row="3"
+                            Background="{DynamicResource PanelBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="8,5"
+                            Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xEC42;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding TotalCount, StringFormat='Total Items: {0}'}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <!-- Qty -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Qty:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalQty, StringFormat='{}{0:N0}'}" Style="{StaticResource TotalValueStyle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <!-- Gross Wt -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Gross:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalGrossWt, StringFormat='{}{0:N3}g'}" Style="{StaticResource TotalValueStyle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <!-- Stone Wt -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Stone:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalStoneWt, StringFormat='{}{0:N3}g'}" Style="{StaticResource TotalValueStyle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <!-- Net Wt -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Net Wt:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalNetWt, StringFormat='{}{0:N3}g'}" Style="{StaticResource TotalValueStyle}" Foreground="{DynamicResource AccentBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <!-- Making -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Making:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalMaking, StringFormat='₹{0:N2}'}" Style="{StaticResource TotalValueStyle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <!-- MRP -->
+                                <Border Style="{StaticResource TotalBadgeStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Total MRP:" Style="{StaticResource TotalLabelStyle}"/>
+                                        <TextBlock Text="{Binding TotalMRP, StringFormat='₹{0:N2}'}" Style="{StaticResource TotalValueStyle}" Foreground="#059669"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </telerik:RadTabItem>
+
+            <!-- TAB 2: TRANSFER REGISTER / HISTORY -->
+            <telerik:RadTabItem Header="Transfer Register" FontSize="13" FontWeight="SemiBold">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Filters Bar -->
+                        <RowDefinition Height="*"/>    <!-- Register Grid -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Filters Bar -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="10,6"
+                            Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="From Date:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadDatePicker Grid.Column="1"
+                                                   SelectedDate="{Binding FilterFromDate, Mode=TwoWay}"
+                                                   Height="28"
+                                                   VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Column="3" Text="To Date:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadDatePicker Grid.Column="4"
+                                                   SelectedDate="{Binding FilterToDate, Mode=TwoWay}"
+                                                   Height="28"
+                                                   VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Column="6" Text="Search:" Style="{StaticResource FieldLabel}"/>
+                            <telerik:RadWatermarkTextBox Grid.Column="7"
+                                                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Voucher / Location / Remarks..."
+                                                         Height="28"
+                                                         VerticalAlignment="Center"/>
+
+                            <telerik:RadButton Grid.Column="9"
+                                               Command="{Binding RefreshCommand}"
+                                               Height="28"
+                                               Padding="12,2"
+                                               Background="{DynamicResource PanelBrush}"
+                                               BorderBrush="{DynamicResource CardBorderBrush}"
+                                               BorderThickness="1"
+                                               FontWeight="SemiBold"
+                                               FontSize="11.5"
+                                               VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="11" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Refresh Register" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </Grid>
+                    </Border>
+
+                    <!-- Register Grid -->
+                    <Border Grid.Row="1"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <telerik:RadGridView ItemsSource="{Binding FilteredTransfersList}"
+                                             SelectedItem="{Binding SelectedTransfer, Mode=TwoWay}"
+                                             AutoGenerateColumns="False"
+                                             IsReadOnly="True"
+                                             RowIndicatorVisibility="Collapsed"
+                                             ShowGroupPanel="False"
+                                             SelectionMode="Single"
+                                             FontSize="12"
+                                             RowHeight="28"
+                                             MouseDoubleClick="RegisterGrid_MouseDoubleClick">
+                            <telerik:RadGridView.Columns>
+                                <telerik:GridViewDataColumn Header="Voucher No" DataMemberBinding="{Binding TransferNo}" Width="110" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Date" DataMemberBinding="{Binding TransferDate, StringFormat='dd/MM/yyyy'}" Width="100" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="From Location" DataMemberBinding="{Binding FromLocation}" Width="130"/>
+                                <telerik:GridViewDataColumn Header="To Location" DataMemberBinding="{Binding ToLocation}" Width="130"/>
+                                <telerik:GridViewDataColumn Header="Transfer Type" DataMemberBinding="{Binding TransferType}" Width="140"/>
+                                <telerik:GridViewDataColumn Header="Total Qty" DataMemberBinding="{Binding TotalQty, StringFormat='{}{0:N0}'}" Width="80" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Gross Wt" DataMemberBinding="{Binding TotalGrossWt, StringFormat='{}{0:N3}'}" Width="100" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Net Wt" DataMemberBinding="{Binding TotalNetWt, StringFormat='{}{0:N3}'}" Width="100" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Total MRP" DataMemberBinding="{Binding TotalMRP, StringFormat='{}{0:N2}'}" Width="110" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Remarks" DataMemberBinding="{Binding Remarks}" Width="*"/>
+                                <telerik:GridViewDataColumn Header="User" DataMemberBinding="{Binding EntryUser}" Width="90" TextAlignment="Center"/>
+                            </telerik:RadGridView.Columns>
+                        </telerik:RadGridView>
+                    </Border>
+                </Grid>
+            </telerik:RadTabItem>
+        </telerik:RadTabControl>
+    </Grid>
+</UserControl>

@@ -1,0 +1,262 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.OldPurchasePaymentDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="Old Gold / Purchase Payment Details"
+        Height="630" Width="520"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FontFamily="Segoe UI">
+
+    <Border Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource AccentBrush}"
+            BorderThickness="2"
+            CornerRadius="8"
+            Padding="0">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.35" Color="#000000" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="60" />
+            </Grid.RowDefinitions>
+
+            <!-- Header (Theme-Aware) -->
+            <Border Grid.Row="0" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="6,6,0,0" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,0,0,1" Padding="16,0">
+                <Grid VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Old Gold / Purchase Details" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <telerik:RadButton Content="✕"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Background="Transparent"
+                                       BorderThickness="0"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Right"
+                                       Click="Cancel_Click"
+                                       Cursor="Hand" />
+                </Grid>
+            </Border>
+
+            <!-- Subheader Account Info (Theme-Aware) -->
+            <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" Padding="16,10" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="0,0,0,1">
+                <StackPanel>
+                    <TextBlock Text="Purchase Mode Account:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <TextBlock x:Name="AccountNameLabel" Text="OLD GOLD PURCHASE" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Form Content (Theme-Aware) -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="20,16">
+                <StackPanel>
+                    <!-- Item (ItemType) and ItemName -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Item (ItemType)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadComboBox x:Name="ItemTypeComboBox"
+                                                 Height="38"
+                                                 FontSize="13.5"
+                                                 IsEditable="True"
+                                                 IsFilteringEnabled="True"
+                                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                                 Background="{DynamicResource InputBackgroundBrush}"
+                                                 BorderBrush="{DynamicResource InputBorderBrush}"
+                                                 SelectionChanged="Field_Changed" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Item Name" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="ItemNameTextBox"
+                                                         Text="OLD"
+                                                         Height="38"
+                                                         FontSize="13.5"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource PanelBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         IsReadOnly="True" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Weights Row 1: Wt and LessWt -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Wt (Old Weight) *" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="WtTextBox"
+                                                         WatermarkContent="0.000"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         FontWeight="SemiBold"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource InputBackgroundBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         TextAlignment="Right"
+                                                         TextChanged="Wt_TextChanged"
+                                                         LostFocus="Wt_LostFocus" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Less Wt (Deduction)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="LessWtTextBox"
+                                                         Text="0.000"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource InputBackgroundBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         TextAlignment="Right"
+                                                         TextChanged="LessWt_TextChanged"
+                                                         LostFocus="LessWt_LostFocus" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Weights Row 2: GrWt and Alloy -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="GrWt (Gross Weight)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="GrWtTextBox"
+                                                         Text="0.000"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         FontWeight="Bold"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource PanelBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         IsReadOnly="True"
+                                                         TextAlignment="Right" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Alloy (Deduction %)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="AlloyTextBox"
+                                                         Text="0.00"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource InputBackgroundBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         TextAlignment="Right"
+                                                         TextChanged="Alloy_TextChanged"
+                                                         LostFocus="Alloy_LostFocus" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Row 3: NtWt and Rate -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="NtWt (Net Weight)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="NtWtTextBox"
+                                                         Text="0.000"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         FontWeight="Bold"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource PanelBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         IsReadOnly="True"
+                                                         TextAlignment="Right" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Rate / Gr" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                            <telerik:RadWatermarkTextBox x:Name="RateTextBox"
+                                                         WatermarkContent="0.00"
+                                                         Height="38"
+                                                         FontSize="14"
+                                                         FontWeight="SemiBold"
+                                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                                         Background="{DynamicResource InputBackgroundBrush}"
+                                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                                         TextAlignment="Right"
+                                                         TextChanged="Rate_TextChanged"
+                                                         LostFocus="Rate_LostFocus" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Row 4: Total Amount Highlight Box (Theme-Aware) -->
+                    <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.5" CornerRadius="6" Padding="14,10" Margin="0,4,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Total Purchase Amount *" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Text="grWt * Rate = Amount (or reverse calculate)" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                            <telerik:RadWatermarkTextBox x:Name="AmountTextBox"
+                                                         Grid.Column="1"
+                                                         WatermarkContent="0.00"
+                                                         Width="180"
+                                                         Height="40"
+                                                         FontSize="16"
+                                                         FontWeight="Bold"
+                                                         Foreground="{DynamicResource AccentBrush}"
+                                                         Background="{DynamicResource InputBackgroundBrush}"
+                                                         BorderBrush="{DynamicResource AccentBrush}"
+                                                         TextAlignment="Right"
+                                                         TextChanged="Amount_TextChanged"
+                                                         LostFocus="Amount_LostFocus" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 5: Narration -->
+                    <StackPanel Margin="0,0,0,6">
+                        <TextBlock Text="Narration" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                        <telerik:RadWatermarkTextBox x:Name="NarrationTextBox"
+                                                     WatermarkContent="Optional notes or remarks"
+                                                     Height="38"
+                                                     Foreground="{DynamicResource PrimaryTextBrush}"
+                                                     Background="{DynamicResource InputBackgroundBrush}"
+                                                     BorderBrush="{DynamicResource InputBorderBrush}"
+                                                     FontSize="13" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer Buttons (Theme-Aware) -->
+            <Border Grid.Row="3" Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="0,0,6,6" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,1,0,0" Padding="16,0">
+                <Grid VerticalAlignment="Center">
+                    <TextBlock Text="[Alt+S] Save  |  [Esc] Cancel" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <telerik:RadButton Content="Apply (Alt+S)" Width="110" Height="40" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource AccentTextBrush}" FontWeight="Bold" Click="Ok_Click" IsDefault="True" />
+                        <telerik:RadButton Content="Cancel" Width="90" Height="40" Click="Cancel_Click" Margin="0,0,8,0" IsCancel="True" />
+                        
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

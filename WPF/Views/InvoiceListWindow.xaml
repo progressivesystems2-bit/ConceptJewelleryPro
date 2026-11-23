@@ -1,0 +1,808 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.InvoiceListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+        Title="Sales Invoice Register / List"
+        Height="720"
+        Width="1500"
+        MinHeight="550"
+        MinWidth="900"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Header Filter Label -->
+        <Style x:Key="FilterLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <!-- Summary Label -->
+        <Style x:Key="SummaryLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+        </Style>
+
+        <!-- Summary Total Box -->
+        <Style x:Key="SummaryTotalBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinHeight" Value="32" />
+        </Style>
+
+        <!-- Radio Button Style -->
+        <Style x:Key="PrintOptionRadioStyle" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Margin" Value="6,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Standard Toolbar Button -->
+        <Style x:Key="WindowButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="85" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <!-- Pager Nav Button -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <!-- Subsheet Plus/Minus Expander Toggle Style -->
+        <Style x:Key="SubsheetExpanderToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Background" Value="#3B82F6" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                SnapsToDevicePixels="True">
+                            <Path x:Name="iconPath"
+                                  Data="M 4 8 L 12 8 M 8 4 L 8 12"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="iconPath" Property="Data" Value="M 4 8 L 12 8" />
+                                <Setter TargetName="border" Property="Background" Value="#EF4444" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.85" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Top Filters -->
+            <RowDefinition Height="*" />    <!-- Main Grid -->
+            <RowDefinition Height="Auto" /> <!-- Record Nav / Info -->
+            <RowDefinition Height="Auto" /> <!-- Bottom Summary & Print Options -->
+        </Grid.RowDefinitions>
+
+        <!-- ================= TOP FILTER HEADER ================= -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="12,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Filters -->
+                <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- From Date -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="From Date:" Style="{StaticResource FilterLabelStyle}" />
+                        <telerik:RadDatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}"
+                                               InputMode="DatePicker"
+                                               Width="125"
+                                               Height="40"
+                                               Padding="0,-15,0,0"
+                                               FontSize="14" />
+                    </StackPanel>
+
+                    <!-- To Date -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="To Date:" Style="{StaticResource FilterLabelStyle}" />
+                        <telerik:RadDatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}"
+                                               InputMode="DatePicker"
+                                               Width="125"
+                                               Padding="0,-15,0,0"
+                                               Height="40"
+                                               FontSize="12.5" />
+                    </StackPanel>
+
+                    <!-- Voucher Type -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="Voucher Type:" Style="{StaticResource FilterLabelStyle}" />
+                        <telerik:RadComboBox ItemsSource="{Binding AvailableVouTypes}"
+                                             SelectedItem="{Binding SelectedVouType, Mode=TwoWay}"
+                                             Width="190"
+                                             Height="40"
+                                             FontSize="12.5"
+                                             IsEditable="False" />
+                    </StackPanel>
+
+                    <!-- Quick Search Text -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <TextBlock Text="Search:" Style="{StaticResource FilterLabelStyle}" />
+                        <telerik:RadWatermarkTextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     WatermarkContent="Search bill, customer, item, barcode..."
+                                                     Width="220"
+                                                     Height="40"
+                                                     FontSize="12.5"
+                                                     Padding="6,0" />
+                    </StackPanel>
+                </WrapPanel>
+
+                <!-- Actions -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Content="Sync WA Status &amp; Replies"
+                                       Style="{StaticResource WindowButtonStyle}"
+                                       Command="{Binding SyncWhatsAppRepliesCommand}"
+                                       ToolTip="Sync WhatsApp message delivery statuses (Sent, Delivered, Read) and customer replies from server" />
+                    <telerik:RadButton Content="Refresh"
+                                       Style="{StaticResource WindowButtonStyle}"
+                                       Command="{Binding RefreshCommand}"
+                                       ToolTip="Reload invoices" />
+                    <telerik:RadButton Content="Export CSV"
+                                       Style="{StaticResource WindowButtonStyle}"
+                                       Command="{Binding ExportExcelCommand}"
+                                       ToolTip="Export filtered invoices to CSV file" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ================= MAIN INVOICE GRID ================= -->
+        <telerik:RadBusyIndicator Grid.Row="1"
+                                  IsBusy="{Binding IsBusy}"
+                                  BusyContent="Loading Invoices...">
+            <DataGrid x:Name="InvoicesDataGrid"
+                      ItemsSource="{Binding Invoices}"
+                      SelectedItem="{Binding SelectedInvoice, Mode=TwoWay}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      GridLinesVisibility="All"
+                      HorizontalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                      VerticalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                      Background="{DynamicResource CardBackgroundBrush}"
+                      Foreground="{DynamicResource PrimaryTextBrush}"
+                      BorderThickness="0"
+                      RowHeight="34"
+                      ColumnHeaderHeight="32"
+                      FontSize="13"
+                      FontFamily="Segoe UI"
+                      MouseDoubleClick="InvoicesDataGrid_MouseDoubleClick">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="DetailsVisibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                <Setter Property="DetailsVisibility" Value="Visible" />
+                            </DataTrigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <Border Background="#F8FAFC"
+                                BorderBrush="#3B82F6"
+                                BorderThickness="3,1,1,1"
+                                CornerRadius="0,4,4,4"
+                                Margin="28,4,8,8"
+                                Padding="10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Subsheet Header Bar -->
+                                <Grid Grid.Row="0" Margin="0,0,0,6">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="📦 Bill Items Subsheet (" FontWeight="Bold" Foreground="#1E293B" FontSize="12.5" />
+                                        <TextBlock Text="{Binding ItemsCount}" FontWeight="Bold" Foreground="#2563EB" FontSize="12.5" />
+                                        <TextBlock Text=" item(s)) — Bill No: " FontWeight="Bold" Foreground="#1E293B" FontSize="12.5" />
+                                        <TextBlock Text="{Binding VouNo}" FontWeight="Bold" Foreground="#2563EB" FontSize="12.5" />
+                                        <TextBlock Text=" | Date: " Foreground="#64748B" FontSize="12" Margin="8,0,0,0" />
+                                        <TextBlock Text="{Binding BillDate, StringFormat='dd/MM/yyyy'}" FontWeight="SemiBold" Foreground="#1E293B" FontSize="12" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Subsheet DataGrid -->
+                                <DataGrid Grid.Row="1"
+                                          ItemsSource="{Binding Items}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          IsReadOnly="True"
+                                          HeadersVisibility="Column"
+                                          GridLinesVisibility="All"
+                                          HorizontalGridLinesBrush="#E2E8F0"
+                                          VerticalGridLinesBrush="#E2E8F0"
+                                          Background="White"
+                                          Foreground="#1E293B"
+                                          BorderBrush="#CBD5E1"
+                                          BorderThickness="1"
+                                          RowHeight="28"
+                                          ColumnHeaderHeight="26"
+                                          FontSize="12">
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Background" Value="#E2E8F0" />
+                                            <Setter Property="Foreground" Value="#334155" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                            <Setter Property="Padding" Value="6,2" />
+                                            <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                            <Setter Property="BorderBrush" Value="#CBD5E1" />
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.Columns>
+                                        <!-- Barcode -->
+                                        <DataGridTextColumn Header="Barcode" Binding="{Binding Barcode}" Width="90" />
+
+                                        <!-- Item Name -->
+                                        <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName}" Width="160" FontWeight="SemiBold" />
+
+                                        <!-- Description / ENote -->
+                                        <DataGridTextColumn Header="Description / ENote" Binding="{Binding ENote}" Width="*" />
+
+                                        <!-- Purity -->
+                                        <DataGridTextColumn Header="Purity" Binding="{Binding Purity}" Width="75">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Qty -->
+                                        <DataGridTextColumn Header="Qty" Binding="{Binding Qty, StringFormat='N0'}" Width="55">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Gross Wt -->
+                                        <DataGridTextColumn Header="Gr Wt (g)" Binding="{Binding GrWt, StringFormat='N3'}" Width="85">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Net Wt -->
+                                        <DataGridTextColumn Header="Net Wt (g)" Binding="{Binding NtWt, StringFormat='N3'}" Width="85">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Rate -->
+                                        <DataGridTextColumn Header="Rate (₹)" Binding="{Binding Rate, StringFormat='N2'}" Width="95">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Making -->
+                                        <DataGridTextColumn Header="Making (₹)" Binding="{Binding Making, StringFormat='N2'}" Width="90">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Stone Value -->
+                                        <DataGridTextColumn Header="Stone (₹)" Binding="{Binding StoneValue, StringFormat='N2'}" Width="85">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="Padding" Value="0,0,4,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+
+                                        <!-- Amount -->
+                                        <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='N2'}" Width="105">
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                    <Setter Property="Padding" Value="0,0,6,0" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+
+                <DataGrid.Columns>
+                    <!-- Bill No with Subsheet Expander Toggle -->
+                    <DataGridTemplateColumn Header="Bill No:" Width="130" SortMemberPath="VouNo">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                                    <ToggleButton Style="{StaticResource SubsheetExpanderToggleStyle}"
+                                                  IsChecked="{Binding IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PreviewMouseDoubleClick="SubsheetToggle_PreviewMouseDoubleClick"
+                                                  ToolTip="Click to view/hide bill items subsheet"
+                                                  Margin="0,0,8,0" />
+                                    <TextBlock Text="{Binding VouNo}"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Bill Date -->
+                    <DataGridTextColumn Header="Bill Date:"
+                                        Binding="{Binding BillDate, StringFormat='dd/MM/yyyy'}"
+                                        Width="100" />
+
+                    <!-- Invoice Type -->
+                    <DataGridTextColumn Header="Invoice Type:"
+                                        Binding="{Binding VouType}"
+                                        Width="170" />
+
+                    <!-- Customer Name -->
+                    <DataGridTextColumn Header="Customer Name:"
+                                        Binding="{Binding CustomerName}"
+                                        Width="*"
+                                        FontWeight="SemiBold" />
+
+                    <!-- Net Amt -->
+                    <DataGridTextColumn Header="Net Amt:"
+                                        Binding="{Binding NetAmt, StringFormat='N2'}"
+                                        Width="110">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Padding" Value="0,0,8,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Qty -->
+                    <DataGridTextColumn Header="Qty:"
+                                        Binding="{Binding Qty, StringFormat='N0'}"
+                                        Width="65">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="0,0,6,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Net Wt -->
+                    <DataGridTextColumn Header="Net Wt:"
+                                        Binding="{Binding NetWt, StringFormat='N3'}"
+                                        Width="90">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="0,0,6,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Taxable Amt -->
+                    <DataGridTextColumn Header="Taxable Amt:"
+                                        Binding="{Binding TaxableAmt, StringFormat='N2'}"
+                                        Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="0,0,8,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Tax Amt -->
+                    <DataGridTextColumn Header="Tax Amt:"
+                                        Binding="{Binding TaxAmt, StringFormat='N2'}"
+                                        Width="110">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="0,0,8,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- Phone -->
+                    <DataGridTextColumn Header="Phone:"
+                                        Binding="{Binding Phone}"
+                                        Width="110" />
+
+                    <!-- Status -->
+                    <DataGridTextColumn Header="Status:"
+                                        Binding="{Binding Status}"
+                                        Width="70" />
+
+                    <!-- WhatsApp Delivery Status -->
+                    <DataGridTemplateColumn Header="WA Status:" Width="110" SortMemberPath="WhatsAppStatus">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Read">
+                                                    <Setter Property="Background" Value="#E8F5E9" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Delivered">
+                                                    <Setter Property="Background" Value="#E3F2FD" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Sent">
+                                                    <Setter Property="Background" Value="#FFF8E1" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Failed">
+                                                    <Setter Property="Background" Value="#FFEBEE" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding WhatsAppStatus}"
+                                               FontSize="11.5"
+                                               FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Read">
+                                                        <Setter Property="Foreground" Value="#2E7D32" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Delivered">
+                                                        <Setter Property="Foreground" Value="#1565C0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Sent">
+                                                        <Setter Property="Foreground" Value="#F57F17" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding WhatsAppStatus}" Value="Failed">
+                                                        <Setter Property="Foreground" Value="#C62828" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- WhatsApp Customer Reply -->
+                    <DataGridTemplateColumn Header="WA Reply:" Width="150" SortMemberPath="WhatsAppReply">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding WhatsAppReply}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding WhatsAppReply}"
+                                           FontWeight="SemiBold"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Margin="4,0" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </telerik:RadBusyIndicator>
+
+        <!-- ================= RECORD NAVIGATOR / HINT BAR ================= -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="0,1,0,1"
+                Padding="12,4">
+            <Grid>
+                <!-- Left: Double click prompt -->
+                <TextBlock Text="Double click on Bill No to see the invoice details"
+                           FontSize="12.5"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center" />
+
+                <!-- Right / Center: Record Navigator -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="Record:"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,6,0" />
+                    <Button Content="|&#x25C0;" Style="{StaticResource NavButtonStyle}" Command="{Binding FirstRecordCommand}" ToolTip="First Record" />
+                    <Button Content="&#x25C0;" Style="{StaticResource NavButtonStyle}" Command="{Binding PrevRecordCommand}" ToolTip="Previous Record" />
+                    <TextBox Text="{Binding SelectedRecordIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Width="45"
+                             Height="24"
+                             TextAlignment="Center"
+                             FontWeight="Bold"
+                             FontSize="12"
+                             Margin="2,0"
+                             VerticalContentAlignment="Center" />
+                    <Button Content="&#x25B6;" Style="{StaticResource NavButtonStyle}" Command="{Binding NextRecordCommand}" ToolTip="Next Record" />
+                    <Button Content="&#x25B6;|" Style="{StaticResource NavButtonStyle}" Command="{Binding LastRecordCommand}" ToolTip="Last Record" />
+                    <TextBlock Text="{Binding TotalRecordsCount, StringFormat=' of {0}'}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="6,0,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ================= BOTTOM SUMMARY TOTALS & PRINT OPTIONS ================= -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- LEFT SIDE: Summary Totals & Action Buttons -->
+                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <!-- Totals Strip -->
+                    <WrapPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <!-- Qty -->
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="Qty" Style="{StaticResource SummaryLabelStyle}" />
+                            <Border Style="{StaticResource SummaryTotalBoxStyle}" Width="85">
+                                <TextBlock Text="{Binding TotalQty, StringFormat='N0'}"
+                                           FontWeight="Bold"
+                                           FontSize="13"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Net Weight -->
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="Net Weight" Style="{StaticResource SummaryLabelStyle}" />
+                            <Border Style="{StaticResource SummaryTotalBoxStyle}" Width="105">
+                                <TextBlock Text="{Binding TotalNetWeight, StringFormat='N3'}"
+                                           FontWeight="Bold"
+                                           FontSize="13"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Taxable Amount -->
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="Taxable Amount" Style="{StaticResource SummaryLabelStyle}" />
+                            <Border Style="{StaticResource SummaryTotalBoxStyle}" Width="135">
+                                <TextBlock Text="{Binding TotalTaxableAmount, StringFormat='N2'}"
+                                           FontWeight="Bold"
+                                           FontSize="13"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Tax Amount -->
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="Tax Amount" Style="{StaticResource SummaryLabelStyle}" />
+                            <Border Style="{StaticResource SummaryTotalBoxStyle}" Width="125">
+                                <TextBlock Text="{Binding TotalTaxAmount, StringFormat='N2'}"
+                                           FontWeight="Bold"
+                                           FontSize="13"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Net Amount -->
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="Net Amount" Style="{StaticResource SummaryLabelStyle}" />
+                            <Border Style="{StaticResource SummaryTotalBoxStyle}" Width="145" BorderBrush="{DynamicResource AccentBrush}">
+                                <TextBlock Text="{Binding TotalNetAmount, StringFormat='N2'}"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource AccentBrush}" />
+                            </Border>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal">
+                        <telerik:RadButton Content="Sales Breakup"
+                                           Style="{StaticResource WindowButtonStyle}"
+                                           Command="{Binding SalesBreakupCommand}"
+                                           ToolTip="View payment breakdown across Cash, Paytm, Credits, Old Silver, etc." />
+                        <telerik:RadButton Content="Sales Error"
+                                           Style="{StaticResource WindowButtonStyle}"
+                                           Command="{Binding SalesErrorCommand}" />
+                        <telerik:RadButton Content="Open Invoice (Enter)"
+                                           Style="{StaticResource WindowButtonStyle}"
+                                           MinWidth="130"
+                                           Background="{DynamicResource AccentBrush}"
+                                           Foreground="{DynamicResource AccentTextBrush}"
+                                           FontWeight="Bold"
+                                           Command="{Binding SelectInvoiceCommand}" />
+                        <telerik:RadButton Content="Close"
+                                           Style="{StaticResource WindowButtonStyle}"
+                                           Command="{Binding CloseCommand}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- RIGHT SIDE: Print Options GroupBox -->
+                <GroupBox Grid.Column="1"
+                          Header="Print Option"
+                          Foreground="{DynamicResource PrimaryTextBrush}"
+                          BorderBrush="{DynamicResource CardBorderBrush}"
+                          BorderThickness="1"
+                          Padding="10,6"
+                          Margin="0,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Row 0 -->
+                        <RadioButton Grid.Row="0" Grid.Column="0"
+                                     Content="Day Wise Print"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     IsChecked="True"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="DayWisePrint" />
+                        <RadioButton Grid.Row="0" Grid.Column="1"
+                                     Content="Voucher Wise Print"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="VoucherWisePrint" />
+
+                        <!-- Row 1 -->
+                        <RadioButton Grid.Row="1" Grid.Column="0"
+                                     Content="Day Wise Summary Print"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="DayWiseSummaryPrint" />
+                        <RadioButton Grid.Row="1" Grid.Column="1"
+                                     Content="Voucher Wise Summary"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="VoucherWiseSummary" />
+
+                        <!-- Row 2 -->
+                        <RadioButton Grid.Row="2" Grid.Column="0"
+                                     Content="Purity Wise Sales"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="PurityWiseSales" />
+                        <RadioButton Grid.Row="2" Grid.Column="1"
+                                     Content="Monthwise Summary"
+                                     GroupName="PrintOpts"
+                                     Style="{StaticResource PrintOptionRadioStyle}"
+                                     Checked="PrintRadio_Checked"
+                                     Tag="MonthwiseSummary" />
+
+                        <!-- Row 3: Print Action Button -->
+                        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,6,0,0">
+                            <telerik:RadButton Content="Print Report"
+                                               Style="{StaticResource WindowButtonStyle}"
+                                               MinWidth="100"
+                                               Command="{Binding PrintReportCommand}" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

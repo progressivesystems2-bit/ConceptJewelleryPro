@@ -1,0 +1,174 @@
+<FlowDocument xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              PageWidth="842"
+              PageHeight="1190"
+              PagePadding="24,28,24,28"
+              ColumnWidth="842"
+              FontFamily="Segoe UI, Arial, sans-serif"
+              FontSize="11"
+              Background="White"
+              Foreground="Black">
+
+    <!-- 1. COMPANY HEADER -->
+    <Table CellSpacing="0" Margin="0,0,0,6">
+        <Table.Columns>
+            <TableColumn Width="480" />
+            <TableColumn Width="310" />
+        </Table.Columns>
+        <TableRowGroup>
+            <TableRow>
+                <TableCell>
+                    <Paragraph Margin="0,0,0,2"><Bold><Run Text="{{CompanyName}}" FontSize="14.5" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell>
+                    <Paragraph Margin="0,2,0,2" TextAlignment="Right">
+                        <Run Text="From Date :  " FontWeight="SemiBold" /><Run Text="{{FromDate}}" FontWeight="SemiBold" />
+                        <Run Text="      To Date :  " FontWeight="SemiBold" /><Run Text="{{ToDate}}" FontWeight="SemiBold" />
+                    </Paragraph>
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell>
+                    <Paragraph Margin="0,0,0,2" FontSize="10.5"><Run Text="{{Address}}" /></Paragraph>
+                </TableCell>
+                <TableCell><Paragraph Margin="0" /></TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell>
+                    <Paragraph Margin="0,0,0,2" FontSize="10.5"><Run Text="TIN: GSTIN: " /><Run Text="{{Gstin}}" /></Paragraph>
+                </TableCell>
+                <TableCell>
+                    <Paragraph Margin="0,0,0,2" TextAlignment="Right" Foreground="Gray" FontSize="10.5"><Run Text="{{ReportTitle}}" /></Paragraph>
+                </TableCell>
+            </TableRow>
+        </TableRowGroup>
+    </Table>
+
+    <!-- 2. DATA TABLE -->
+    <Table CellSpacing="0" Margin="0,6,0,16">
+        <Table.Columns>
+            <TableColumn Width="72" />
+            <TableColumn Width="72" />
+            <TableColumn Width="220" />
+            <TableColumn Width="45" />
+            <TableColumn Width="65" />
+            <TableColumn Width="95" />
+            <TableColumn Width="72" />
+            <TableColumn Width="72" />
+            <TableColumn Width="85" />
+        </Table.Columns>
+
+        <TableRowGroup>
+            <!-- Header Row -->
+            <TableRow>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Left" FontSize="11" Margin="0"><Bold><Run Text="Bill Date" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Left" FontSize="11" Margin="0"><Bold><Run Text="Bill No" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Left" FontSize="11" Margin="0"><Bold><Run Text="Customer Details" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="Qty" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="Nt Wt" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="Taxable Amount" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="CGST" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="SGST" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,2.0,0,1.0" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="Total" /></Bold></Paragraph>
+                </TableCell>
+            </TableRow>
+
+            <!-- Dynamic Voucher Category Header Template -->
+            <!-- <VoucherTypeHeader> -->
+            <TableRow>
+                <TableCell ColumnSpan="9" Padding="2,4,2,4">
+                    <Paragraph Margin="0,8,0,4">
+                        <Bold><Run Text="{{VouTypeHeader}}" Foreground="#DC2626" FontSize="12" /></Bold>
+                    </Paragraph>
+                </TableCell>
+            </TableRow>
+            <!-- </VoucherTypeHeader> -->
+
+            <!-- Dynamic Invoice Row Template -->
+            <!-- <DataRows> -->
+            <TableRow>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Left" FontSize="10.5" Margin="0"><Run Text="{{BillDate}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Left" FontSize="10.5" Margin="0"><Run Text="{{BillNo}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Left" FontSize="10.5" Margin="0"><Run Text="{{CustomerDetails}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{Qty}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{NetWeight}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{TaxableAmt}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{Cgst}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{Sgst}}" /></Paragraph></TableCell>
+                <TableCell Padding="4,2.5,4,2.5"><Paragraph TextAlignment="Right" FontSize="10.5" Margin="0"><Run Text="{{Total}}" /></Paragraph></TableCell>
+            </TableRow>
+            <!-- </DataRows> -->
+
+            <!-- Dynamic Voucher Category Total Row Template -->
+            <!-- <VoucherTypeTotalRow> -->
+            <TableRow>
+                <TableCell ColumnSpan="3" BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Left" FontSize="11" Margin="0"><Bold><Run Text="TOTAL ({{VouTypeHeader}})" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeQty}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeNetWeight}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeTaxableAmt}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeCgst}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeSgst}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.0,0,1.0" Padding="4,4,4,4">
+                    <Paragraph TextAlignment="Right" FontSize="11" Margin="0"><Bold><Run Text="{{TypeTotal}}" /></Bold></Paragraph>
+                </TableCell>
+            </TableRow>
+            <!-- </VoucherTypeTotalRow> -->
+
+            <!-- Dynamic Grand Total Row Template -->
+            <!-- <GrandTotalRow> -->
+            <TableRow>
+                <TableCell ColumnSpan="3" BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Left" FontSize="11.5" Margin="0"><Bold><Run Text="GRAND TOTAL" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandQty}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandNetWeight}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandTaxableAmt}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandCgst}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandSgst}}" /></Bold></Paragraph>
+                </TableCell>
+                <TableCell BorderBrush="Black" BorderThickness="0,1.5,0,2.5" Padding="4,5,4,5">
+                    <Paragraph TextAlignment="Right" FontSize="11.5" Margin="0"><Bold><Run Text="{{GrandTotal}}" /></Bold></Paragraph>
+                </TableCell>
+            </TableRow>
+            <!-- </GrandTotalRow> -->
+        </TableRowGroup>
+    </Table>
+</FlowDocument>

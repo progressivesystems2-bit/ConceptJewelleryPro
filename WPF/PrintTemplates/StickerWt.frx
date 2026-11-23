@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-11-17" ReportInfo.Modified="2026-11-17" ReportInfo.CreatorVersion="2027.1.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Items" ReferenceName="Items" DataType="System.Int32" Enabled="true">
+      <Column Name="Barcode" DataType="System.String"/>
+      <Column Name="Barcode6Digit" DataType="System.String"/>
+      <Column Name="BarcodeAutoNo" DataType="System.Int32"/>
+      <Column Name="Nos" DataType="System.Int32"/>
+      <Column Name="VouNo" DataType="System.String"/>
+      <Column Name="ItemName" DataType="System.String"/>
+      <Column Name="Item" DataType="System.String"/>
+      <Column Name="ItemCode" DataType="System.String"/>
+      <Column Name="Purity" DataType="System.String"/>
+      <Column Name="HUID" DataType="System.String"/>
+      <Column Name="Description" DataType="System.String"/>
+      <Column Name="Desc" DataType="System.String"/>
+      <Column Name="Size" DataType="System.String"/>
+      <Column Name="Qty" DataType="System.String"/>
+      <Column Name="Type" DataType="System.String"/>
+      <Column Name="BType" DataType="System.String"/>
+      <Column Name="GrossWt" DataType="System.String"/>
+      <Column Name="GW" DataType="System.String"/>
+      <Column Name="StoneWt" DataType="System.String"/>
+      <Column Name="LessWt" DataType="System.String"/>
+      <Column Name="LW" DataType="System.String"/>
+      <Column Name="NetWt" DataType="System.String"/>
+      <Column Name="NW" DataType="System.String"/>
+      <Column Name="CodedNw" DataType="System.String"/>
+      <Column Name="CodedNetWt" DataType="System.String"/>
+      <Column Name="Making" DataType="System.String"/>
+      <Column Name="MC" DataType="System.String"/>
+      <Column Name="MakingRaw" DataType="System.String"/>
+      <Column Name="MakingType" DataType="System.String"/>
+      <Column Name="McType" DataType="System.String"/>
+      <Column Name="MPerGr" DataType="System.String"/>
+      <Column Name="StoneValue" DataType="System.String"/>
+      <Column Name="CostTounch" DataType="System.String"/>
+      <Column Name="CostPg" DataType="System.String"/>
+      <Column Name="CostMaking" DataType="System.String"/>
+      <Column Name="CostMc" DataType="System.String"/>
+      <Column Name="CostMakingRaw" DataType="System.String"/>
+      <Column Name="CostPrice" DataType="System.String"/>
+      <Column Name="CP" DataType="System.String"/>
+      <Column Name="CostRate" DataType="System.String"/>
+      <Column Name="MRP" DataType="System.String"/>
+      <Column Name="Price" DataType="System.String"/>
+      <Column Name="Profit" DataType="System.String"/>
+      <Column Name="Supplier" DataType="System.String"/>
+      <Column Name="SupplierName" DataType="System.String"/>
+      <Column Name="PartyCode" DataType="System.String"/>
+      <Column Name="SupplierFullName" DataType="System.String"/>
+      <Column Name="SuppInvNo" DataType="System.String"/>
+      <Column Name="SuppDate" DataType="System.String"/>
+      <Column Name="PDate" DataType="System.String"/>
+      <Column Name="PunchedOn" DataType="System.String"/>
+      <Column Name="Date" DataType="System.String"/>
+      <Column Name="BoxNo" DataType="System.String"/>
+      <Column Name="Godown" DataType="System.String"/>
+      <Column Name="Brand" DataType="System.String"/>
+      <Column Name="Remarks" DataType="System.String"/>
+      <Column Name="Note" DataType="System.String"/>
+      <Column Name="Status" DataType="System.String"/>
+      <Column Name="EntryUser" DataType="System.String"/>
+      <Column Name="StickerFormat" DataType="System.String"/>
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="StoreName" DataType="System.String"/>
+      <Column Name="FirmName" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="81" PaperHeight="12" LeftMargin="0" TopMargin="0" RightMargin="0" BottomMargin="0" Watermark.Font="Arial, 60pt">
+    <DataBand Name="Data1" Width="306.18" Height="45.36" DataSource="Items">
+      <TextObject Name="txtItemName" Left="4.72" Top="2.84" Width="94.5" Height="10.4" Padding="0,0,0,0" Text="[Items.ItemName]" Font="Arial, 6.5pt, style=Bold" HorzAlign="Left" VertAlign="Center" WordWrap="false"/>
+      <TextObject Name="txtNetWt" Left="4.72" Top="13.23" Width="94.5" Height="10.4" Padding="0,0,0,0" Text="Nt Wt: [Items.NetWt]g" Font="Arial, 6pt, style=Bold" HorzAlign="Left" VertAlign="Center" WordWrap="false"/>
+      <TextObject Name="txtPurityDesc" Left="4.72" Top="23.62" Width="94.5" Height="10.4" Padding="0,0,0,0" Text="[Items.Purity] [Items.Description]" Font="Arial, 5.5pt, style=Bold" HorzAlign="Left" VertAlign="Center" WordWrap="false"/>
+      <TextObject Name="txtMaking" Left="4.72" Top="34.02" Width="94.5" Height="10.4" Padding="0,0,0,0" Text="MC: [Items.Making] [Items.MakingType]" Font="Arial, 5.5pt, style=Bold" HorzAlign="Left" VertAlign="Center" WordWrap="false"/>
+      <TextObject Name="txtCompany" Left="108.68" Top="2.84" Width="94.5" Height="9.45" Padding="0,0,0,0" Text="[Items.CompanyName]" Font="Arial, 6pt, style=Bold" HorzAlign="Center" VertAlign="Center" WordWrap="false"/>
+      <BarcodeObject Name="Barcode1" Left="113.4" Top="12.28" Width="85.05" Height="19.85" AutoSize="false" DataColumn="Items.Barcode" Expression="[Items.Barcode]" Text="000001" ShowText="false" Barcode="Code128" Barcode.AutoEncode="true"/>
+      <TextObject Name="txtBarcode" Left="108.68" Top="34.02" Width="94.5" Height="9.45" Padding="0,0,0,0" Text="[Items.Barcode]" Font="Arial, 6pt, style=Bold" HorzAlign="Center" VertAlign="Center" WordWrap="false"/>
+    </DataBand>
+  </ReportPage>
+</Report>

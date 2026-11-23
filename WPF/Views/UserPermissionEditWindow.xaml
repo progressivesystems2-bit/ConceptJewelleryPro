@@ -1,0 +1,561 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.UserPermissionEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+        Title="{Binding Title}"
+        Width="880"
+        Height="720"
+        MinWidth="800"
+        MinHeight="600"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Alt" Key="S" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="F10" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CancelCommand}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <Style x:Key="MiniActionButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <Style x:Key="EntryCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+
+        <Style x:Key="PermCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,0,16,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notification -->
+        <controls:ToastNotification Grid.Row="0"
+                                    Grid.RowSpan="3"
+                                    Panel.ZIndex="99"
+                                    Message="{Binding ToastMessage}"
+                                    ToastType="{Binding ToastType}" />
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,12">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource PanelBrush}">
+                    <TextBlock Text="&#xE7EF;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="16"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                    <TextBlock Text="Configure user credentials, transaction entry permissions and report access" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Body -->
+        <telerik:RadBusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, Mode=OneWay}" BusyContent="Saving user permissions...">
+            <Grid Margin="20,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- User Credentials & Batch Actions Card -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource CardBackgroundBrush}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16,12"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Top Inputs: Username, Password, Toolbar -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Username -->
+                            <TextBlock Grid.Column="0" Text="User Name *" Style="{StaticResource FieldLabelStyle}" />
+                            <telerik:RadWatermarkTextBox x:Name="UsernameTextBox"
+                                                         Grid.Column="1"
+                                                         Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Enter username"
+                                                         TabIndex="1" />
+
+                            <!-- Password -->
+                            <TextBlock Grid.Column="3" Text="Password" Style="{StaticResource FieldLabelStyle}" />
+                            <telerik:RadPasswordBox Grid.Column="4"
+                                                         Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Enter password"
+                                                         TabIndex="2" />
+
+                            <!-- Toolbar Profile -->
+                            <TextBlock Grid.Column="6" Text="Toolbar" Style="{StaticResource FieldLabelStyle}" />
+                            <telerik:RadWatermarkTextBox Grid.Column="7"
+                                                         Text="{Binding Toolbar, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="e.g. DP1"
+                                                         TabIndex="3" />
+                        </Grid>
+
+                        <!-- Quick Batch Selection Toolbar -->
+                        <Border Grid.Row="1" Margin="0,10,0,0" Padding="0,8,0,0" BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,1,0,0">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Quick Actions:" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <telerik:RadButton Content="Select All Entries" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding SelectAllEntriesCommand}" />
+                                    <telerik:RadButton Content="Clear Entries" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding UnselectAllEntriesCommand}" />
+                                    <Border Width="1" Height="16" Background="{DynamicResource SeparatorBrush}" Margin="4,0,8,0" />
+                                    <telerik:RadButton Content="Select All Reports" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding SelectAllReportsCommand}" />
+                                    <telerik:RadButton Content="Clear Reports" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding UnselectAllReportsCommand}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <telerik:RadButton Content="Grant All Rights" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding GrantAllCommand}" />
+                                    <telerik:RadButton Content="Revoke All Rights" Style="{StaticResource MiniActionButtonStyle}" Command="{Binding RevokeAllCommand}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Categorized Permissions Tabs: Entries & Reports -->
+                <telerik:RadTabControl Grid.Row="1"
+                                       Background="{DynamicResource WindowBackgroundBrush}"
+                                       BorderBrush="{DynamicResource CardBorderBrush}"
+                                       BorderThickness="1">
+
+                    <!-- ================= TAB 1: ENTRIES ================= -->
+                    <telerik:RadTabItem Header="Entries &amp; Transactions" FontSize="13" FontWeight="SemiBold">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,12,16,12">
+                            <StackPanel>
+
+                                <!-- Group 1: Sales & Orders -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Sales, Returns &amp; Orders" Style="{StaticResource SectionHeaderStyle}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Header -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Module" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Add" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Modify" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Delete" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                            <!-- Row 1: Sales / Invoice -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Sales / Invoice" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SaleAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding SaleMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding SaleDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Row 2: Sales Return -->
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Sales Return" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding RetAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding RetMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding RetDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Row 3: Customer Orders -->
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Orders" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding OrdAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding OrdMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding OrdDel}" Style="{StaticResource PermCheckBoxStyle}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Group 2: Master Creations -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Master Creations" Style="{StaticResource SectionHeaderStyle}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Header -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Module" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Add" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Modify" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Delete" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                            <!-- Customer -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Customer Master" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding CusAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding CusMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding CusDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Ledger / Account -->
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Account / Ledger Master" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding LedAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding LedMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding LedDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Item Master -->
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Item Master" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding ItemAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding ItemMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding ItemDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Barcode Master -->
+                                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Barcode Master" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding BarAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding BarMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="3" IsChecked="{Binding BarDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Staff Master -->
+                                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Staff Master" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding StaffAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding StaffMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="3" IsChecked="{Binding StaffDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- User Accounts -->
+                                            <TextBlock Grid.Row="6" Grid.Column="0" Text="User Master &amp; Permissions" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding UserAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="6" Grid.Column="2" IsChecked="{Binding UserMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="6" Grid.Column="3" IsChecked="{Binding UserDel}" Style="{StaticResource PermCheckBoxStyle}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Group 3: Financial & Vouchers -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Vouchers &amp; Financial Transactions" Style="{StaticResource SectionHeaderStyle}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Header -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Module" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Add" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Modify" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Delete" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                            <!-- Receipts -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Receipt Vouchers" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding RecAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding RecMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding RecDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Payments -->
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Payment Vouchers" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding PayAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding PayMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding PayDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Journal -->
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Journal Vouchers" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding JouAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding JouMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding JouDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Bank / Cash -->
+                                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Bank / Cash Transactions" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding BcAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding BcMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="3" IsChecked="{Binding BcDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Note Transfer -->
+                                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Note Transfer" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding NoteTransfer}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding NoteTransferMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="3" IsChecked="{Binding NoteTransferDel}" Style="{StaticResource PermCheckBoxStyle}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Group 4: Inventory, Karighar & Movements -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Inventory, Karighar &amp; Movements" Style="{StaticResource SectionHeaderStyle}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Header -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Module" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Add" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Modify" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Delete" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                                            <!-- Purchase -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Purchase" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding PurAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding PurMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding PurDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Karighar Issue -->
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Karighar / Material Issue" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding MIssAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding MIssMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding MIssDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Karighar Receive -->
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Karighar / Material Receive" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding MRecAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding MRecMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding MRecDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Approval Issue -->
+                                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Approval Issue" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding AIssAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding AIssMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="4" Grid.Column="3" IsChecked="{Binding AIssDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Approval Receive -->
+                                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Approval Receive" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ARecAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ARecMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="5" Grid.Column="3" IsChecked="{Binding ARecDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Hallmark Issue -->
+                                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Hallmark Issue" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding HIssAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="6" Grid.Column="2" IsChecked="{Binding HIssMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="6" Grid.Column="3" IsChecked="{Binding HIssDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Hallmark Receive -->
+                                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Hallmark Receive" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding HRecAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="7" Grid.Column="2" IsChecked="{Binding HRecMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="7" Grid.Column="3" IsChecked="{Binding HRecDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Repairs -->
+                                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Repairs" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding RepAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="8" Grid.Column="2" IsChecked="{Binding RepMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="8" Grid.Column="3" IsChecked="{Binding RepDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Schemes -->
+                                            <TextBlock Grid.Row="9" Grid.Column="0" Text="Scheme Transactions" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="9" Grid.Column="1" IsChecked="{Binding ScAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="9" Grid.Column="2" IsChecked="{Binding ScMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="9" Grid.Column="3" IsChecked="{Binding ScDel}" Style="{StaticResource PermCheckBoxStyle}" />
+
+                                            <!-- Bhav / Rate Cut -->
+                                            <TextBlock Grid.Row="10" Grid.Column="0" Text="Bhav / Rate Cut" VerticalAlignment="Center" Margin="0,4" />
+                                            <CheckBox Grid.Row="10" Grid.Column="1" IsChecked="{Binding BhavAdd}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="10" Grid.Column="2" IsChecked="{Binding BhavMod}" Style="{StaticResource PermCheckBoxStyle}" />
+                                            <CheckBox Grid.Row="10" Grid.Column="3" IsChecked="{Binding BhavDel}" Style="{StaticResource PermCheckBoxStyle}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </telerik:RadTabItem>
+
+                    <!-- ================= TAB 2: REPORTS ================= -->
+                    <telerik:RadTabItem Header="Reports &amp; Registers" FontSize="13" FontWeight="SemiBold">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,12,16,12">
+                            <StackPanel>
+
+                                <!-- Sales & Customer Reports -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Sales &amp; Customer Reports" Style="{StaticResource SectionHeaderStyle}" />
+                                        <WrapPanel Orientation="Horizontal">
+                                            <CheckBox Content="Sales Register" IsChecked="{Binding SalesRegister}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Item Wise Sales" IsChecked="{Binding ItemWiseSales}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="VAT / Tax Register" IsChecked="{Binding VatRegister}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Hide Party Details" IsChecked="{Binding HidePartyDetails}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Stock & Purchase Reports -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Stock &amp; Purchase Reports" Style="{StaticResource SectionHeaderStyle}" />
+                                        <WrapPanel Orientation="Horizontal">
+                                            <CheckBox Content="Purchase Register" IsChecked="{Binding PurchaseRegister}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Barcode Stock Report" IsChecked="{Binding BarcodeStock}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Rate Chart" IsChecked="{Binding RateChart}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Label Printing" IsChecked="{Binding LabelPrinting}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Financial & Accounting Statements -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Financial &amp; Accounting Statements" Style="{StaticResource SectionHeaderStyle}" />
+                                        <WrapPanel Orientation="Horizontal">
+                                            <CheckBox Content="Individual Ledger" IsChecked="{Binding LedgerIndividual}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Group Ledger" IsChecked="{Binding LedgerGroup}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Metal Wise Ledger" IsChecked="{Binding MetalWiseLedger}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Karigar Ledger" IsChecked="{Binding KarigarLedger}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Trial Balance" IsChecked="{Binding TrialBalance}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Opening Trial Balance" IsChecked="{Binding OpeningTrial}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Trading Account" IsChecked="{Binding Trading}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Profit &amp; Loss Statement" IsChecked="{Binding ProfitLoss}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Balance Sheet" IsChecked="{Binding BalanceSheet}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Cash Book" IsChecked="{Binding CashBook}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Cash Book Opening" IsChecked="{Binding CashBookOpening}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Audit Trail & System Logs -->
+                                <Border Style="{StaticResource EntryCardStyle}">
+                                    <StackPanel>
+                                        <TextBlock Text="Audit Trail &amp; System Logs" Style="{StaticResource SectionHeaderStyle}" />
+                                        <WrapPanel Orientation="Horizontal">
+                                            <CheckBox Content="Audit Trail (View)" IsChecked="{Binding AuditView}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Audit Trail (Delete)" IsChecked="{Binding AuditDel}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                            <CheckBox Content="Attendance Log" IsChecked="{Binding Attendance}" Style="{StaticResource PermCheckBoxStyle}" Width="240" Margin="0,6,12,6" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </telerik:RadTabItem>
+                </telerik:RadTabControl>
+            </Grid>
+        </telerik:RadBusyIndicator>
+
+        <!-- Footer Actions -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="20,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <telerik:RadButton Content="Cancel"
+                                   Width="90"
+                                   Height="40"
+                                   Margin="0,0,10,0"
+                                   Command="{Binding CancelCommand}"
+                                   IsTabStop="False" />
+                <telerik:RadButton Content="Save (Alt+S)"
+                                   Width="130"
+                                   Height="40"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   Background="CadetBlue"
+                                   Command="{Binding SaveCommand}"
+                                   TabIndex="100"
+                                   IsTabStop="True" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

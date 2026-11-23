@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-11-19" ReportInfo.Modified="2026-11-19" ReportInfo.CreatorVersion="2027.1.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="BillHeader" ReferenceName="BillHeader" DataType="System.Int32" Enabled="true">
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="CompanyAddress" DataType="System.String"/>
+      <Column Name="CompanyPhone" DataType="System.String"/>
+      <Column Name="CompanyGstin" DataType="System.String"/>
+      <Column Name="StateCode" DataType="System.String"/>
+      <Column Name="VouNo" DataType="System.String"/>
+      <Column Name="BillDate" DataType="System.String"/>
+      <Column Name="BillDateLong" DataType="System.String"/>
+      <Column Name="VouType" DataType="System.String"/>
+      <Column Name="CustomerName" DataType="System.String"/>
+      <Column Name="CustomerAddress" DataType="System.String"/>
+      <Column Name="CustomerPhone" DataType="System.String"/>
+      <Column Name="CustomerCity" DataType="System.String"/>
+      <Column Name="TotalQty" DataType="System.String"/>
+      <Column Name="TotalGrWt" DataType="System.String"/>
+      <Column Name="TotalNtWt" DataType="System.String"/>
+      <Column Name="TotalMetalValue" DataType="System.String"/>
+      <Column Name="TotalMaking" DataType="System.String"/>
+      <Column Name="GrossAmt" DataType="System.String"/>
+      <Column Name="TotalDiscount" DataType="System.String"/>
+      <Column Name="TaxableBaseAmt" DataType="System.String"/>
+      <Column Name="CgstRate" DataType="System.String"/>
+      <Column Name="SgstRate" DataType="System.String"/>
+      <Column Name="CgstAmt" DataType="System.String"/>
+      <Column Name="SgstAmt" DataType="System.String"/>
+      <Column Name="TotalGstAmt" DataType="System.String"/>
+      <Column Name="NetAmt" DataType="System.String"/>
+      <Column Name="TotalAmount" DataType="System.String"/>
+      <Column Name="AmountInWords" DataType="System.String"/>
+      <Column Name="PaymentSummary" DataType="System.String"/>
+      <Column Name="PaymentAccountsText" DataType="System.String"/>
+      <Column Name="PaymentAmountsText" DataType="System.String"/>
+      <Column Name="HsnSummary" DataType="System.String"/>
+      <Column Name="Remarks" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <BusinessObjectDataSource Name="Items" ReferenceName="Items" DataType="System.Int32" Enabled="true">
+      <Column Name="SNo" DataType="System.String"/>
+      <Column Name="Barcode" DataType="System.String"/>
+      <Column Name="ItemName" DataType="System.String"/>
+      <Column Name="Subtext" DataType="System.String"/>
+      <Column Name="HsnCode" DataType="System.String"/>
+      <Column Name="Purity" DataType="System.String"/>
+      <Column Name="Qty" DataType="System.String"/>
+      <Column Name="GrWt" DataType="System.String"/>
+      <Column Name="NtWt" DataType="System.String"/>
+      <Column Name="Rate" DataType="System.String"/>
+      <Column Name="MetalValue" DataType="System.String"/>
+      <Column Name="Making" DataType="System.String"/>
+      <Column Name="DisAmt" DataType="System.String"/>
+      <Column Name="TaxableValue" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="210" PaperHeight="297" LeftMargin="7" TopMargin="6" RightMargin="7" BottomMargin="6" Watermark.Font="Arial, 60pt">
+    <!-- ==================== TOP HALF: ORIGINAL COPY ==================== -->
+    <DataBand Name="Data1" Top="120" Width="740" Height="26" CanGrow="true" DataSource="Items">
+      <DataHeaderBand Name="DataHeader1" Width="740" Height="114">
+        <!-- Top letterhead space (50px) + Customer/Invoice Header -->
+        <TextObject Name="tCustName" Left="0" Top="46" Width="280" Height="18" Text="Customer Names: [BillHeader.CustomerName]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+        <TextObject Name="tCustAddr" Left="0" Top="64" Width="280" Height="18" Text="Address [BillHeader.CustomerAddress]" Font="Segoe UI, 8.5pt, style=Bold" VertAlign="Center"/>
+
+        <TextObject Name="tPhone" Left="284" Top="46" Width="136" Height="18" Text="[BillHeader.CustomerPhone]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+        <TextObject Name="tCity" Left="284" Top="64" Width="136" Height="18" Text="[BillHeader.CustomerCity]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+
+        <TextObject Name="tGstinTitle" Left="420" Top="46" Width="320" Height="18" Text="GSTIN: [BillHeader.CompanyGstin]    TAX INVOICE" Font="Segoe UI, 10pt, style=Bold" HorzAlign="Right" VertAlign="Center"/>
+        <TextObject Name="tInvMeta" Left="420" Top="64" Width="320" Height="18" Text="Invoice No : [BillHeader.VouNo]    Invoice Date: [BillHeader.BillDate]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right" VertAlign="Center"/>
+
+        <!-- Table Column Headers -->
+        <TextObject Name="thSno" Left="0" Top="88" Width="30" Height="24" Text="S.No" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thBarcode" Left="30" Top="88" Width="62" Height="24" Text="BARCODE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thItem" Left="92" Top="88" Width="126" Height="24" Text="ITEM" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Left" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thHsn" Left="218" Top="88" Width="46" Height="24" Text="HSN" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thPurity" Left="264" Top="88" Width="46" Height="24" Text="PURITY" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thQty" Left="310" Top="88" Width="32" Height="24" Text="QTY" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thGrWt" Left="342" Top="88" Width="52" Height="24" Text="GR.WT" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thNtWt" Left="394" Top="88" Width="52" Height="24" Text="NT. WT" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thRate" Left="446" Top="88" Width="68" Height="24" Text="RATE / GR" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thVal" Left="514" Top="88" Width="72" Height="24" Text="VALUE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thMaking" Left="586" Top="88" Width="72" Height="24" Text="MAKING" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="thAmt" Left="658" Top="88" Width="82" Height="24" Text="TAXABLE VALUE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+      </DataHeaderBand>
+
+      <!-- Item Row -->
+      <TextObject Name="tcSno" Left="0" Top="0" Width="30" Height="24" Text="[Items.SNo]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="tcBarcode" Left="30" Top="0" Width="62" Height="24" Text="[Items.Barcode]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="tcItem" Left="92" Top="0" Width="126" Height="24" Text="[Items.ItemName]&#13;&#10;[Items.Subtext]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Left" VertAlign="Center" CanGrow="true"/>
+      <TextObject Name="tcHsn" Left="218" Top="0" Width="46" Height="24" Text="[Items.HsnCode]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="tcPurity" Left="264" Top="0" Width="46" Height="24" Text="[Items.Purity]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="tcQty" Left="310" Top="0" Width="32" Height="24" Text="[Items.Qty]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcGrWt" Left="342" Top="0" Width="52" Height="24" Text="[Items.GrWt]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcNtWt" Left="394" Top="0" Width="52" Height="24" Text="[Items.NtWt]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcRate" Left="446" Top="0" Width="68" Height="24" Text="[Items.Rate]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcVal" Left="514" Top="0" Width="72" Height="24" Text="[Items.MetalValue]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcMaking" Left="586" Top="0" Width="72" Height="24" Text="[Items.Making]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="tcAmt" Left="658" Top="0" Width="82" Height="24" Text="[Items.TaxableValue]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+
+      <DataFooterBand Name="DataFooter1" Width="740" Height="220" CanGrow="true">
+        <!-- Items Subtotals Row -->
+        <TextObject Name="tfEmpty1" Left="0" Top="2" Width="310" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfQty" Left="310" Top="2" Width="32" Height="22" Text="[BillHeader.TotalQty]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfGrWt" Left="342" Top="2" Width="52" Height="22" Text="[BillHeader.TotalGrWt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfNtWt" Left="394" Top="2" Width="52" Height="22" Text="[BillHeader.TotalNtWt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfEmpty2" Left="446" Top="2" Width="68" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfVal" Left="514" Top="2" Width="72" Height="22" Text="[BillHeader.TotalMetalValue]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfMaking" Left="586" Top="2" Width="72" Height="22" Text="[BillHeader.TotalMaking]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tfAmt" Left="658" Top="2" Width="82" Height="22" Text="[BillHeader.TotalAmount]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+
+        <!-- Lower Left: Notes & Signatures -->
+        <TextObject Name="tNotePhone" Left="0" Top="34" Width="440" Height="16" Text="NOTE : CHANGED PHONE NO : 2519343, 2519977" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="tNote1" Left="0" Top="50" Width="440" Height="14" Text="* Weight &amp; pieces verified and found correct" Font="Segoe UI, 7.5pt"/>
+        <TextObject Name="tNote2" Left="0" Top="64" Width="440" Height="14" Text="* I hereby agree to the terms &amp; conditions stated overleaf" Font="Segoe UI, 7.5pt"/>
+        <TextObject Name="tEoe" Left="0" Top="86" Width="440" Height="16" Text="E.&amp; O. E" Font="Segoe UI, 8.5pt, style=Bold" HorzAlign="Center"/>
+        <TextObject Name="tCustSign" Left="0" Top="122" Width="200" Height="18" Text="Customer's Signature" Font="Segoe UI, 9pt, style=Bold"/>
+        <TextObject Name="tForStore" Left="200" Top="122" Width="240" Height="18" Text="For [BillHeader.CompanyName]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right"/>
+
+        <!-- Lower Right: CGST, SGST, Net Total, Payments -->
+        <TextObject Name="tlCgst" Left="450" Top="32" Width="170" Height="16" Text="CGST" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="tvCgst" Left="620" Top="32" Width="120" Height="16" Text="[BillHeader.CgstAmt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right"/>
+        <TextObject Name="tlSgst" Left="450" Top="48" Width="170" Height="16" Text="SG ST" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="tvSgst" Left="620" Top="48" Width="120" Height="16" Text="[BillHeader.SgstAmt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right"/>
+
+        <TextObject Name="tlNet" Left="450" Top="66" Width="170" Height="20" Text="Net Total :" Font="Segoe UI, 9pt, style=Bold" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tvNet" Left="620" Top="66" Width="120" Height="20" Text="[BillHeader.NetAmt]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+
+        <TextObject Name="tPayAcc" Left="450" Top="90" Width="180" Height="36" Text="[BillHeader.PaymentAccountsText]" Font="Segoe UI, 8pt, style=Bold" CanGrow="true"/>
+        <TextObject Name="tPayAmt" Left="630" Top="90" Width="110" Height="36" Text="[BillHeader.PaymentAmountsText]" Font="Segoe UI, 8.5pt, style=Bold" HorzAlign="Right" CanGrow="true"/>
+
+        <TextObject Name="tFinalLine" Left="450" Top="132" Width="170" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="tFinalAmt" Left="620" Top="132" Width="120" Height="22" Text="[BillHeader.NetAmt]" Font="Segoe UI, 10.5pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+
+        <!-- Cut Separator -->
+        <TextObject Name="tCutLine" Left="0" Top="194" Width="740" Height="16" Text="- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" Font="Segoe UI, 7pt" TextFill.Color="Gray" HorzAlign="Center" VertAlign="Center"/>
+      </DataFooterBand>
+    </DataBand>
+
+    <!-- ==================== BOTTOM HALF: DUPLICATE (CUSTOMER COPY) ==================== -->
+    <DataBand Name="Data2" Top="500" Width="740" Height="26" CanGrow="true" DataSource="Items">
+      <DataHeaderBand Name="DataHeader2" Width="740" Height="114">
+        <TextObject Name="bCustName" Left="0" Top="46" Width="280" Height="18" Text="Customer Name: [BillHeader.CustomerName]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+        <TextObject Name="bCustAddr" Left="0" Top="64" Width="280" Height="18" Text="Address [BillHeader.CustomerAddress]" Font="Segoe UI, 8.5pt, style=Bold" VertAlign="Center"/>
+
+        <TextObject Name="bPhone" Left="284" Top="46" Width="136" Height="18" Text="[BillHeader.CustomerPhone]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+        <TextObject Name="bCity" Left="284" Top="64" Width="136" Height="18" Text="[BillHeader.CustomerCity]" Font="Segoe UI, 9.5pt, style=Bold" VertAlign="Center"/>
+
+        <TextObject Name="bGstinTitle" Left="420" Top="46" Width="320" Height="18" Text="GSTIN: [BillHeader.CompanyGstin]    TAX INVOICE" Font="Segoe UI, 10pt, style=Bold" HorzAlign="Right" VertAlign="Center"/>
+        <TextObject Name="bInvMeta" Left="420" Top="64" Width="320" Height="18" Text="Invoice No : [BillHeader.VouNo]    Invoice Date: [BillHeader.BillDate]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right" VertAlign="Center"/>
+
+        <TextObject Name="bhSno" Left="0" Top="88" Width="30" Height="24" Text="S.No" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhBarcode" Left="30" Top="88" Width="62" Height="24" Text="BARCODE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhItem" Left="92" Top="88" Width="126" Height="24" Text="ITEM" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Left" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhHsn" Left="218" Top="88" Width="46" Height="24" Text="HSN" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhPurity" Left="264" Top="88" Width="46" Height="24" Text="PURITY" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Center" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhQty" Left="310" Top="88" Width="32" Height="24" Text="QTY" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhGrWt" Left="342" Top="88" Width="52" Height="24" Text="GR.WT" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhNtWt" Left="394" Top="88" Width="52" Height="24" Text="NT. WT" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhRate" Left="446" Top="88" Width="68" Height="24" Text="RATE / GR" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhVal" Left="514" Top="88" Width="72" Height="24" Text="VALUE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhMaking" Left="586" Top="88" Width="72" Height="24" Text="MAKING" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bhAmt" Left="658" Top="88" Width="82" Height="24" Text="TAXABLE VALUE" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+      </DataHeaderBand>
+
+      <TextObject Name="bcSno" Left="0" Top="0" Width="30" Height="24" Text="[Items.SNo]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="bcBarcode" Left="30" Top="0" Width="62" Height="24" Text="[Items.Barcode]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="bcItem" Left="92" Top="0" Width="126" Height="24" Text="[Items.ItemName]&#13;&#10;[Items.Subtext]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Left" VertAlign="Center" CanGrow="true"/>
+      <TextObject Name="bcHsn" Left="218" Top="0" Width="46" Height="24" Text="[Items.HsnCode]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="bcPurity" Left="264" Top="0" Width="46" Height="24" Text="[Items.Purity]" Font="Segoe UI, 8pt" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="bcQty" Left="310" Top="0" Width="32" Height="24" Text="[Items.Qty]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcGrWt" Left="342" Top="0" Width="52" Height="24" Text="[Items.GrWt]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcNtWt" Left="394" Top="0" Width="52" Height="24" Text="[Items.NtWt]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcRate" Left="446" Top="0" Width="68" Height="24" Text="[Items.Rate]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcVal" Left="514" Top="0" Width="72" Height="24" Text="[Items.MetalValue]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcMaking" Left="586" Top="0" Width="72" Height="24" Text="[Items.Making]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+      <TextObject Name="bcAmt" Left="658" Top="0" Width="82" Height="24" Text="[Items.TaxableValue]" Font="Segoe UI, 8pt" HorzAlign="Right" VertAlign="Center"/>
+
+      <DataFooterBand Name="DataFooter2" Width="740" Height="162" CanGrow="true">
+        <TextObject Name="bfEmpty1" Left="0" Top="2" Width="310" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfQty" Left="310" Top="2" Width="32" Height="22" Text="[BillHeader.TotalQty]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfGrWt" Left="342" Top="2" Width="52" Height="22" Text="[BillHeader.TotalGrWt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfNtWt" Left="394" Top="2" Width="52" Height="22" Text="[BillHeader.TotalNtWt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfEmpty2" Left="446" Top="2" Width="68" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfVal" Left="514" Top="2" Width="72" Height="22" Text="[BillHeader.TotalMetalValue]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfMaking" Left="586" Top="2" Width="72" Height="22" Text="[BillHeader.TotalMaking]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bfAmt" Left="658" Top="2" Width="82" Height="22" Text="[BillHeader.TotalAmount]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+
+        <TextObject Name="bNotePhone" Left="0" Top="34" Width="440" Height="16" Text="NOTE : CHANGED PHONE NO : 2519343, 2519977" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="bNote1" Left="0" Top="50" Width="440" Height="14" Text="* Weight &amp; pieces verified and found correct" Font="Segoe UI, 7.5pt"/>
+        <TextObject Name="bNote2" Left="0" Top="64" Width="440" Height="14" Text="* I hereby agree to the terms &amp; conditions stated overleaf" Font="Segoe UI, 7.5pt"/>
+        <TextObject Name="bEoe" Left="0" Top="86" Width="440" Height="16" Text="E.&amp; O. E" Font="Segoe UI, 8.5pt, style=Bold" HorzAlign="Center"/>
+        <TextObject Name="bCustSign" Left="0" Top="122" Width="200" Height="18" Text="Customer's Signature" Font="Segoe UI, 9pt, style=Bold"/>
+        <TextObject Name="bForStore" Left="200" Top="122" Width="240" Height="18" Text="For [BillHeader.CompanyName]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right"/>
+
+        <TextObject Name="blCgst" Left="450" Top="32" Width="170" Height="16" Text="CGST" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="bvCgst" Left="620" Top="32" Width="120" Height="16" Text="[BillHeader.CgstAmt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right"/>
+        <TextObject Name="blSgst" Left="450" Top="48" Width="170" Height="16" Text="SG ST" Font="Segoe UI, 8pt, style=Bold"/>
+        <TextObject Name="bvSgst" Left="620" Top="48" Width="120" Height="16" Text="[BillHeader.SgstAmt]" Font="Segoe UI, 8pt, style=Bold" HorzAlign="Right"/>
+
+        <TextObject Name="blNet" Left="450" Top="66" Width="170" Height="20" Text="Net Total :" Font="Segoe UI, 9pt, style=Bold" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bvNet" Left="620" Top="66" Width="120" Height="20" Text="[BillHeader.NetAmt]" Font="Segoe UI, 9pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+
+        <TextObject Name="bPayAcc" Left="450" Top="90" Width="180" Height="36" Text="[BillHeader.PaymentAccountsText]" Font="Segoe UI, 8pt, style=Bold" CanGrow="true"/>
+        <TextObject Name="bPayAmt" Left="630" Top="90" Width="110" Height="36" Text="[BillHeader.PaymentAmountsText]" Font="Segoe UI, 8.5pt, style=Bold" HorzAlign="Right" CanGrow="true"/>
+
+        <TextObject Name="bFinalLine" Left="450" Top="132" Width="170" Height="22" Text="" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+        <TextObject Name="bFinalAmt" Left="620" Top="132" Width="120" Height="22" Text="[BillHeader.NetAmt]" Font="Segoe UI, 10.5pt, style=Bold" HorzAlign="Right" VertAlign="Center" Border.Lines="Top,Bottom" Border.Width="1.5"/>
+      </DataFooterBand>
+    </DataBand>
+  </ReportPage>
+</Report>

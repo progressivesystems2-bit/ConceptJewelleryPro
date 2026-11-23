@@ -1,0 +1,217 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.BoxEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+        Title="{Binding Title}"
+        Width="500"
+        Height="610"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Alt" Key="S" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="F10" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CancelCommand}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadNumericUpDown}" BasedOn="{StaticResource RadNumericUpDownStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Padding" Value="8,0,4,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notification -->
+        <controls:ToastNotification Grid.Row="0"
+                                    Grid.RowSpan="3"
+                                    Panel.ZIndex="99"
+                                    Message="{Binding ToastMessage}"
+                                    ToastType="{Binding ToastType}" />
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Width="34" Height="34" CornerRadius="6" Background="{DynamicResource AccentBrush}">
+                    <TextBlock Text="&#xE8F1;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="16"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                    <TextBlock Text="Configure physical box code, name, rack location, count, weight and serial" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Body -->
+        <telerik:RadBusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, Mode=OneWay}" BusyContent="Saving...">
+            <Border Margin="16,12"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="16,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" /> <!-- 0: Box No -->
+                        <RowDefinition Height="Auto" /> <!-- 1: Box Name -->
+                        <RowDefinition Height="Auto" /> <!-- 2: Rack -->
+                        <RowDefinition Height="Auto" /> <!-- 3: No of Boxes -->
+                        <RowDefinition Height="Auto" /> <!-- 4: Box Wt -->
+                        <RowDefinition Height="Auto" /> <!-- 5: Serial -->
+                        <RowDefinition Height="Auto" /> <!-- 6: Status -->
+                        <RowDefinition Height="Auto" /> <!-- 7: Remarks -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Box No -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Box No *" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadWatermarkTextBox x:Name="BoxNoTextBox"
+                                                 Grid.Row="0" Grid.Column="1"
+                                                 Text="{Binding BoxNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 WatermarkContent="e.g. CHA01" />
+
+                    <!-- Box Name -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Box Name" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadWatermarkTextBox Grid.Row="1" Grid.Column="1"
+                                                 Text="{Binding BoxName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 WatermarkContent="e.g. CHAIN CB" />
+
+                    <!-- Rack -->
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Rack" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadComboBox x:Name="RackComboBox"
+                                         Grid.Row="2" Grid.Column="1"
+                                         ItemsSource="{Binding AvailableRacks}"
+                                         Text="{Binding Rack, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         IsEditable="True"
+                                         LostFocus="RackComboBox_LostFocus"
+                                         EmptyText="Select or type rack location (e.g. B2)" />
+
+                    <!-- No. of Boxes -->
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="No. of Boxes" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadNumericUpDown Grid.Row="3" Grid.Column="1"
+                                              Value="{Binding NumberOfBoxes, Mode=TwoWay}"
+                                              IsInteger="True"
+                                              Minimum="1"
+                                              NumberDecimalDigits="0"
+                                              ToolTip="Total number of boxes / trays" />
+
+                    <!-- Box Wt (g) -->
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Box Wt (g)" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadNumericUpDown Grid.Row="4" Grid.Column="1"
+                                              Value="{Binding BoxWt, Mode=TwoWay}"
+                                              Minimum="0"
+                                              NumberDecimalDigits="3"
+                                              ToolTip="Tare / Box weight in grams" />
+
+                    <!-- Serial -->
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Serial" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadNumericUpDown Grid.Row="5" Grid.Column="1"
+                                              Value="{Binding Serial, Mode=TwoWay}"
+                                              IsInteger="True"
+                                              Minimum="1"
+                                              NumberDecimalDigits="0" />
+
+                    <!-- Status -->
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Status" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadComboBox Grid.Row="6" Grid.Column="1"
+                                         ItemsSource="{Binding StatusOptions}"
+                                         SelectedItem="{Binding Status, Mode=TwoWay}"
+                                         IsEditable="False" />
+
+                    <!-- Remarks -->
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Remarks" Style="{StaticResource FieldLabelStyle}" />
+                    <telerik:RadWatermarkTextBox Grid.Row="7" Grid.Column="1"
+                                                 Text="{Binding Remarks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 WatermarkContent="Optional notes or description" />
+                </Grid>
+            </Border>
+        </telerik:RadBusyIndicator>
+
+        <!-- Footer Buttons -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource FooterBackgroundBrush}"
+                BorderBrush="{DynamicResource FooterBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,10">
+            <Grid>
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource DangerBrush}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="220" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <telerik:RadButton Content="Save (Alt+S)"
+                                       Command="{Binding SaveCommand}"
+                                       MinWidth="95"
+                                       
+                                       Margin="0,0,8,0"
+                                       Background="{DynamicResource AccentBrush}"
+                                       Foreground="{DynamicResource AccentTextBrush}"
+                                       FontWeight="SemiBold" />
+
+                    <telerik:RadButton Content="Cancel (Esc)"
+                                       Command="{Binding CancelCommand}"
+                                       MinWidth="85"
+                                       
+                                       Background="{DynamicResource PanelBrush}"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       BorderBrush="{DynamicResource CardBorderBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

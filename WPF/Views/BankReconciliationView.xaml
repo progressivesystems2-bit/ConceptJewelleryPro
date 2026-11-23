@@ -1,0 +1,361 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.BankReconciliationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="MetricCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
+
+        <Style x:Key="BrsFilterRadioStyle" TargetType="RadioButton">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,18,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <!-- 0: Header & Controls Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- 1: BRS KPI Summary Bar -->
+            <RowDefinition Height="Auto"/>
+            <!-- 2: Filter Tabs -->
+            <RowDefinition Height="Auto"/>
+            <!-- 3: Reconciliation DataGrid -->
+            <RowDefinition Height="*"/>
+            <!-- 4: Status Footer -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ROW 0: Header & Controls Toolbar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <DockPanel LastChildFill="True">
+                <!-- Action Buttons (Right) -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Command="{Binding RunReconciliationCommand}"
+                                       Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                       Height="36"
+                                       Padding="14,0"
+                                       Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Reconcile Now" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Command="{Binding ExportReportCommand}"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Height="36"
+                                       Padding="12,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export BRS" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+                </StackPanel>
+
+                <!-- Left Controls: Title, Bank Picker, Statement Picker, Dates -->
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <Border Background="#208B5CF6" CornerRadius="8" Width="38" Height="38" Margin="0,0,10,0">
+                            <TextBlock Text="&#xE8C7;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#8B5CF6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Bank Reconciliation" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            <TextBlock Text="Reconcile official statement with ERP bank ledger" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Bank Account Dropdown -->
+                    <StackPanel Margin="0,0,14,0">
+                        <TextBlock Text="ERP BANK ACCOUNT" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,3"/>
+                        <telerik:RadComboBox ItemsSource="{Binding BankAccounts}"
+                                             SelectedItem="{Binding SelectedBankAccount, Mode=TwoWay}"
+                                             DisplayMemberPath="AccountName"
+                                             Width="210"
+                                             Height="32"/>
+                    </StackPanel>
+
+                    <!-- Bank Statement File -->
+                    <StackPanel Margin="0,0,14,0">
+                        <TextBlock Text="STATEMENT FILE (.XLSX / .CSV)" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,3"/>
+                        <StackPanel Orientation="Horizontal">
+                            <telerik:RadButton Command="{Binding BrowseStatementFileCommand}"
+                                               Style="{StaticResource ToolbarButtonStyle}"
+                                               Height="32"
+                                               Padding="10,0"
+                                               Margin="0,0,6,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE838;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Browse File" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                            <TextBlock Text="{Binding StatementFileName, TargetNullValue='No statement loaded'}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       MaxWidth="180"
+                                       TextTrimming="CharacterEllipsis"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- From / To Dates -->
+                    <StackPanel Margin="0,0,8,0">
+                        <TextBlock Text="FROM DATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,3"/>
+                        <DatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}" Width="115" Height="32"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,14,0">
+                        <TextBlock Text="TO DATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,3"/>
+                        <DatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}" Width="115" Height="32"/>
+                    </StackPanel>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ROW 1: BRS KPI Summary Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,0,0,1" Padding="16,10">
+            <UniformGrid Columns="6">
+                <!-- KPI 1: Statement Balance -->
+                <Border Style="{StaticResource MetricCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="STATEMENT BALANCE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <TextBlock Text="{Binding StatementClosingBalance, StringFormat='₹{0:N2}'}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+                        <TextBlock Text="As per Bank Statement" FontSize="9" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- KPI 2: Uncleared Deposits (+) -->
+                <Border Style="{StaticResource MetricCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="UNCLEARED DEPOSITS (+)" FontSize="10" FontWeight="Bold" Foreground="#10B981"/>
+                        <TextBlock Text="{Binding UnclearedDeposits, StringFormat='₹{0:N2}'}" FontSize="15" FontWeight="Bold" Foreground="#10B981" Margin="0,4,0,0"/>
+                        <TextBlock Text="In ERP, uncleared in bank" FontSize="9" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- KPI 3: Unpresented Cheques (-) -->
+                <Border Style="{StaticResource MetricCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="UNPRESENTED CHQS (-)" FontSize="10" FontWeight="Bold" Foreground="#F59E0B"/>
+                        <TextBlock Text="{Binding UnpresentedWithdrawals, StringFormat='₹{0:N2}'}" FontSize="15" FontWeight="Bold" Foreground="#F59E0B" Margin="0,4,0,0"/>
+                        <TextBlock Text="Issued, not yet debited" FontSize="9" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- KPI 4: Reconciled Balance -->
+                <Border Style="{StaticResource MetricCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="RECONCILED BALANCE" FontSize="10" FontWeight="Bold" Foreground="#8B5CF6"/>
+                        <TextBlock Text="{Binding ReconciledBalance, StringFormat='₹{0:N2}'}" FontSize="15" FontWeight="Bold" Foreground="#8B5CF6" Margin="0,4,0,0"/>
+                        <TextBlock Text="Calculated Book Balance" FontSize="9" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- KPI 5: ERP Book Balance -->
+                <Border Style="{StaticResource MetricCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="ERP BOOK BALANCE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <TextBlock Text="{Binding BookClosingBalance, StringFormat='₹{0:N2}'}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+                        <TextBlock Text="Actual ERP Ledger" FontSize="9" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- KPI 6: Net Difference -->
+                <Border Style="{StaticResource MetricCardStyle}" Margin="0">
+                    <StackPanel>
+                        <TextBlock Text="NET DIFFERENCE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <TextBlock Text="{Binding NetDifference, StringFormat='₹{0:N2}'}"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   Margin="0,4,0,0"/>
+                        <Border Background="#2022C55E" CornerRadius="4" Padding="4,1" HorizontalAlignment="Left" Margin="0,2,0,0"
+                                Visibility="{Binding IsFullyReconciled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="✓ BALANCED" FontSize="9" FontWeight="Bold" Foreground="#22C55E"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+        </Border>
+
+        <!-- ROW 2: Filter Tabs -->
+        <Border Grid.Row="2" Padding="16,8" Background="{DynamicResource WindowBackgroundBrush}">
+            <DockPanel LastChildFill="True">
+                <!-- Counts Breakdown (Right) -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#1522C55E" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding ReconciledCount, StringFormat='{}{0} Matched'}" FontSize="11" FontWeight="SemiBold" Foreground="#22C55E"/>
+                    </Border>
+                    <Border Background="#158B5CF6" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding PartialMatchCount, StringFormat='{}{0} Partial'}" FontSize="11" FontWeight="SemiBold" Foreground="#8B5CF6"/>
+                    </Border>
+                    <Border Background="#15F59E0B" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding BankOnlyCount, StringFormat='{}{0} Bank Only'}" FontSize="11" FontWeight="SemiBold" Foreground="#F59E0B"/>
+                    </Border>
+                    <Border Background="#153B82F6" CornerRadius="4" Padding="6,2">
+                        <TextBlock Text="{Binding ErpOnlyCount, StringFormat='{}{0} ERP Only'}" FontSize="11" FontWeight="SemiBold" Foreground="#3B82F6"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Filter Tabs (Left) -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton Content="All Transactions"
+                                 GroupName="BrsFilter"
+                                 IsChecked="{Binding IsFilterAll, Mode=TwoWay}"
+                                 Style="{StaticResource BrsFilterRadioStyle}"/>
+                    <RadioButton Content="Reconciled"
+                                 GroupName="BrsFilter"
+                                 IsChecked="{Binding IsFilterReconciled, Mode=TwoWay}"
+                                 Style="{StaticResource BrsFilterRadioStyle}"/>
+                    <RadioButton Content="Partial Matches"
+                                 GroupName="BrsFilter"
+                                 IsChecked="{Binding IsFilterPartialMatch, Mode=TwoWay}"
+                                 Style="{StaticResource BrsFilterRadioStyle}"/>
+                    <RadioButton Content="Bank Only (Missing in ERP)"
+                                 GroupName="BrsFilter"
+                                 IsChecked="{Binding IsFilterBankOnly, Mode=TwoWay}"
+                                 Style="{StaticResource BrsFilterRadioStyle}"/>
+                    <RadioButton Content="ERP Only (Uncleared)"
+                                 GroupName="BrsFilter"
+                                 IsChecked="{Binding IsFilterErpOnly, Mode=TwoWay}"
+                                 Style="{StaticResource BrsFilterRadioStyle}"
+                                 Margin="0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ROW 3: Reconciliation DataGrid -->
+        <Border Grid.Row="3" Margin="16,0,16,8" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="8">
+            <DataGrid ItemsSource="{Binding FilteredItems}"
+                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      BorderThickness="0"
+                      Background="Transparent">
+                <DataGrid.Columns>
+                    <!-- Status Badge -->
+                    <DataGridTemplateColumn Header="Status" Width="130">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#15888888" CornerRadius="4" Padding="6,3" HorizontalAlignment="Left">
+                                    <TextBlock Text="{Binding StatusBadgeText}" Foreground="{Binding StatusBadgeColor}" FontSize="11" FontWeight="Bold"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Date -->
+                    <DataGridTextColumn Header="Date" Binding="{Binding TransactionDate, StringFormat='dd/MM/yyyy'}" Width="95"/>
+
+                    <!-- Description / Narration -->
+                    <DataGridTextColumn Header="Statement Narration / ERP Description" Binding="{Binding Description}" Width="240"/>
+
+                    <!-- Reference / Cheque No -->
+                    <DataGridTextColumn Header="Chq / Ref No" Binding="{Binding ReferenceNo}" Width="120"/>
+
+                    <!-- Statement Debit (Withdrawal) -->
+                    <DataGridTextColumn Header="Bank Debit (-)" Binding="{Binding StatementDebit, StringFormat='{}{0:N2}', TargetNullValue=''}" Width="105"/>
+
+                    <!-- Statement Credit (Deposit) -->
+                    <DataGridTextColumn Header="Bank Credit (+)" Binding="{Binding StatementCredit, StringFormat='{}{0:N2}', TargetNullValue=''}" Width="105"/>
+
+                    <!-- ERP Debit (Receipt) -->
+                    <DataGridTextColumn Header="ERP Debit (+)" Binding="{Binding ErpDebit, StringFormat='{}{0:N2}', TargetNullValue=''}" Width="105"/>
+
+                    <!-- ERP Credit (Payment) -->
+                    <DataGridTextColumn Header="ERP Credit (-)" Binding="{Binding ErpCredit, StringFormat='{}{0:N2}', TargetNullValue=''}" Width="105"/>
+
+                    <!-- ERP Voucher # & Type -->
+                    <DataGridTextColumn Header="ERP Voucher" Binding="{Binding ErpVouNo}" Width="95"/>
+
+                    <!-- Reconciliation Notes / Matching Reason -->
+                    <DataGridTextColumn Header="Reconciliation Notes" Binding="{Binding MatchedNotes}" Width="*"/>
+
+                    <!-- Action: Workflow Actions -->
+                    <DataGridTemplateColumn Header="Action" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Add Voucher for Bank Only -->
+                                    <Button Command="{Binding DataContext.CreateVoucherForEntryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding IsBankOnly, Converter={StaticResource BoolToVis}}"
+                                            Height="24"
+                                            Padding="6,0"
+                                            Margin="0,0,4,0"
+                                            Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="+" FontWeight="Bold" Foreground="#10B981" Margin="0,0,3,0"/>
+                                            <TextBlock Text="Add Voucher" FontSize="10"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Accept Match for Partial Match -->
+                                    <Button Command="{Binding DataContext.AcceptPartialMatchCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding IsPartialMatch, Converter={StaticResource BoolToVis}}"
+                                            Background="#8B5CF6"
+                                            Foreground="White"
+                                            Height="24"
+                                            Padding="6,0"
+                                            Margin="0,0,4,0"
+                                            Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="✓" FontWeight="Bold" Foreground="White" Margin="0,0,3,0"/>
+                                            <TextBlock Text="Accept" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Unlink Match for Partial or Reconciled -->
+                                    <Button Command="{Binding DataContext.UnlinkMatchedItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Visibility="{Binding IsPartialMatch, Converter={StaticResource BoolToVis}}"
+                                            ToolTip="Split into Bank Only and ERP Only"
+                                            Height="24"
+                                            Padding="6,0"
+                                            Cursor="Hand">
+                                        <TextBlock Text="✕" FontSize="10" Foreground="#EF4444" FontWeight="Bold"/>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- ROW 4: Status Footer -->
+        <Border Grid.Row="4" Background="{DynamicResource HeaderBackgroundBrush}" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,1,0,0" Padding="16,8">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

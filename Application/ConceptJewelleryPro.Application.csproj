@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\ConceptJewelleryPro.Domain.csproj" />
+    <ProjectReference Include="..\Data.Access\ConceptJewelleryPro.Data.Access.csproj" />
+    <ProjectReference Include="..\Shared\ConceptJewelleryPro.Shared.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

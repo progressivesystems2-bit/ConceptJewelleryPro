@@ -1,0 +1,535 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.LedgerReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="HeaderFilterLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="TopFilterBoxStyle" TargetType="GroupBox">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <Style x:Key="FilterComboBoxStyle" TargetType="telerik:RadComboBox" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="IsEditable" Value="True"/>
+            <Setter Property="IsFilteringEnabled" Value="True"/>
+            <Setter Property="TextSearchMode" Value="Contains"/>
+            <Setter Property="IsTextSearchEnabled" Value="True"/>
+            <Setter Property="OpenDropDownOnFocus" Value="True"/>
+            <Setter Property="StaysOpenOnEdit" Value="True"/>
+            <Setter Property="CanAutocompleteSelectItems" Value="False"/>
+            <Setter Property="ClearSelectionButtonVisibility" Value="Collapsed"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FilterDatePickerStyle" TargetType="DatePicker">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="11.5"/>
+        </Style>
+
+        <Style x:Key="LedgerTabButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1,1,1,1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="NavBtnStyle" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="SummaryBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Height" Value="40"/>
+        </Style>
+
+        <Style x:Key="SummaryTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification Overlay -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"/>
+
+        <Grid Margin="10,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header Filters & Action Buttons -->
+                <RowDefinition Height="Auto"/> <!-- Tab Headers -->
+                <RowDefinition Height="*"/>    <!-- Data Grid -->
+                <RowDefinition Height="Auto"/> <!-- Record Navigation Bar -->
+                <RowDefinition Height="Auto"/> <!-- Summary Bar -->
+                <RowDefinition Height="Auto"/> <!-- Print Options Footer -->
+            </Grid.RowDefinitions>
+
+            <!-- ROW 0: Top Header Filters -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="10,8"
+                    Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- Date range -->
+                        <ColumnDefinition Width="2.5*"/> <!-- Account Combo -->
+                        <ColumnDefinition Width="1.5*"/> <!-- Phone Combo -->
+                        <ColumnDefinition Width="1.5*"/> <!-- Ref Name Combo -->
+                        <ColumnDefinition Width="Auto"/> <!-- Top Action Buttons -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Date Range -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="From Date:" Style="{StaticResource HeaderFilterLabel}" FontSize="11" Margin="0,0,0,2"/>
+                            <DatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}"
+                                        Width="115"
+                                        Style="{StaticResource FilterDatePickerStyle}"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,6,0">
+                            <TextBlock Text="To Date:" Style="{StaticResource HeaderFilterLabel}" FontSize="11" Margin="0,0,0,2"/>
+                            <DatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}"
+                                        Width="115"
+                                        Style="{StaticResource FilterDatePickerStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Account Name -->
+                    <GroupBox Grid.Column="1" Header="Select Account Name" Style="{StaticResource TopFilterBoxStyle}">
+                        <telerik:RadComboBox ItemsSource="{Binding AccountNames}"
+                                             FontWeight="Bold"
+                                             Foreground="{DynamicResource PrimaryTextBrush}"
+                                             Text="{Binding SelectedAccountName, Mode=TwoWay}"
+                                             SelectedItem="{Binding SelectedAccountName, Mode=TwoWay}"
+                                             Style="{StaticResource FilterComboBoxStyle}"/>
+                    </GroupBox>
+
+                    <!-- Phone No -->
+                    <GroupBox Grid.Column="2" Header="Select Phone No" Style="{StaticResource TopFilterBoxStyle}">
+                        <telerik:RadComboBox ItemsSource="{Binding PhoneNumbers}"
+                                             Text="{Binding SelectedPhoneNo, Mode=TwoWay}"
+                                             SelectedItem="{Binding SelectedPhoneNo, Mode=TwoWay}"
+                                             FontWeight="Bold"
+                                             Foreground="{DynamicResource PrimaryTextBrush}"
+                                             Style="{StaticResource FilterComboBoxStyle}"/>
+                    </GroupBox>
+
+                    <!-- Reference Name -->
+                    <GroupBox Grid.Column="3" Header="Reference Name" Style="{StaticResource TopFilterBoxStyle}">
+                        <telerik:RadComboBox ItemsSource="{Binding ReferenceNames}"
+                                             Text="{Binding SelectedRefName, Mode=TwoWay}"
+                                             SelectedItem="{Binding SelectedRefName, Mode=TwoWay}"
+                                             Style="{StaticResource FilterComboBoxStyle}"/>
+                    </GroupBox>
+
+                    <!-- Actions -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                        <telerik:RadButton Command="{Binding RefreshCommand}"
+                                           ToolTip="Refresh Data"
+                                           Height="40"
+                                           Padding="10,0"
+                                           Margin="0,0,6,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Refresh" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </telerik:RadButton>
+                        <telerik:RadButton Command="{Binding ExportToExcelCommand}"
+                                           ToolTip="Export to Excel / CSV"
+                                           Height="40"
+                                           Padding="10,0"
+                                           Margin="0,0,6,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xEDE1;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Excel" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </telerik:RadButton>
+                        <telerik:RadButton Command="{Binding PrintCommand}"
+                                           ToolTip="Print Ledger Report"
+                                           Height="40"
+                                           Padding="12,0"
+                                           Background="{DynamicResource AccentBrush}"
+                                           Foreground="{DynamicResource AccentTextBrush}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="Print" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </telerik:RadButton>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ROW 1: Tab Navigation Buttons -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+                <!-- Tab 1: Ledger In Rupees -->
+                <telerik:RadButton Command="{Binding SelectTabCommand}" Height="40"
+                                   CommandParameter="LedgerInRupees">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE825;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Ledger In Rupees" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <telerik:RadButton.Style>
+                        <Style TargetType="telerik:RadButton" BasedOn="{StaticResource LedgerTabButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLedgerInRupeesActive}" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </telerik:RadButton.Style>
+                </telerik:RadButton>
+
+                <!-- Tab 2: Ledger In Weight -->
+                <telerik:RadButton Command="{Binding SelectTabCommand}" Height="40"
+                                   CommandParameter="LedgerInWeight">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE8B9;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Ledger In Weight" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <telerik:RadButton.Style>
+                        <Style TargetType="telerik:RadButton" BasedOn="{StaticResource LedgerTabButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLedgerInWeightActive}" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </telerik:RadButton.Style>
+                </telerik:RadButton>
+            </StackPanel>
+
+            <!-- ROW 2: Main Data Grids -->
+            <Grid Grid.Row="2">
+                <!-- GRID 1: Ledger In Rupees -->
+                <telerik:RadGridView ItemsSource="{Binding LedgerEntries}"
+                                     SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                                     MouseDoubleClick="Grid_MouseDoubleClick"
+                                     PreviewKeyDown="Grid_PreviewKeyDown"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="True"
+                                     CanUserReorderColumns="True"
+                                     CanUserResizeColumns="True"
+                                     ShowGroupPanel="False"
+                                     FontWeight="SemiBold"
+                                     RowIndicatorVisibility="Collapsed"
+                                     SelectionMode="Single"
+                                     GridLinesVisibility="Both"
+                                     Visibility="{Binding IsRupeeGridVisible, Converter={StaticResource BoolToVis}}">
+                    <telerik:RadGridView.Columns>
+                        <telerik:GridViewDataColumn Header="VouDate" DataMemberBinding="{Binding FormattedDate}" Width="110"/>
+                        <telerik:GridViewDataColumn Header="VouNo" DataMemberBinding="{Binding VouNo}" Width="140"/>
+                        <telerik:GridViewDataColumn Header="VouType" DataMemberBinding="{Binding VouType}" Width="220"/>
+                        <telerik:GridViewDataColumn Header="Head" DataMemberBinding="{Binding Head}" Width="*"/>
+                        <telerik:GridViewDataColumn Header="Debits" DataMemberBinding="{Binding FormattedDebit}" TextAlignment="Right" Width="120"/>
+                        <telerik:GridViewDataColumn Header="Credits" DataMemberBinding="{Binding FormattedCredit}" TextAlignment="Right" Width="120"/>
+                        <telerik:GridViewDataColumn Header="Balance" DataMemberBinding="{Binding FormattedBalance}" TextAlignment="Right" Width="150"/>
+                        <telerik:GridViewDataColumn Header="Narration" DataMemberBinding="{Binding Narration}" Width="1.5*"/>
+                    </telerik:RadGridView.Columns>
+                </telerik:RadGridView>
+
+                <!-- GRID 2: Ledger In Weight -->
+                <telerik:RadGridView ItemsSource="{Binding WeightEntries}"
+                                     SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                                     MouseDoubleClick="Grid_MouseDoubleClick"
+                                     PreviewKeyDown="Grid_PreviewKeyDown"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="True"
+                                     CanUserReorderColumns="True"
+                                     CanUserResizeColumns="True"
+                                     ShowGroupPanel="False"
+                                     RowIndicatorVisibility="Collapsed"
+                                     SelectionMode="Single"
+                                     GridLinesVisibility="Both"
+                                     Visibility="{Binding IsWeightGridVisible, Converter={StaticResource BoolToVis}}">
+                    <telerik:RadGridView.Columns>
+                        <telerik:GridViewDataColumn Header="VouDate" DataMemberBinding="{Binding FormattedDate}" Width="100" />
+                        <telerik:GridViewDataColumn Header="VouNo" DataMemberBinding="{Binding VouNo}" Width="130"/>
+                        <telerik:GridViewDataColumn Header="VouType" DataMemberBinding="{Binding VouType}" Width="140"/>
+                        <telerik:GridViewDataColumn Header="Head / ItemType" DataMemberBinding="{Binding Head}" Width="*"/>
+                        <telerik:GridViewDataColumn Header="Debits (Wt)" DataMemberBinding="{Binding FormattedWeightDebit}" TextAlignment="Right" Width="120"/>
+                        <telerik:GridViewDataColumn Header="Credits (Wt)" DataMemberBinding="{Binding FormattedWeightCredit}" TextAlignment="Right" Width="120"/>
+                        <telerik:GridViewDataColumn Header="Balance (Wt)" DataMemberBinding="{Binding FormattedWeightBalance}" TextAlignment="Right" Width="130"/>
+                        <telerik:GridViewDataColumn Header="Narration" DataMemberBinding="{Binding Narration}" Width="1.5*"/>
+                    </telerik:RadGridView.Columns>
+                </telerik:RadGridView>
+            </Grid>
+
+            <!-- ROW 3: Record Navigation Bar -->
+            <Border Grid.Row="3"
+                    Background="{DynamicResource PanelBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1,0,1,1"
+                    Padding="8,4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Record:" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Button Content="&#xE892;" Style="{StaticResource NavBtnStyle}" Command="{Binding FirstRecordCommand}" ToolTip="First Account"/>
+                        <Button Content="&#xE76B;" Style="{StaticResource NavBtnStyle}" Command="{Binding PreviousRecordCommand}" ToolTip="Previous Account"/>
+                        <Border Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1" Padding="8,1" Margin="3,0" Height="24">
+                            <TextBlock VerticalAlignment="Center" FontWeight="Bold" FontSize="11.5">
+                                <Run Text="{Binding CurrentAccountIndex, Mode=OneWay}"/>
+                                <Run Text=" of "/>
+                                <Run Text="{Binding TotalAccountsCount, Mode=OneWay}"/>
+                            </TextBlock>
+                        </Border>
+                        <Button Content="&#xE76C;" Style="{StaticResource NavBtnStyle}" Command="{Binding NextRecordCommand}" ToolTip="Next Account"/>
+                        <Button Content="&#xE893;" Style="{StaticResource NavBtnStyle}" Command="{Binding LastRecordCommand}" ToolTip="Last Account"/>
+                    </StackPanel>
+
+                    <ProgressBar Grid.Column="1"
+                                 IsIndeterminate="True"
+                                 Height="4"
+                                 Margin="20,0,10,0"
+                                 VerticalAlignment="Center"
+                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+                </Grid>
+            </Border>
+
+            <!-- ROW 4: Summary Bar / Footer Strip -->
+            <Border Grid.Row="4"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="8,6"
+                    Margin="0,6,0,6">
+                <Grid>
+                    <!-- Rupee Summary View -->
+                    <Grid Visibility="{Binding IsRupeeFooterVisible, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*"/> <!-- Category -->
+                            <ColumnDefinition Width="2*"/>   <!-- Account Name -->
+                            <ColumnDefinition Width="1.2*"/> <!-- Opening -->
+                            <ColumnDefinition Width="1.2*"/> <!-- Debits -->
+                            <ColumnDefinition Width="1.2*"/> <!-- Credits -->
+                            <ColumnDefinition Width="1.4*"/> <!-- Balance -->
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Category" FontSize="14" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.Category}" Style="{StaticResource SummaryTextStyle}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Account Name" FontWeight="SemiBold" Padding="10,4,0,0" FontSize="14" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.AccountName}" Style="{StaticResource SummaryTextStyle}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Opening" FontSize="14" Padding="10,4,0,0" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedOpening}" Style="{StaticResource SummaryTextStyle}" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Debits" FontSize="14"  Padding="10,4,0,0" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedTotalDebits}" Style="{StaticResource SummaryTextStyle}" Foreground="#D97706" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Credits" FontSize="14" Padding="10,4,0,0" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedTotalCredits}" FontSize="14" Style="{StaticResource SummaryTextStyle}" Foreground="#2563EB" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="5">
+                            <TextBlock Text="Balance" FontSize="14" Padding="10,4,0,0" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}" Background="{DynamicResource AccentBrush}">
+                                <TextBlock Text="{Binding Summary.FormattedClosingBalance}" Style="{StaticResource SummaryTextStyle}" FontSize="16" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Weight Summary View -->
+                    <Grid Visibility="{Binding IsWeightFooterVisible, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.4*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Category" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.Category}" Style="{StaticResource SummaryTextStyle}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Account Name" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.AccountName}" Style="{StaticResource SummaryTextStyle}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Opening Wt (g)" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedOpeningWeight}" Style="{StaticResource SummaryTextStyle}" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Total Issued Wt (g)" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedTotalWeightIssued}" Style="{StaticResource SummaryTextStyle}" Foreground="#D97706" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Total Recd Wt (g)" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}">
+                                <TextBlock Text="{Binding Summary.FormattedTotalWeightReceived}" Style="{StaticResource SummaryTextStyle}" Foreground="#2563EB" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="5">
+                            <TextBlock Text="Closing Wt (g)" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            <Border Style="{StaticResource SummaryBoxStyle}" Background="{DynamicResource AccentBrush}">
+                                <TextBlock Text="{Binding Summary.FormattedClosingWeight}" Style="{StaticResource SummaryTextStyle}" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Right"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ROW 5: Bottom Print Option Bar (Matches Image) -->
+            <Border Grid.Row="5"
+                    Background="{DynamicResource AccentBrush}"
+                    CornerRadius="4"
+                    Padding="12,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Grid.Column="0"
+                              Header="Print Option"
+                              Foreground="{DynamicResource AccentTextBrush}"
+                              FontWeight="Bold"
+                              FontSize="11.5"
+                              BorderBrush="{DynamicResource TopBarGlassBorderBrush}"
+                              Padding="10,4">
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton Content="Ledger Running"
+                                         IsChecked="{Binding IsOptionRunning, Mode=TwoWay}"
+                                         Foreground="{DynamicResource AccentTextBrush}"
+                                         FontWeight="SemiBold"
+                                         Margin="0,0,16,0"/>
+                            <RadioButton Content="Ledger Running Day Total"
+                                         IsChecked="{Binding IsOptionRunningDayTotal, Mode=TwoWay}"
+                                         Foreground="{DynamicResource AccentTextBrush}"
+                                         FontWeight="SemiBold"
+                                         Margin="0,0,16,0"/>
+                            <RadioButton Content="Ledger With Narration"
+                                         IsChecked="{Binding IsOptionWithNarration, Mode=TwoWay}"
+                                         Foreground="{DynamicResource AccentTextBrush}"
+                                         FontWeight="SemiBold"
+                                         Margin="0,0,16,0"/>
+                            <RadioButton Content="Ledger Month Wise"
+                                         IsChecked="{Binding IsOptionMonthWise, Mode=TwoWay}"
+                                         Foreground="{DynamicResource AccentTextBrush}"
+                                         FontWeight="SemiBold"
+                                         Margin="0,0,16,0"/>
+                            <RadioButton Content="Ledger With Acknowledgment"
+                                         IsChecked="{Binding IsOptionWithAcknowledgment, Mode=TwoWay}"
+                                         Foreground="{DynamicResource AccentTextBrush}"
+                                         FontWeight="SemiBold"/>
+                        </WrapPanel>
+                    </GroupBox>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="Concept Jewellery Ledger Pro"
+                                   Foreground="{DynamicResource AccentTextBrush}"
+                                   Opacity="0.8"
+                                   FontStyle="Italic"
+                                   FontSize="11"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

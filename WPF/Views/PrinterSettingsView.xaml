@@ -1,0 +1,365 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.PrinterSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="AccentToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+
+        <Style x:Key="MiniActionButton" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="8,0,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notifications Container -->
+        <controls:ToastNotification Grid.Row="0"
+                                     Grid.RowSpan="2"
+                                     Panel.ZIndex="99"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"
+                                     Message="{Binding ToastMessage}"
+                                     ToastType="{Binding ToastType}" />
+
+        <!-- Header / Actions Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="8" Background="{DynamicResource PanelBrush}">
+                        <TextBlock Text="&#xE749;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="18"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Printer Settings" FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="Configure default invoice and barcode label printers for this computer" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Content="Save Changes"
+                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                       Command="{Binding SaveCommand}" />
+
+                    <telerik:RadButton Content="Refresh Printers"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding RefreshPrintersCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <telerik:RadBusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, Mode=OneWay}" BusyContent="Loading printers...">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="24,20,24,30" MaxWidth="900" HorizontalAlignment="Left">
+
+                    <!-- Info Alert: Local Storage -->
+                    <Border Background="#EBF3FC"
+                            BorderBrush="#BAD3F7"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16,12"
+                            Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE946;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="18"
+                                       Foreground="#185ABD"
+                                       VerticalAlignment="Top"
+                                       Margin="0,2,12,0" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Workstation Specific Settings"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#103875" />
+                                <TextBlock Text="These printer preferences are saved locally on this machine (printersettings.json) and are not stored in the database. Each workstation in your network can configure its own physical printers independently."
+                                           FontSize="11.5"
+                                           Foreground="#2B4E80"
+                                           TextWrapping="Wrap"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- CARD 1: Default Bill Printer -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="&#xE749;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Text="Default Bill Printer"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBlock Text="Choose the default printer used for printing Sales Invoices, Estimates, Receipts, Payment Vouchers, and Reports."
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="0,0,0,16" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Select Bill Printer"
+                                           FontSize="12"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,6" />
+
+                                <telerik:RadComboBox Grid.Row="1" Grid.Column="0"
+                                                     Height="34"
+                                                     ItemsSource="{Binding AvailablePrinters}"
+                                                     SelectedItem="{Binding DefaultBillPrinter, Mode=TwoWay}"
+                                                     IsEditable="True"
+                                                     FontSize="12.5"
+                                                     VerticalContentAlignment="Center" />
+
+                                <telerik:RadButton Grid.Row="1" Grid.Column="1"
+                                                   Content="Clear"
+                                                   Style="{StaticResource MiniActionButton}"
+                                                   Command="{Binding ClearBillPrinterCommand}"
+                                                   ToolTip="Clear default bill printer selection" />
+                            </Grid>
+
+                            <CheckBox IsChecked="{Binding BillPrintPreviewBeforePrint, Mode=TwoWay}"
+                                      Margin="0,14,0,0"
+                                      FontSize="12.5"
+                                      FontWeight="SemiBold"
+                                      Cursor="Hand">
+                                <TextBlock Text="Print preview before print (Billing Printer)"
+                                           FontSize="12.5"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="When checked, invoices open the print preview window before sending to the bill printer. When unchecked, invoices print directly."
+                                       FontSize="11"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="24,2,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CARD 2: Default Barcode Printer -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="&#xE8FE;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Text="Default Barcode Printer"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBlock Text="Choose the default thermal printer used for jewelry barcode tags, rat-tail stickers, and item labels."
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="0,0,0,16" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Select Barcode Printer"
+                                           FontSize="12"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,6" />
+
+                                <telerik:RadComboBox Grid.Row="1" Grid.Column="0"
+                                                     Height="34"
+                                                     ItemsSource="{Binding AvailablePrinters}"
+                                                     SelectedItem="{Binding DefaultBarcodePrinter, Mode=TwoWay}"
+                                                     IsEditable="True"
+                                                     FontSize="12.5"
+                                                     VerticalContentAlignment="Center" />
+
+                                <telerik:RadButton Grid.Row="1" Grid.Column="1"
+                                                   Content="Clear"
+                                                   Style="{StaticResource MiniActionButton}"
+                                                   Command="{Binding ClearBarcodePrinterCommand}"
+                                                   ToolTip="Clear default barcode printer selection" />
+                            </Grid>
+
+                            <CheckBox IsChecked="{Binding BarcodePrintPreviewBeforePrint, Mode=TwoWay}"
+                                      Margin="0,14,0,0"
+                                      FontSize="12.5"
+                                      FontWeight="SemiBold"
+                                      Cursor="Hand">
+                                <TextBlock Text="Print preview before print (Barcode Printer)"
+                                           FontSize="12.5"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="When checked, barcode stickers open a preview window before sending to the barcode printer."
+                                       FontSize="11"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="24,2,0,0" />
+
+                            <Separator Margin="0,16,0,14" Background="{DynamicResource CardBorderBrush}" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Barcode Sticker Print Method (PRN / FRX File)"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,0,0,8" />
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <RadioButton Content="PRN File (Direct Thermal ZPL / PRN)"
+                                                     IsChecked="{Binding IsPrnEngineSelected, Mode=TwoWay}"
+                                                     FontSize="12.5"
+                                                     FontWeight="Medium"
+                                                     Foreground="{DynamicResource PrimaryTextBrush}"
+                                                     Margin="0,0,24,0"
+                                                     Cursor="Hand" />
+
+                                        <RadioButton Content="FRX File (FastReport 81x12 StickerPC / StickerWt)"
+                                                     IsChecked="{Binding IsFrxEngineSelected, Mode=TwoWay}"
+                                                     FontSize="12.5"
+                                                     FontWeight="Medium"
+                                                     Foreground="{DynamicResource PrimaryTextBrush}"
+                                                     Cursor="Hand" />
+                                    </StackPanel>
+
+                                    <TextBlock Text="Choose whether barcode labels are printed using raw thermal .prn files (StickerPC.prn / StickerWt.prn) or FastReport 81x12mm .frx templates (StickerPC.frx / StickerWt.frx)."
+                                               FontSize="11.5"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <telerik:RadButton Grid.Column="1"
+                                                   Content="Open Templates Folder"
+                                                   Style="{StaticResource MiniActionButton}"
+                                                   VerticalAlignment="Center"
+                                                   Command="{Binding OpenTemplatesFolderCommand}"
+                                                   ToolTip="Open folder containing active StickerPC and StickerWt (.prn / .frx) templates" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CARD 3: Invoice Printing Options -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="&#xE8B7;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Text="Invoice Printing Options"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBlock Text="Control how weights, piece-rate items, and details appear on printed invoices."
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="0,0,0,16" />
+
+                            <CheckBox IsChecked="{Binding HideWtInPcItem, Mode=TwoWay}"
+                                      FontSize="13"
+                                      FontWeight="SemiBold"
+                                      Cursor="Hand">
+                                <TextBlock Text="Hide Weight in Piece-Rate Items (HideWtInPcItem)"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="When enabled (default), Gross Wt and Net Wt display as '-' for piece-rate items on printed invoices."
+                                       FontSize="11.5"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="24,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </telerik:RadBusyIndicator>
+    </Grid>
+</UserControl>

@@ -1,0 +1,255 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.VoucherAuditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="{Binding Title}"
+        Height="720" Width="1100"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        FontFamily="Segoe UI"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="KpiCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header KPI cards -->
+            <RowDefinition Height="Auto"/> <!-- Filter / Controls bar -->
+            <RowDefinition Height="*"/>    <!-- Data Grid -->
+            <RowDefinition Height="Auto"/> <!-- Footer bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ROW 0: KPI Summary Cards -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Total Scanned -->
+            <Border Grid.Column="0" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="TOTAL VOUCHERS" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock Text="{Binding TotalScanned}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 2: Balanced -->
+            <Border Grid.Column="1" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="BALANCED (DR = CR)" FontSize="11" FontWeight="SemiBold" Foreground="#10B981"/>
+                    <TextBlock Text="{Binding BalancedCount}" FontSize="20" FontWeight="Bold" Foreground="#10B981" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 3: Imbalanced -->
+            <Border Grid.Column="2" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="IMBALANCED VOUCHERS" FontSize="11" FontWeight="SemiBold" Foreground="#EF4444"/>
+                    <TextBlock Text="{Binding ImbalancedCount}" FontSize="20" FontWeight="Bold" Foreground="#EF4444" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 4: Total Net Difference -->
+            <Border Grid.Column="3" Style="{StaticResource KpiCardStyle}" Margin="0">
+                <StackPanel>
+                    <TextBlock Text="TOTAL DISCREPANCY" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock FontSize="20" FontWeight="Bold" Foreground="#EF4444" Margin="0,2,0,0">
+                        <Run Text="₹ "/><Run Text="{Binding FormattedTotalImbalance, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ROW 1: Filter & Action Bar -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,8"
+                Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/> <!-- Date range -->
+                    <ColumnDefinition Width="Auto"/> <!-- Imbalance toggle -->
+                    <ColumnDefinition Width="*"/>    <!-- Search box -->
+                    <ColumnDefinition Width="Auto"/> <!-- Actions -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Date Range -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock Text="From:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,4,0" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <telerik:RadDatePicker SelectedValue="{Binding FromDate, Mode=TwoWay}"
+                                           DateTimeWatermarkContent="Start Date"
+                                           Width="120"  Margin="0,0,8,0"/>
+                    <TextBlock Text="To:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,4,0" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <telerik:RadDatePicker SelectedValue="{Binding ToDate, Mode=TwoWay}"
+                                           DateTimeWatermarkContent="End Date"
+                                           Width="120" />
+                </StackPanel>
+
+                <!-- Toggle: Show Only Imbalances -->
+                <CheckBox Grid.Column="1"
+                          IsChecked="{Binding ShowOnlyImbalances, Mode=TwoWay}"
+                          Content="Show Only Imbalanced Vouchers"
+                          FontWeight="SemiBold"
+                          VerticalAlignment="Center"
+                          Foreground="#EF4444"
+                          Margin="0,0,16,0"/>
+
+                <!-- Search Box -->
+                <telerik:RadWatermarkTextBox Grid.Column="2"
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             WatermarkContent="Search voucher no, account name, table..."
+                                             Height="40"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,12,0"/>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Command="{Binding RefreshCommand}"
+                                       Padding="10,0" Margin="0,0,6,0"
+                                       ToolTip="Re-audit vouchers">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Re-Scan" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+
+                    <telerik:RadButton Command="{Binding ExportCommand}"
+                                       Padding="10,0"
+                                       ToolTip="Export Audit to CSV">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xEDE1;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="Export" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </telerik:RadButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ROW 2: Audit Results DataGrid -->
+        <telerik:RadGridView Grid.Row="2"
+                             ItemsSource="{Binding DisplayItems}"
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             CanUserSortColumns="True"
+                             CanUserResizeColumns="True"
+                             ShowGroupPanel="True"
+                             ShowColumnFooters="True"
+                             RowIndicatorVisibility="Collapsed"
+                             GridLinesVisibility="Both"
+                             FontSize="12">
+            <telerik:RadGridView.Columns>
+                <telerik:GridViewDataColumn Header="Voucher No"
+                                            DataMemberBinding="{Binding VouNo}"
+                                            Width="120">
+                    <telerik:GridViewDataColumn.AggregateFunctions>
+                        <telerik:CountFunction Caption="Vouchers: " ResultFormatString="{}{0}"/>
+                    </telerik:GridViewDataColumn.AggregateFunctions>
+                </telerik:GridViewDataColumn>
+
+                <telerik:GridViewDataColumn Header="Date"
+                                            DataMemberBinding="{Binding FormattedVouDate}"
+                                            Width="90"/>
+
+                <telerik:GridViewDataColumn Header="Type"
+                                            DataMemberBinding="{Binding VouType}"
+                                            Width="130"/>
+
+                <telerik:GridViewDataColumn Header="Table"
+                                            DataMemberBinding="{Binding SourceTable}"
+                                            Width="90"/>
+
+                <telerik:GridViewDataColumn Header="Debit Accounts (Dr)"
+                                            DataMemberBinding="{Binding DebitAccounts}"
+                                            Width="1.5*"/>
+
+                <telerik:GridViewDataColumn Header="Credit Accounts (Cr)"
+                                            DataMemberBinding="{Binding CreditAccounts}"
+                                            Width="1.5*"/>
+
+                <telerik:GridViewDataColumn Header="Total Dr (₹)"
+                                            DataMemberBinding="{Binding TotalDebit}"
+                                            DataFormatString="{}{0:N2}"
+                                            TextAlignment="Right"
+                                            Width="115">
+                    <telerik:GridViewDataColumn.AggregateFunctions>
+                        <telerik:SumFunction ResultFormatString="{}{0:N2}"/>
+                    </telerik:GridViewDataColumn.AggregateFunctions>
+                </telerik:GridViewDataColumn>
+
+                <telerik:GridViewDataColumn Header="Total Cr (₹)"
+                                            DataMemberBinding="{Binding TotalCredit}"
+                                            DataFormatString="{}{0:N2}"
+                                            TextAlignment="Right"
+                                            Width="115">
+                    <telerik:GridViewDataColumn.AggregateFunctions>
+                        <telerik:SumFunction ResultFormatString="{}{0:N2}"/>
+                    </telerik:GridViewDataColumn.AggregateFunctions>
+                </telerik:GridViewDataColumn>
+
+                <telerik:GridViewDataColumn Header="Diff (₹)"
+                                            DataMemberBinding="{Binding Difference}"
+                                            DataFormatString="{}{0:N2}"
+                                            TextAlignment="Right"
+                                            Width="105">
+                    <telerik:GridViewDataColumn.AggregateFunctions>
+                        <telerik:SumFunction ResultFormatString="{}{0:N2}"/>
+                    </telerik:GridViewDataColumn.AggregateFunctions>
+                </telerik:GridViewDataColumn>
+
+                <telerik:GridViewDataColumn Header="Audit Status"
+                                            DataMemberBinding="{Binding StatusText}"
+                                            Width="150"/>
+
+                <telerik:GridViewDataColumn Header="Remarks / Breakdown"
+                                            DataMemberBinding="{Binding Remarks}"
+                                            Width="1.5*"/>
+            </telerik:RadGridView.Columns>
+        </telerik:RadGridView>
+
+        <!-- ROW 3: Status bar & Close button -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,8"
+                Margin="0,8,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+                <telerik:RadButton Grid.Column="1"
+                                   Content="Close"
+                                   Click="OnCloseClick"
+                                   
+                                   Padding="16,0"
+                                   FontWeight="SemiBold"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

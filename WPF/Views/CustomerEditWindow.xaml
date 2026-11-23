@@ -1,0 +1,242 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.CustomerEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="{Binding Title}"
+        Height="700" Width="880"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        FontFamily="Segoe UI"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Alt" Key="S" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="F10" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CancelCommand}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20,16" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,4,8,4" />
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadDateTimePicker}" BasedOn="{StaticResource RadDateTimePickerStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,4,8,4" />
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,4,8,4" />
+            <Setter Property="Padding" Value="8,0,4,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid KeyboardNavigation.TabNavigation="Cycle">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,12">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Width="32" Height="32" CornerRadius="6" Background="{DynamicResource PanelBrush}">
+                    <TextBlock Text="&#xE77B;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="14"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                    <TextBlock Text="Fill in the customer details below" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Body -->
+        <telerik:RadBusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy}" BusyContent="Saving Customer...">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,16">
+                <StackPanel>
+                    <!-- Error Notification Banner -->
+                    <Border Background="#FFEEEE" BorderBrush="#FFCCCC" BorderThickness="1" CornerRadius="4" Padding="12,8" Margin="0,0,0,12"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Customer Entry Details" Style="{StaticResource SectionTitleStyle}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Left Column: Initial / Code / Name / Group / Profession / Address / Address2 / Pincode / City -->
+
+                                <!-- Row 0: Initial and Customer Code -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Initial | Code *" Style="{StaticResource FieldLabelStyle}" />
+                                <Grid Grid.Row="0" Grid.Column="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadComboBox Grid.Column="0" IsEditable="True" ItemsSource="{Binding Initials}" SelectedItem="{Binding Initial, Mode=TwoWay}" Text="{Binding Initial, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="1" Margin="0,4,4,4" />
+                                    <telerik:RadWatermarkTextBox Grid.Column="1" Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" WatermarkContent="Customer Code" TabIndex="2" Margin="4,4,0,4" />
+                                </Grid>
+
+                                <!-- Row 1: Customer Name -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Customer Name *" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="1" Grid.Column="1" Text="{Binding CompanyName, UpdateSourceTrigger=PropertyChanged}" TabIndex="3" FontWeight="Bold" />
+
+                                <!-- Row 2: Group -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Group" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadComboBox Grid.Row="2" Grid.Column="1" IsEditable="True" ItemsSource="{Binding Groups}" SelectedItem="{Binding Group, Mode=TwoWay}" Text="{Binding Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" />
+
+                                <!-- Row 3: Profession -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Profession" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="3" Grid.Column="1" Text="{Binding Profession, UpdateSourceTrigger=PropertyChanged}" TabIndex="5" />
+
+                                <!-- Row 4: Address -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Address" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="4" Grid.Column="1" Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" TabIndex="6" />
+
+                                <!-- Row 5: Address 2 -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Address 2" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="5" Grid.Column="1" Text="{Binding Address2, UpdateSourceTrigger=PropertyChanged}" TabIndex="7" />
+
+                                <!-- Row 6: Pin Code -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Pin Code" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="6" Grid.Column="1" Text="{Binding Pincode, UpdateSourceTrigger=PropertyChanged}" TabIndex="8" />
+
+                                <!-- Row 7: City -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Text="City" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="7" Grid.Column="1" Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" TabIndex="9" />
+
+                                <!-- Right Column Fields -->
+
+                                <!-- Row 0: Mobile -->
+                                <TextBlock Grid.Row="0" Grid.Column="3" Text="Mobile" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="0" Grid.Column="4" Text="{Binding Mobile, UpdateSourceTrigger=PropertyChanged}" TabIndex="10" />
+
+                                <!-- Row 1: Phone -->
+                                <TextBlock Grid.Row="1" Grid.Column="3" Text="Phone" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="1" Grid.Column="4" Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}" TabIndex="11" />
+
+                                <!-- Row 2: Email -->
+                                <TextBlock Grid.Row="2" Grid.Column="3" Text="Email" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadWatermarkTextBox Grid.Row="2" Grid.Column="4" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" TabIndex="12" />
+
+                                <!-- Row 3: Date of Birth -->
+                                <TextBlock Grid.Row="3" Grid.Column="3" Text="Date of Birth" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadDateTimePicker Grid.Row="3" Grid.Column="4" InputMode="DatePicker" SelectedValue="{Binding DOB, Mode=TwoWay}" TabIndex="13" />
+
+                                <!-- Row 4: Anniversary Date -->
+                                <TextBlock Grid.Row="4" Grid.Column="3" Text="Anniversary Date" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadDateTimePicker Grid.Row="4" Grid.Column="4" InputMode="DatePicker" SelectedValue="{Binding DOA, Mode=TwoWay}" TabIndex="14" />
+
+                                <!-- Row 5: Nos / Print -->
+                                <TextBlock Grid.Row="5" Grid.Column="3" Text="Nos | Print" Style="{StaticResource FieldLabelStyle}" />
+                                <Grid Grid.Row="5" Grid.Column="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadWatermarkTextBox Grid.Column="0" Text="{Binding Nos, Mode=TwoWay, TargetNullValue='', UpdateSourceTrigger=LostFocus, StringFormat=N0}" WatermarkContent="0" TabIndex="15" Margin="0,4,8,4" />
+                                    <CheckBox Grid.Column="1" Content="Print" IsChecked="{Binding Print}" VerticalAlignment="Center" FontWeight="SemiBold" TabIndex="16" />
+                                </Grid>
+
+                                <!-- Row 6: Status -->
+                                <TextBlock Grid.Row="6" Grid.Column="3" Text="Status" Style="{StaticResource FieldLabelStyle}" />
+                                <telerik:RadComboBox Grid.Row="6" Grid.Column="4" IsEditable="True" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding Status, Mode=TwoWay}" Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="17" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </telerik:RadBusyIndicator>
+
+        <!-- Sticky Bottom Footer -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="20,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <telerik:RadButton Content="Cancel"
+                                   Width="90"
+                                   Height="40"
+                                   Margin="0,0,10,0"
+                                   Command="{Binding CancelCommand}"
+                                   IsTabStop="False" />
+                <telerik:RadButton Content="Save Customer (Alt+S)"
+                                   Width="170"
+                                   Height="40"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                   Command="{Binding SaveCommand}"
+                                   TabIndex="18"
+                                   IsTabStop="True" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

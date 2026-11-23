@@ -1,0 +1,186 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.CustomerHistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="Customer Purchase History"
+        Width="820" Height="540"
+        MinWidth="700" MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="KpiCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Customer Info Bar -->
+            <RowDefinition Height="Auto"/> <!-- KPI Cards -->
+            <RowDefinition Height="Auto"/> <!-- Filter box / Search -->
+            <RowDefinition Height="*"/>    <!-- Data Grid -->
+            <RowDefinition Height="Auto"/> <!-- Footer bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ROW 0: Customer Info Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="14,10"
+                Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="CustomerNameTextBlock" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="26,4,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8EA;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock x:Name="CustomerPhoneTextBlock" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Copy Phone Button -->
+                <telerik:RadButton Grid.Column="1"
+                                   x:Name="CopyPhoneButton"
+                                   Click="CopyPhoneButton_Click"
+                                   Padding="10,4"
+                                   Height="30"
+                                   VerticalAlignment="Center"
+                                   ToolTip="Copy Mobile Number to Clipboard">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Copy Phone" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </telerik:RadButton>
+            </Grid>
+        </Border>
+
+        <!-- ROW 1: KPI Summary Cards -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Total Invoices -->
+            <Border Grid.Column="0" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="TOTAL INVOICES" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock x:Name="TotalInvoicesTextBlock" Text="0" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 2: Total Spent -->
+            <Border Grid.Column="1" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="TOTAL VALUE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock x:Name="TotalValueTextBlock" Text="₹ 0.00" FontSize="18" FontWeight="Bold" Foreground="#10B981" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 3: Avg Invoice -->
+            <Border Grid.Column="2" Style="{StaticResource KpiCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="AVG BILL VALUE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock x:Name="AvgValueTextBlock" Text="₹ 0.00" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 4: Last Purchase -->
+            <Border Grid.Column="3" Style="{StaticResource KpiCardStyle}" Margin="0">
+                <StackPanel>
+                    <TextBlock Text="LAST PURCHASE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                    <TextBlock x:Name="LastPurchaseTextBlock" Text="-" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ROW 2: Filter bar -->
+        <Grid Grid.Row="2" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <telerik:RadWatermarkTextBox x:Name="SearchBox"
+                                         WatermarkContent="Filter items by name or bill number..."
+                                         Height="28"
+                                         FontSize="12"
+                                         Padding="6,0"
+                                         TextChanged="SearchBox_TextChanged"/>
+
+            <TextBlock Grid.Column="1"
+                       x:Name="RecordCountTextBlock"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0"
+                       FontSize="11.5"
+                       Foreground="{DynamicResource SecondaryTextBrush}"/>
+        </Grid>
+
+        <!-- ROW 3: Purchases Data Grid -->
+        <Grid Grid.Row="3">
+            <telerik:RadBusyIndicator x:Name="BusyIndicator" IsBusy="True" BusyContent="Loading history..."/>
+
+            <telerik:RadGridView x:Name="HistoryGridView"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="True"
+                                 RowIndicatorVisibility="Collapsed"
+                                 ShowGroupPanel="False"
+                                 CanUserFreezeColumns="False"
+                                 SelectionMode="Single"
+                                 FontSize="12"
+                                 RowHeight="32">
+                <telerik:RadGridView.Columns>
+                    <telerik:GridViewDataColumn Header="Date" DataMemberBinding="{Binding Date, StringFormat='dd/MM/yyyy'}" Width="100" TextAlignment="Center"/>
+                    <telerik:GridViewDataColumn Header="Bill No" DataMemberBinding="{Binding VouNo}" Width="110" TextAlignment="Center"/>
+                    <telerik:GridViewDataColumn Header="Item Name" DataMemberBinding="{Binding ItemName}" Width="*"/>
+                    <telerik:GridViewDataColumn Header="Qty" DataMemberBinding="{Binding Qty, StringFormat='{}{0:N0}'}" Width="65" TextAlignment="Right"/>
+                    <telerik:GridViewDataColumn Header="Net Wt" DataMemberBinding="{Binding NtWt, StringFormat='{}{0:N3} g'}" Width="100" TextAlignment="Right"/>
+                    <telerik:GridViewDataColumn Header="Amount" DataMemberBinding="{Binding Amount, StringFormat='₹ {0:N2}'}" Width="130" TextAlignment="Right"/>
+                </telerik:RadGridView.Columns>
+            </telerik:RadGridView>
+
+            <!-- Empty State -->
+            <TextBlock x:Name="EmptyStateTextBlock"
+                       Text="No past purchase records found for this customer."
+                       FontSize="13"
+                       FontStyle="Italic"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Visibility="Collapsed"/>
+        </Grid>
+
+        <!-- ROW 4: Footer -->
+        <Border Grid.Row="4" Margin="0,12,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <telerik:RadButton Content="Close"
+                                   Width="85"
+                                   Height="30"
+                                   IsCancel="True"
+                                   Click="CloseButton_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

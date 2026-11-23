@@ -1,0 +1,605 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.SchemeCreationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="{DynamicResource WindowBackgroundBrush}">
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding NewCommand}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="M" Modifiers="Alt" Command="{Binding ModifyCommand}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding DeleteCommand}"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+
+        <Style x:Key="SectionBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="#0F4C5C"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+
+        <!-- Form Teal Label Block (consistent with BarcodeCreation) -->
+        <Style x:Key="FieldLabelBlock" TargetType="Border">
+            <Setter Property="Background" Value="#003B46"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,1.5,4,1.5"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+
+        <Style x:Key="FieldLabelText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,1.5"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+       
+
+        <Style TargetType="telerik:RadDateTimePicker"
+BasedOn="{StaticResource RadDateTimePickerStyle}">
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Padding" Value="0,-22,0,0"/>
+        </Style>
+
+        
+    </UserControl.Resources>
+    
+    
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification Overlay in Bottom Right Corner -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header / Toolbar -->
+                    <RowDefinition Height="*"/>    <!-- Content Container -->
+                </Grid.RowDefinitions>
+
+                <!-- Header & Top Action Toolbar (Matching BarcodeCreation) -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource HeaderBackgroundBrush}"
+                        BorderBrush="{DynamicResource HeaderBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        CornerRadius="6"
+                        Padding="12,8"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Module Title & Icon -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="32" Height="32" CornerRadius="6" Background="#003B46" Margin="0,0,10,0">
+                                <TextBlock Text="&#xE8CB;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Scheme Creation" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Text="Customer Saving Schemes" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Action Toolbar Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <telerik:RadButton x:Name="AddNewButton"
+                                               Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                               Command="{Binding NewCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Add New (Alt+A)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton x:Name="SaveButton"
+                                               Style="{StaticResource ToolbarButtonStyle}"
+                                               Command="{Binding SaveCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Save (Alt+S)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                               Command="{Binding ModifyCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Modify (Alt+M)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}"
+                                               Command="{Binding DeleteCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Delete (Alt+D)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                               Command="{Binding CancelCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Cancel (Alt+C)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                               Command="{Binding RefreshCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </StackPanel>
+
+                        <!-- Scheme Code Display Badge -->
+                        <Border Grid.Column="2"
+                                Background="{DynamicResource PanelBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10,4">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Scheme: " FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Scode}" FontSize="15" FontWeight="Bold" Foreground="#003B46" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Border Background="#E0F2FE" BorderBrush="#0284C7" BorderThickness="1" CornerRadius="3" Padding="6,2">
+                                    <TextBlock Text="{Binding FormMode}" FontSize="11" FontWeight="SemiBold" Foreground="#0284C7"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Tabbed Layout: Scheme Creation Form / List -->
+                <telerik:RadTabControl Grid.Row="1"
+                                       SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+                    <!-- Tab 1: Scheme Creation Form -->
+                    <telerik:RadTabItem Header="Scheme Creation" FontSize="13" FontWeight="SemiBold">
+                        <Border Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1,0,1,1"
+                                Padding="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <!-- Left Column: Form Fields Box -->
+                                    <ColumnDefinition Width="600"/>
+                                    <!-- Gap -->
+                                    <ColumnDefinition Width="16"/>
+                                    <!-- Right Column: Installment Schedule Box -->
+                                    <ColumnDefinition Width="460"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left Box: Form Entry (Styled consistent with BarcodeCreation SectionBoxStyle) -->
+                                <Border Grid.Column="0" Style="{StaticResource SectionBoxStyle}">
+                                    <StackPanel>
+                                        <!-- Header within box -->
+                                        <Border Background="#003B46" CornerRadius="3" Padding="10,6" Margin="0,0,0,12">
+                                            <TextBlock Text="Scheme Information &amp; Customer Details"
+                                                       FontWeight="Bold"
+                                                       FontSize="14"
+                                                       Foreground="White"/>
+                                        </Border>
+
+                                        <!-- 1. Customer Name -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Customer Name" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <telerik:RadComboBox x:Name="CustomerComboBox"
+                                                                 Grid.Column="1"
+                                                                 ItemsSource="{Binding Customers}"
+                                                                 DisplayMemberPath="AccountName"
+                                                                 SelectedValuePath="AccountName"
+                                                                 Text="{Binding CustomerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 IsEditable="True"
+                                                                 IsFilteringEnabled="True"
+                                                                 IsEnabled="{Binding IsFormEnabled}"/>
+                                        </Grid>
+
+                                        <!-- 2. Installment Amt & Month (2-col row) -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="80"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Installment Amt -->
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Installment Amt" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding InstallmentAmt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.00}'}"
+                                                     IsEnabled="{Binding IsFormEnabled}"
+                                                     FontWeight="Bold"
+                                                     HorizontalContentAlignment="Right"/>
+
+                                            <!-- Month -->
+                                            <Border Grid.Column="3" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Months" Style="{StaticResource FieldLabelText}" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <TextBox Grid.Column="4"
+                                                     Text="{Binding Month, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0}'}"
+                                                     IsEnabled="{Binding IsFormEnabled}"
+                                                     HorizontalContentAlignment="Center"/>
+                                        </Grid>
+
+                                        <!-- 3. Total Amount & Scheme Discount -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="140"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Total Amount -->
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Total Amount" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding TotalAmt, Mode=OneWay, StringFormat='{}{0:0.00}'}"
+                                                     IsReadOnly="True"
+                                                     Background="{DynamicResource PanelBrush}"
+                                                     FontWeight="Bold"
+                                                     HorizontalContentAlignment="Right"/>
+
+                                            <!-- Scheme Discount -->
+                                            <Border Grid.Column="3" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Scheme Discount" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="4"
+                                                     Text="{Binding SchemeDiscount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.00}'}"
+                                                     IsEnabled="{Binding IsFormEnabled}"
+                                                     HorizontalContentAlignment="Right"/>
+                                        </Grid>
+
+                                        <!-- 4. Total Value -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Total Value" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding TotalValue, Mode=OneWay, StringFormat='{}{0:0.00}'}"
+                                                     IsReadOnly="True"
+                                                     Background="{DynamicResource PanelBrush}"
+                                                     FontWeight="Bold"
+                                                     FontSize="16"
+                                                     Foreground="#003B46"
+                                                     HorizontalContentAlignment="Right"/>
+                                        </Grid>
+
+                                        <!-- 5. Start Date & Maturity Date -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="140"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Start Date -->
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Start Date" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <telerik:RadDatePicker Grid.Column="1"
+                                                                   SelectedValue="{Binding SDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   IsEnabled="{Binding IsFormEnabled}"/>
+
+                                            <!-- Maturity Date -->
+                                            <Border Grid.Column="3" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Maturity Date" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <telerik:RadDatePicker Grid.Column="4"
+                                                                   SelectedValue="{Binding EDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   IsEnabled="{Binding IsFormEnabled}"/>
+                                        </Grid>
+
+                                        <!-- 6. DOB & DOA -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="140"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- DOB -->
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="DOB" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding DOB, Mode=OneWay}"
+                                                     IsReadOnly="True"
+                                                     Background="{DynamicResource PanelBrush}"/>
+
+                                            <!-- DOA -->
+                                            <Border Grid.Column="3" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="DOA" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <TextBox Grid.Column="4"
+                                                     Text="{Binding DOA, Mode=OneWay}"
+                                                     IsReadOnly="True"
+                                                     Background="{DynamicResource PanelBrush}"/>
+                                        </Grid>
+
+                                        <!-- 7. Staff Name & Closed -->
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="100"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Staff Name -->
+                                            <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                                <TextBlock Text="Staff Name" Style="{StaticResource FieldLabelText}"/>
+                                            </Border>
+                                            <telerik:RadComboBox Grid.Column="1"
+                                                                 ItemsSource="{Binding StaffList}"
+                                                                 DisplayMemberPath="Staff"
+                                                                 SelectedValuePath="Staff"
+                                                                 Text="{Binding Staff, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 IsEditable="True"
+                                                                 IsEnabled="{Binding IsFormEnabled}"/>
+
+                                            <!-- Closed CheckBox -->
+                                            <CheckBox Grid.Column="3"
+                                                      IsChecked="{Binding Closed, Mode=TwoWay}"
+                                                      IsEnabled="{Binding IsFormEnabled}"
+                                                      Content="Closed"
+                                                      FontWeight="SemiBold"
+                                                      FontSize="14"
+                                                      VerticalAlignment="Center"
+                                                      Margin="10,0,0,0"/>
+                                        </Grid>
+
+                                        <Separator Margin="0,4,0,12"/>
+
+                                        <!-- Bottom Scheme Code & Sequence Box -->
+                                        <Border Background="{DynamicResource PanelBrush}"
+                                                BorderBrush="{DynamicResource BorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="12,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="Scheme No:" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBlock Text="{Binding Scode}" FontSize="20" FontWeight="Bold" Foreground="#003B46" VerticalAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="Seq / Nos:" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Text="{Binding Nos, Mode=OneWay}"
+                                                             IsReadOnly="True"
+                                                             Background="White"
+                                                             Width="100"
+                                                             Height="32"
+                                                             FontSize="14"
+                                                             FontWeight="Bold"
+                                                             HorizontalContentAlignment="Right"
+                                                             VerticalContentAlignment="Center"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Right Box: Installment Schedule (Compact No-Scroll Layout) -->
+                                <Border Grid.Column="2" Style="{StaticResource SectionBoxStyle}">
+                                    <StackPanel>
+                                        <!-- Header -->
+                                        <Border Background="#003B46" CornerRadius="3" Padding="10,6" Margin="0,0,0,10">
+                                            <TextBlock Text="Installment Schedule"
+                                                       FontWeight="Bold"
+                                                       FontSize="14"
+                                                       Foreground="White"/>
+                                        </Border>
+
+                                        <!-- Summary Header in 2-column compact grid -->
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Row 0: Scheme Code & Months -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Scheme:" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,0,4"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Scode, Mode=OneWay}" IsReadOnly="True" Height="28" FontSize="12" FontWeight="Bold" Foreground="#003B46" Background="{DynamicResource PanelBrush}" Margin="0,0,0,4"/>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Months:" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" Margin="0,0,0,4"/>
+                                            <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding Month, StringFormat='{}{0:0.00}', Mode=OneWay}" IsReadOnly="True" Height="28" FontSize="12" HorizontalContentAlignment="Center" Background="{DynamicResource PanelBrush}" Margin="0,0,0,4"/>
+
+                                            <!-- Row 1: Start Date & End Date -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Start Date:" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SDate, StringFormat='dd/MM/yyyy', Mode=OneWay}" IsReadOnly="True" Height="28" FontSize="12" Background="{DynamicResource PanelBrush}"/>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="3" Text="End Date:" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding EDate, StringFormat='dd/MM/yyyy', Mode=OneWay}" IsReadOnly="True" Height="28" FontSize="12" Background="{DynamicResource PanelBrush}"/>
+                                        </Grid>
+
+                                        <Separator Margin="0,2,0,8"/>
+
+                                        <!-- Installment Due Dates in 2-Column UniformGrid (No scrolling required) -->
+                                        <ItemsControl ItemsSource="{Binding Installments}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="2"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="2,1.5,4,1.5">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="68"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.Column="0" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="2" Padding="4,2" Margin="0,0,3,0" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Title}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <TextBox Grid.Column="1" Text="{Binding DueDate}" IsReadOnly="True" Height="26" FontSize="12" Background="White" Padding="4,1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </telerik:RadTabItem>
+
+                    <!-- Tab 2: List of All Schemes -->
+                    <telerik:RadTabItem Header="List" FontSize="13" FontWeight="SemiBold">
+                        <Border Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1,0,1,1"
+                                Padding="12">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Search Filter Bar -->
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Height="36"
+                                             Padding="8,4"
+                                             FontSize="13"
+                                             VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Search by Scheme Code, Customer, Staff or Status..."
+                                               Foreground="#888888"
+                                               IsHitTestVisible="False"
+                                               VerticalAlignment="Center"
+                                               Margin="12,0,0,0"
+                                               Visibility="{Binding SearchText, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"/>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding FilteredSchemeList.Count, StringFormat='Total Schemes: {0}'}"
+                                               VerticalAlignment="Center"
+                                               FontWeight="SemiBold"
+                                               FontSize="13"
+                                               Margin="14,0,0,0"/>
+                                </Grid>
+
+                                <!-- Data Grid (Consistent with BarcodeCreation DataGrid) -->
+                                <telerik:RadGridView Grid.Row="1"
+                                                     ItemsSource="{Binding FilteredSchemeList}"
+                                                     SelectedItem="{Binding SelectedScheme, Mode=TwoWay}"
+                                                     AutoGenerateColumns="False"
+                                                     IsReadOnly="True"
+                                                     RowIndicatorVisibility="Collapsed"
+                                                     ShowGroupPanel="False"
+                                                     EnableRowVirtualization="True"
+                                                     SelectionMode="Single"
+                                                     MinHeight="400">
+                                    <telerik:RadGridView.Columns>
+                                        <telerik:GridViewDataColumn Header="Scheme Code" DataMemberBinding="{Binding Scode}" Width="110"/>
+                                        <telerik:GridViewDataColumn Header="Customer Name" DataMemberBinding="{Binding CustomerName}" Width="220"/>
+                                        <telerik:GridViewDataColumn Header="Installment" DataMemberBinding="{Binding InstallmentAmt, StringFormat='{}{0:0.00}'}" TextAlignment="Right" Width="110"/>
+                                        <telerik:GridViewDataColumn Header="Months" DataMemberBinding="{Binding Month, StringFormat='{}{0:0}'}" TextAlignment="Right" Width="80"/>
+                                        <telerik:GridViewDataColumn Header="Total Value" DataMemberBinding="{Binding TotalValue, StringFormat='{}{0:0.00}'}" TextAlignment="Right" Width="110"/>
+                                        <telerik:GridViewDataColumn Header="Start Date" DataMemberBinding="{Binding SDate, StringFormat='dd/MM/yyyy'}" Width="100"/>
+                                        <telerik:GridViewDataColumn Header="Maturity Date" DataMemberBinding="{Binding EDate, StringFormat='dd/MM/yyyy'}" Width="100"/>
+                                        <telerik:GridViewDataColumn Header="Staff" DataMemberBinding="{Binding Staff}" Width="130"/>
+                                        <telerik:GridViewDataColumn Header="Closed" DataMemberBinding="{Binding Closed}" Width="75"/>
+                                        <telerik:GridViewDataColumn Header="Status" DataMemberBinding="{Binding Status}" Width="*"/>
+                                    </telerik:RadGridView.Columns>
+                                </telerik:RadGridView>
+                            </Grid>
+                        </Border>
+                    </telerik:RadTabItem>
+                </telerik:RadTabControl>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

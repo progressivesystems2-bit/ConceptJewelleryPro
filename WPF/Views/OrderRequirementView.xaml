@@ -1,0 +1,298 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.OrderRequirementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">     
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <Style x:Key="MetricCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Top Toolbar -->
+            <RowDefinition Height="Auto" /> <!-- KPI Summary Cards -->
+            <RowDefinition Height="Auto" /> <!-- Filter Bar -->
+            <RowDefinition Height="*" />    <!-- RadGridView -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Top Header & Toolbar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="36" Height="36" Background="{DynamicResource PanelBrush}" CornerRadius="6" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Order / Customer Requirements" FontSize="16.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="Manage custom jewellery orders, design requirements, artisans &amp; delivery tracking" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Actions Toolbar -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <telerik:RadButton Content="+ New Order (Alt+A)"
+                                       Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                       Command="{Binding AddNewCommand}"
+                                       MinWidth="135"
+                                       FontSize="12.5"
+                                       FontWeight="Bold"
+                                       Margin="0,0,6,0" />
+
+                    <telerik:RadButton Content="✏ Modify"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding ModifyCommand}" />
+
+                    <telerik:RadButton Content="✕ Delete"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding DeleteCommand}"
+                                       Foreground="{DynamicResource ErrorBrush}" />
+
+                    <Border Width="1" Background="{DynamicResource SeparatorBrush}" Margin="2,4,8,4" />
+
+                    <telerik:RadButton Content="📷 View Photo"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding ViewImageCommand}" />
+
+                    <telerik:RadButton Content="🖨 Order Slip"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding PrintReceiptCommand}" />
+
+                    <telerik:RadButton Content="📊 Export CSV"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding ExportToExcelCommand}" />
+
+                    <telerik:RadButton Content="🔄 Refresh"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding RefreshCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. KPI Summary Cards -->
+        <Grid Grid.Row="1" Margin="16,10,16,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Total Orders -->
+            <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="TOTAL ORDERS" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <TextBlock Text="{Binding TotalOrdersCount}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Pending -->
+            <Border Grid.Column="1" Style="{StaticResource MetricCardStyle}" BorderBrush="#3B82F6">
+                <StackPanel>
+                    <TextBlock Text="PENDING / IN PROGRESS" FontSize="10.5" FontWeight="Bold" Foreground="#3B82F6" />
+                    <TextBlock Text="{Binding PendingOrdersCount}" FontSize="18" FontWeight="Bold" Foreground="#3B82F6" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Completed -->
+            <Border Grid.Column="2" Style="{StaticResource MetricCardStyle}" BorderBrush="#16A34A">
+                <StackPanel>
+                    <TextBlock Text="COMPLETED / DELIVERED" FontSize="10.5" FontWeight="Bold" Foreground="#16A34A" />
+                    <TextBlock Text="{Binding CompletedOrdersCount}" FontSize="18" FontWeight="Bold" Foreground="#16A34A" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Approx Value -->
+            <Border Grid.Column="3" Style="{StaticResource MetricCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="TOTAL APPROX VALUE" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <TextBlock Text="{Binding TotalApproxValue, StringFormat='₹{0:N2}'}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Advance Paid -->
+            <Border Grid.Column="4" Style="{StaticResource MetricCardStyle}" BorderBrush="#16A34A">
+                <StackPanel>
+                    <TextBlock Text="TOTAL ADVANCE" FontSize="10.5" FontWeight="Bold" Foreground="#16A34A" />
+                    <TextBlock Text="{Binding TotalAdvanceCollected, StringFormat='₹{0:N2}'}" FontSize="16" FontWeight="Bold" Foreground="#16A34A" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Balance Due -->
+            <Border Grid.Column="5" Style="{StaticResource MetricCardStyle}" BorderBrush="#DC2626" Margin="0">
+                <StackPanel>
+                    <TextBlock Text="TOTAL BALANCE DUE" FontSize="10.5" FontWeight="Bold" Foreground="#DC2626" />
+                    <TextBlock Text="{Binding TotalBalanceDue, StringFormat='₹{0:N2}'}" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- 3. Filter Bar -->
+        <Border Grid.Row="2" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="0,1,0,1" Padding="16,8" Margin="0,4,0,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="280" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Search -->
+                <telerik:RadWatermarkTextBox Grid.Column="0"
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             WatermarkContent="🔍 Search by Customer, Order #, Item, Phone..."
+                                             
+                                             FontSize="13"
+                                             Margin="0,0,14,0" />
+
+                <!-- Status Filter -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0">
+                    <TextBlock Text="Status:" VerticalAlignment="Center" Margin="0,0,6,0" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <telerik:RadComboBox Width="130"
+                                         ItemsSource="{Binding StatusFilterOptions}"
+                                         SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
+                                         FontSize="12.5" />
+                </StackPanel>
+
+                <!-- Date Range -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0">
+                    <TextBlock Text="From:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <telerik:RadDatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}" Width="115" />
+                    <TextBlock Text="To:" VerticalAlignment="Center" Margin="8,0,5,0" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <telerik:RadDatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}" Width="115" />
+                </StackPanel>
+
+                <!-- Show Open Only CheckBox -->
+                <CheckBox Grid.Column="3"
+                          Content="Show Open Orders Only"
+                          IsChecked="{Binding ShowOnlyOpen, Mode=TwoWay}"
+                          FontWeight="SemiBold"
+                          VerticalAlignment="Center"
+                          Foreground="{DynamicResource PrimaryTextBrush}" />
+            </Grid>
+        </Border>
+
+        <!-- 4. Main RadGridView of Orders -->
+        <telerik:RadGridView Grid.Row="3"
+                             x:Name="OrdersGrid"
+                             ItemsSource="{Binding FilteredOrders}"
+                             SelectedItem="{Binding SelectedOrder, Mode=TwoWay}"
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             CanUserReorderColumns="True"
+                             CanUserResizeColumns="True"
+                             ShowGroupPanel="True"
+                             RowIndicatorVisibility="Collapsed"
+                             RowHeight="40"
+                             FontSize="13"
+                             BorderThickness="0"
+                             Background="{DynamicResource CardBackgroundBrush}"
+                             Foreground="{DynamicResource PrimaryTextBrush}"
+                             Margin="16,0,16,14"
+                             MouseDoubleClick="OrdersGrid_MouseDoubleClick">
+            <telerik:RadGridView.Columns>
+                <!-- Photo Thumbnail Indicator -->
+                <telerik:GridViewColumn Header="Img" Width="45">
+                    <telerik:GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Width="26" Height="26" CornerRadius="3" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                                        Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="📷" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </telerik:GridViewColumn.CellTemplate>
+                </telerik:GridViewColumn>
+
+                <!-- Order No -->
+                <telerik:GridViewDataColumn Header="Order No" DataMemberBinding="{Binding OrderNo}" Width="105" />
+
+                <!-- Category / Type -->
+                <telerik:GridViewDataColumn Header="Type" DataMemberBinding="{Binding OrderCategory}" Width="95" />
+
+                <!-- Order Date -->
+                <telerik:GridViewDataColumn Header="Order Date" DataMemberBinding="{Binding OrderDate, StringFormat=dd/MM/yyyy}" Width="95" />
+
+                <!-- Delivery Date -->
+                <telerik:GridViewDataColumn Header="Due Date" DataMemberBinding="{Binding DeliveryDate, StringFormat=dd/MM/yyyy}" Width="95" />
+
+                <!-- Customer Name -->
+                <telerik:GridViewDataColumn Header="Customer Name" DataMemberBinding="{Binding CustomerName}" Width="160" />
+
+                <!-- Phone -->
+                <telerik:GridViewDataColumn Header="Phone" DataMemberBinding="{Binding Phone}" Width="110" />
+
+                <!-- City -->
+                <telerik:GridViewDataColumn Header="City" DataMemberBinding="{Binding City}" Width="95" />
+
+                <!-- Item Name -->
+                <telerik:GridViewDataColumn Header="Item Name" DataMemberBinding="{Binding ItemName}" Width="140" />
+
+                <!-- Purity -->
+                <telerik:GridViewDataColumn Header="Purity" DataMemberBinding="{Binding Purity}" Width="65" />
+
+                <!-- Qty -->
+                <telerik:GridViewDataColumn Header="Qty" DataMemberBinding="{Binding Qty}" Width="50" TextAlignment="Right" />
+
+                <!-- Approx Weight -->
+                <telerik:GridViewDataColumn Header="Approx Wt" DataMemberBinding="{Binding AppWeight, StringFormat=N3}" Width="85" TextAlignment="Right" />
+
+                <!-- Approx Value -->
+                <telerik:GridViewDataColumn Header="Approx Value" DataMemberBinding="{Binding AppValue, StringFormat='₹{0:N2}'}" Width="110" TextAlignment="Right" />
+
+                <!-- Advance Paid -->
+                <telerik:GridViewDataColumn Header="Advance" DataMemberBinding="{Binding AdvancePaid, StringFormat='₹{0:N2}'}" Width="95" TextAlignment="Right" />
+
+                <!-- Balance Due -->
+                <telerik:GridViewDataColumn Header="Balance" DataMemberBinding="{Binding BalanceDue, StringFormat='₹{0:N2}'}" Width="95" TextAlignment="Right" />
+
+                <!-- Status Badge -->
+                <telerik:GridViewDataColumn Header="Status" DataMemberBinding="{Binding Status}" Width="105" />
+
+                <!-- Assigned Karigar -->
+                <telerik:GridViewDataColumn Header="Karigar" DataMemberBinding="{Binding KarigarName}" Width="120" />
+
+                <!-- Closed -->
+                <telerik:GridViewCheckBoxColumn Header="Closed" DataMemberBinding="{Binding Closed}" Width="65" />
+
+                <!-- Description -->
+                <telerik:GridViewDataColumn Header="Requirement Notes" DataMemberBinding="{Binding Description}" Width="*" />
+            </telerik:RadGridView.Columns>
+        </telerik:RadGridView>
+
+        <!-- Toast Notification Container -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                    Grid.Row="3"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,0,24,24" />
+    </Grid>
+</UserControl>

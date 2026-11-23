@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ConceptJewelleryPro | Luxury Showroom Portal</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
+</head>
+<body data-theme="glassmorphism">
+
+  <!-- ── Top Application Header ────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="brand-container" onclick="navigateTo('dashboard')">
+      <div class="brand-logo-icon">💎</div>
+      <div>
+        <div class="brand-title">Concept Pro</div>
+        <div class="brand-subtitle">Showroom Management ERP</div>
+      </div>
+    </div>
+
+    <!-- Live Rate Ticker in Header (Desktop / Tablet) -->
+    <div class="rate-ticker">
+      <div class="rate-badge">
+        <span class="label">22K Gold:</span>
+        <span class="val">₹6,850/g</span>
+      </div>
+      <div class="rate-divider"></div>
+      <div class="rate-badge">
+        <span class="label">18K Gold:</span>
+        <span class="val">₹5,600/g</span>
+      </div>
+      <div class="rate-divider"></div>
+      <div class="rate-badge">
+        <span class="label">Silver:</span>
+        <span class="val">₹88/g</span>
+      </div>
+    </div>
+
+    <!-- User Profile & Actions -->
+    <div class="header-actions">
+      <button class="btn-icon" onclick="navigateTo('dashboard')" title="Dashboard">🏠</button>
+      <button class="btn-icon" onclick="applyTheme(State.theme === 'light' ? 'glassmorphism' : (State.theme === 'glassmorphism' ? 'darkGold' : 'light'))" title="Toggle Theme">✨</button>
+      
+      <div id="header-user-pill" class="user-pill" style="display:none;" onclick="navigateTo('settings')">
+        <div id="header-user-avatar" class="user-avatar">A</div>
+        <div>
+          <div id="header-user-name" class="user-name">ADMIN</div>
+          <div id="header-user-role" class="user-role">Administrator</div>
+        </div>
+      </div>
+
+      <button id="header-logout-btn" class="btn-icon" style="display:none;" onclick="logout()" title="Logout">🚪</button>
+    </div>
+  </header>
+
+  <!-- ── Mobile Live Rate Strip ────────────────────────────────────────────── -->
+  <div class="mobile-rate-strip">
+    <div>22K: <strong style="color:var(--accent-gold);">₹6,850/g</strong></div>
+    <div style="width:1px; height:12px; background:var(--border-subtle);"></div>
+    <div>18K: <strong style="color:var(--text-primary);">₹5,600/g</strong></div>
+    <div style="width:1px; height:12px; background:var(--border-subtle);"></div>
+    <div>Silver: <strong style="color:var(--text-primary);">₹88/g</strong></div>
+  </div>
+
+  <!-- ── Main Viewport ─────────────────────────────────────────────────────── -->
+  <main class="main-viewport">
+
+    <!-- ── VIEW 0: LOGIN ───────────────────────────────────────────────────── -->
+    <section id="view-login" class="view-section login-view-wrapper">
+      <div class="glass-card login-card">
+        <div class="login-emblem">👑</div>
+        <h2 class="login-title gold-gradient-text">Concept Jewellery Pro</h2>
+        <p class="login-desc">Enter your staff credentials to access the showroom portal</p>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="login-username">Username / Staff ID</label>
+            <input type="text" id="login-username" class="form-input" placeholder="e.g. admin or staff1" required autocomplete="username" autocapitalize="none">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="login-submit-btn" class="btn-gold btn-full" style="margin-top: 1rem;">
+            Sign In to Portal ✨
+          </button>
+        </form>
+
+        <div class="demo-presets">
+          <div class="demo-presets-title">Quick Demo Login</div>
+          <div class="demo-pills">
+            <button type="button" class="demo-pill" onclick="fillDemoUser('admin', 'admin123')">👑 Admin</button>
+            <button type="button" class="demo-pill" onclick="fillDemoUser('cashier', 'cashier123')">🧾 Cashier</button>
+            <button type="button" class="demo-pill" onclick="fillDemoUser('staff', 'staff123')">💎 Sales Staff</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VIEW 1: 3x3 GRID DASHBOARD ──────────────────────────────────────── -->
+    <section id="view-dashboard" class="view-section" style="display:none;">
+      
+      <!-- Welcome Banner -->
+      <div class="glass-card dashboard-header-banner">
+        <div class="dashboard-title-group">
+          <h1>Welcome, <span id="dash-staff-name" class="gold-gradient-text">STAFF USER</span></h1>
+          <p id="dash-staff-role">Showroom Operations Portal • Live Localhost Instance</p>
+        </div>
+        <div>
+          <button class="btn-secondary" onclick="navigateTo('settings')">⚙️ Server Status</button>
+        </div>
+      </div>
+
+      <!-- 3x3 Fluid Grid -->
+      <div class="grid-3x3">
+
+        <!-- 1. Barcode Valuation -->
+        <div class="glass-card tile-card" onclick="navigateTo('valuation')">
+          <div class="tile-icon-circle">🏷️</div>
+          <div>
+            <div class="tile-title">Barcode<br>Valuation</div>
+            <span class="tile-badge">Live Rates</span>
+          </div>
+        </div>
+
+        <!-- 2. Catalogue -->
+        <div class="glass-card tile-card" onclick="navigateTo('catalogue')">
+          <div class="tile-icon-circle">💎</div>
+          <div>
+            <div class="tile-title">Stock<br>Catalogue</div>
+            <span class="tile-badge">Showcase</span>
+          </div>
+        </div>
+
+        <!-- 3. Image Update -->
+        <div class="glass-card tile-card" onclick="navigateTo('image-update')">
+          <div class="tile-icon-circle">📸</div>
+          <div>
+            <div class="tile-title">Image<br>Update</div>
+            <span class="tile-badge">Capture</span>
+          </div>
+        </div>
+
+        <!-- 4. Sticker Reprint -->
+        <div class="glass-card tile-card" onclick="navigateTo('sticker-reprint')">
+          <div class="tile-icon-circle">🏷️</div>
+          <div>
+            <div class="tile-title">Sticker<br>Reprint</div>
+            <span class="tile-badge">Print & Edit</span>
+          </div>
+        </div>
+
+        <!-- 4. Customer Requirement -->
+        <div class="glass-card tile-card" onclick="navigateTo('customer-req')">
+          <div class="tile-icon-circle">📝</div>
+          <div>
+            <div class="tile-title">Customer<br>Requirement</div>
+            <span class="tile-badge">Wishlist</span>
+          </div>
+        </div>
+
+        <!-- 5. AI Biller -->
+        <div class="glass-card tile-card" onclick="navigateTo('ai-biller')">
+          <div class="tile-icon-circle">🤖</div>
+          <div>
+            <div class="tile-title">AI<br>Biller</div>
+            <span class="tile-badge">AI Scan</span>
+          </div>
+        </div>
+
+        <!-- 6. Generate Invoice -->
+        <div class="glass-card tile-card" onclick="navigateTo('generate-invoice')">
+          <div class="tile-icon-circle">🧾</div>
+          <div>
+            <div class="tile-title">Generate<br>Invoice</div>
+            <span class="tile-badge">Billing</span>
+          </div>
+        </div>
+
+        <!-- 7. Documents -->
+        <div class="glass-card tile-card" onclick="navigateTo('documents')">
+          <div class="tile-icon-circle">📁</div>
+          <div>
+            <div class="tile-title">Documents<br>& KYC</div>
+            <span class="tile-badge">Upload</span>
+          </div>
+        </div>
+
+        <!-- 8. Stock Summary -->
+        <div class="glass-card tile-card" onclick="navigateTo('stock-summary')">
+          <div class="tile-icon-circle">📦</div>
+          <div>
+            <div class="tile-title">Stock<br>Summary</div>
+            <span class="tile-badge">Stats</span>
+          </div>
+        </div>
+
+        <!-- 9. Server & Settings -->
+        <div class="glass-card tile-card" onclick="navigateTo('settings')">
+          <div class="tile-icon-circle">⚙️</div>
+          <div>
+            <div class="tile-title">Server &<br>Settings</div>
+            <span class="tile-badge">Config</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Summary Strip -->
+      <div class="glass-card quick-stats-strip">
+        <div class="quick-stat-item">
+          <div class="label">22K Gold Rate</div>
+          <div class="val gold">₹6,850 / g</div>
+        </div>
+        <div class="quick-stat-item">
+          <div class="label">18K Gold Rate</div>
+          <div class="val">₹5,600 / g</div>
+        </div>
+        <div class="quick-stat-item">
+          <div class="label">Silver Rate</div>
+          <div class="val">₹88 / g</div>
+        </div>
+        <div class="quick-stat-item">
+          <div class="label">ERP Status</div>
+          <div class="val" style="color:var(--status-success); font-size:1.1rem;">● Connected</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 1: BARCODE VALUATION ────────────────────────────────────── -->
+    <section id="view-valuation" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>🏷️ Barcode Valuation</h2>
+          <p>Scan or enter jewellery tag barcode for live metal price & making charge calculation</p>
+        </div>
+      </div>
+
+      <div class="feature-split-layout">
+        <!-- Input & Config Column -->
+        <div>
+          <div class="glass-card" style="padding: clamp(1rem, 3vw, 1.5rem); margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label">Article Barcode</label>
+              <div style="display:flex; gap:0.5rem;">
+                <input type="text" id="val-barcode-input" class="form-input" placeholder="e.g. 005008 or BC1002" autocapitalize="characters" onkeydown="if(event.key==='Enter') lookupValuationBarcode()">
+                <button type="button" class="btn-scanner" onclick="openCameraScanner('val-barcode-input', lookupValuationBarcode)" title="Scan barcode with camera" aria-label="Scan barcode with camera">📷</button>
+                <button id="val-search-btn" class="btn-gold" style="min-width:48px; padding:0 1rem;" onclick="lookupValuationBarcode()">🔍</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label">Making Charges</label>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.65rem;">
+                <div>
+                  <input type="number" inputmode="decimal" id="val-making-per-gram" class="form-input" placeholder="Making / g (₹)" oninput="document.getElementById('val-making-percent').value=''; calculateValuation();">
+                </div>
+                <div>
+                  <input type="number" inputmode="decimal" id="val-making-percent" class="form-input" placeholder="Making (%)" oninput="document.getElementById('val-making-per-gram').value=''; calculateValuation();">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">GST Mode</label>
+              <div style="display:flex; gap:0.85rem; flex-wrap:wrap;">
+                <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.85rem; cursor:pointer;">
+                  <input type="radio" name="val-gst-mode" value="ExclusiveGST" checked onchange="calculateValuation()"> + 3% GST (Exclusive)
+                </label>
+                <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.85rem; cursor:pointer;">
+                  <input type="radio" name="val-gst-mode" value="InclusiveGST" onchange="calculateValuation()"> GST Included
+                </label>
+              </div>
+            </div>
+
+            <button class="btn-gold btn-full" onclick="calculateValuation()" style="margin-top:0.4rem;">Recalculate Valuation ⚡</button>
+          </div>
+
+          <!-- Product Details Card -->
+          <div id="val-product-card" class="glass-card" style="padding: clamp(1rem, 3vw, 1.5rem); display:none; margin-bottom:1.25rem;">
+            <div style="display:flex; gap:1rem; align-items:center;">
+              <img id="val-item-img" src="" alt="Product" style="width:72px; height:72px; border-radius:var(--radius-md); object-fit:cover; border:1px solid var(--border-subtle); display:none;">
+              <div id="val-img-placeholder" style="width:72px; height:72px; border-radius:var(--radius-md); background:var(--bg-input); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0;">💎</div>
+              <div>
+                <h3 id="val-item-name" style="font-size:1.05rem; font-weight:800;">Item Name</h3>
+                <p id="val-item-barcode" style="color:var(--accent-gold); font-weight:700; font-size:0.82rem;">#000000</p>
+                <p id="val-item-desc" style="color:var(--text-muted); font-size:0.78rem; margin-top:2px;">Description</p>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.5rem; margin-top:1rem; text-align:center; padding-top:0.85rem; border-top:1px solid var(--border-subtle);">
+              <div>
+                <div style="font-size:0.68rem; color:var(--text-muted); font-weight:700;">Gross Wt</div>
+                <div id="val-gross-wt" style="font-weight:800; font-size:0.9rem;">0g</div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem; color:var(--text-muted); font-weight:700;">Stone Wt</div>
+                <div id="val-stone-wt" style="font-weight:800; font-size:0.9rem;">0g</div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem; color:var(--text-muted); font-weight:700;">Net Wt</div>
+                <div id="val-net-wt" style="font-weight:800; font-size:0.9rem; color:var(--accent-gold);">0g</div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem; color:var(--text-muted); font-weight:700;">Rate/g</div>
+                <div id="val-rate-gram" style="font-weight:800; font-size:0.9rem; color:var(--accent-gold);">₹0/g</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt / Final Price Column -->
+        <div>
+          <div id="val-receipt-card" class="glass-card valuation-receipt" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+              <h3 class="luxury-serif" style="font-size:1.15rem;">Valuation Receipt</h3>
+              <span id="receipt-barcode" class="tile-badge">#000000</span>
+            </div>
+
+            <div class="receipt-line">
+              <span>Metal Value (<span id="receipt-metal-calc">0g × ₹0</span>)</span>
+              <span id="receipt-metal-val" style="font-weight:700;">₹0</span>
+            </div>
+
+            <div class="receipt-line">
+              <span>Stone Value</span>
+              <span id="receipt-stone-val" style="font-weight:700;">₹0</span>
+            </div>
+
+            <div class="receipt-line">
+              <span>Making Charges</span>
+              <span id="receipt-making-val" style="font-weight:700;">₹0</span>
+            </div>
+
+            <div class="receipt-line subtotal">
+              <span>SubTotal</span>
+              <span id="receipt-subtotal">₹0</span>
+            </div>
+
+            <div class="receipt-line">
+              <span id="receipt-gst-label">GST (3%)</span>
+              <span id="receipt-gst-val">₹0</span>
+            </div>
+
+            <div class="receipt-line total">
+              <span class="label">ESTIMATED PRICE</span>
+              <span id="receipt-final-price" class="val">₹0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 2: CATALOGUE ────────────────────────────────────────────── -->
+    <section id="view-catalogue" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>💎 Showroom Stock Catalogue</h2>
+          <p>Browse active in-stock jewellery items with live specs, weights, and high-res photos</p>
+        </div>
+      </div>
+
+      <!-- Search & Filters Bar (Fluid on Mobile) -->
+      <div class="glass-card" style="padding: clamp(0.85rem, 2.5vw, 1.25rem); margin-bottom:1.25rem;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:0.6rem; align-items:flex-end;">
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label">Search Keyword / Barcode</label>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="cat-search-input" class="form-input" placeholder="Search necklace, ring, barcode 005008..." onkeydown="if(event.key==='Enter') fetchCatalogue()">
+              <button type="button" class="btn-scanner" onclick="openCameraScanner('cat-search-input', fetchCatalogue)" title="Scan barcode with camera" aria-label="Scan barcode with camera">📷</button>
+              <button class="btn-gold" style="min-width:48px;" onclick="fetchCatalogue()">🔍</button>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Item Name</label>
+            <select id="cat-itemname-select" class="form-select" onchange="onCatalogueItemNameChange()">
+              <option value="All">All Items</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Size</label>
+            <select id="cat-size-select" class="form-select" onchange="fetchCatalogue()">
+              <option value="All">All Sizes</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">From Wt (g)</label>
+            <input type="number" inputmode="decimal" id="cat-from-wt" class="form-input" placeholder="0" onchange="fetchCatalogue()">
+          </div>
+          <div>
+            <label class="form-label">To Wt (g)</label>
+            <input type="number" inputmode="decimal" id="cat-to-wt" class="form-input" placeholder="100" onchange="fetchCatalogue()">
+          </div>
+          <div>
+            <label class="form-label">Purity</label>
+            <select id="cat-purity-select" class="form-select" onchange="fetchCatalogue()">
+              <option value="All">All Purities</option>
+              <option value="916">22K (916)</option>
+              <option value="750">18K (750)</option>
+              <option value="Silver">Silver</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="opacity:0; display:block;">Action</label>
+            <button type="button" class="btn-secondary" style="width:100%; height:40px; display:flex; align-items:center; justify-content:center; gap:4px;" onclick="resetCatalogueFilters()" title="Reset all catalogue filters">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Pills -->
+      <div class="category-pills">
+        <button class="cat-pill active" data-category="All" onclick="filterCategory('All')">All Items</button>
+        <button class="cat-pill" data-category="Ring" onclick="filterCategory('Ring')">Rings</button>
+        <button class="cat-pill" data-category="Necklace" onclick="filterCategory('Necklace')">Necklaces</button>
+        <button class="cat-pill" data-category="Bangle" onclick="filterCategory('Bangle')">Bangles</button>
+        <button class="cat-pill" data-category="Earrings" onclick="filterCategory('Earrings')">Earrings</button>
+        <button class="cat-pill" data-category="Pendant" onclick="filterCategory('Pendant')">Pendants</button>
+        <button class="cat-pill" data-category="Chain" onclick="filterCategory('Chain')">Chains</button>
+        <button class="cat-pill" data-category="Kada" onclick="filterCategory('Kada')">Kadas</button>
+        <button class="cat-pill" data-category="Mangalsutra" onclick="filterCategory('Mangalsutra')">Mangalsutra</button>
+      </div>
+
+      <!-- Catalogue Stock Grid -->
+      <div id="catalogue-loading" style="display:none; justify-content:center; padding:3rem; font-size:1.1rem; color:var(--text-muted);">
+        Loading Stock Catalogue...
+      </div>
+      <div id="catalogue-empty" style="display:none; text-align:center; padding:3rem; color:var(--text-muted);">
+        No jewellery stock items found matching your filters.
+      </div>
+      <div id="catalogue-items-grid" class="catalogue-grid"></div>
+    </section>
+
+    <!-- ── MODULE 3: IMAGE UPDATE (Capture Only) ────────────────────────── -->
+    <section id="view-image-update" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>📸 Barcode Image Capture</h2>
+          <p>Search or scan jewellery barcode and capture or upload product photo to server</p>
+        </div>
+      </div>
+
+      <div style="max-width:620px; margin:0 auto;">
+        <div class="glass-card" style="padding:clamp(1.2rem, 3vw, 1.8rem);">
+          <div class="form-group">
+            <label class="form-label">Article Barcode</label>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="img-barcode-input" class="form-input" placeholder="e.g. 005008" autocapitalize="characters" onkeydown="if(event.key==='Enter') lookupBarcodeForImage()">
+              <button type="button" class="btn-scanner" onclick="openCameraScanner('img-barcode-input', lookupBarcodeForImage)" title="Scan barcode with camera" aria-label="Scan barcode with camera">📷</button>
+              <button class="btn-gold" style="min-width:48px;" onclick="lookupBarcodeForImage()">🔍</button>
+            </div>
+          </div>
+
+          <!-- Product info banner -->
+          <div id="img-product-info-card" style="display:none; padding:0.9rem 1rem; background:var(--bg-input); border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem;">
+              <div style="flex:1; min-width:0;">
+                <div id="img-product-name" style="font-weight:800; font-size:1rem; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Item Name</div>
+                <div id="img-product-purity" style="color:var(--accent-gold); font-size:0.82rem; font-weight:700; margin-top:3px;">Silver • Net: 0g</div>
+                <div id="img-product-specs" style="color:var(--text-muted); font-size:0.78rem; margin-top:3px;">Gross: 0g • Size: -</div>
+              </div>
+              <div id="img-server-photo-badge" style="text-align:right; flex-shrink:0;">
+                <span id="img-photo-status" class="tile-badge">Checking...</span>
+              </div>
+            </div>
+
+            <!-- Existing photo preview if present on server -->
+            <div id="img-current-photo-container" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-subtle); text-align:center;">
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:0.4rem; text-transform:uppercase; font-weight:700;">Current Server Photo</div>
+              <img id="img-current-server-preview" src="" alt="Server Photo" style="max-width:160px; max-height:160px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); object-fit:cover;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Capture / Select Photo</label>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
+              <input type="file" id="img-file-input" style="display:none;" accept="image/*" onchange="handleImageSelect(event)">
+              <input type="file" id="img-camera-input" style="display:none;" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('img-camera-input').click()">
+                📷 Open Camera
+              </button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('img-file-input').click()">
+                🖼️ From Gallery
+              </button>
+            </div>
+          </div>
+
+          <div id="img-preview-box" style="display:none; text-align:center; margin:1rem 0; padding:0.75rem; background:var(--bg-input); border-radius:var(--radius-md);">
+            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700; margin-bottom:0.4rem;">New Photo Selected:</div>
+            <img id="img-upload-preview" src="" alt="New Preview" style="max-width:200px; max-height:200px; border-radius:var(--radius-md); border:2px solid var(--accent-gold); object-fit:cover;">
+          </div>
+
+          <button id="img-upload-submit-btn" class="btn-gold btn-full" onclick="uploadBarcodeImage()" style="margin-top:0.5rem;">
+            📸 Upload Photo to Server
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE: STICKER REPRINT ─────────────────────────────────────────── -->
+    <section id="view-sticker-reprint" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>🏷️ Barcode Sticker Reprint</h2>
+          <p>Scan barcode, change Type (PC / WT), Size, MRP or MC, and print respective sticker</p>
+        </div>
+      </div>
+
+      <div style="max-width:720px; margin:0 auto;">
+        <div class="glass-card" style="padding:clamp(1.2rem, 3.5vw, 1.85rem);">
+          <!-- Barcode Search -->
+          <div class="form-group">
+            <label class="form-label">Article Barcode</label>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="stk-barcode-input" class="form-input" placeholder="e.g. 005008" autocapitalize="characters" onkeydown="if(event.key==='Enter') lookupBarcodeForSticker()">
+              <button type="button" class="btn-scanner" onclick="openCameraScanner('stk-barcode-input', lookupBarcodeForSticker)" title="Scan barcode with camera" aria-label="Scan barcode with camera">📷</button>
+              <button class="btn-gold" style="min-width:48px;" onclick="lookupBarcodeForSticker()">🔍</button>
+            </div>
+          </div>
+
+          <!-- Product Details Banner (Shown after barcode lookup) -->
+          <div id="stk-product-info-card" style="display:none; padding:1rem; background:var(--bg-input); border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem;">
+              <div style="flex:1; min-width:0;">
+                <div id="stk-item-name" style="font-weight:800; font-size:1.05rem; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Item Name</div>
+                <div id="stk-item-meta" style="color:var(--accent-gold); font-size:0.82rem; font-weight:700; margin-top:2px;">TAG #0000 • 22KT</div>
+                <div id="stk-item-weights" style="color:var(--text-muted); font-size:0.78rem; margin-top:4px;">Gross: 0g • Net: 0g • Stone: 0g</div>
+                <div id="stk-item-desc" style="color:var(--text-secondary); font-size:0.76rem; margin-top:2px; font-style:italic;">Description</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <div id="stk-item-img-box" style="display:none; margin-bottom:4px;">
+                  <img id="stk-item-thumb" src="" alt="Thumbnail" style="width:48px; height:48px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); object-fit:cover;">
+                </div>
+                <span id="stk-db-type-badge" class="tile-badge">WT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Specifications Form (PC / WT) -->
+          <div id="stk-edit-section" style="display:none;">
+            <!-- PC / WT Segmented Selector -->
+            <label class="form-label" style="margin-bottom:0.35rem;">Type Selection (PC / WT)</label>
+            <div class="segmented-type-toggle">
+              <button type="button" id="stk-btn-pc" class="type-toggle-btn" onclick="setStickerType('PC')">
+                📦 Piece (PC)
+              </button>
+              <button type="button" id="stk-btn-wt" class="type-toggle-btn active" onclick="setStickerType('WT')">
+                ⚖️ Weight (WT)
+              </button>
+            </div>
+
+            <!-- Dynamic Fields -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+              <!-- Size (Always editable for both PC and WT) -->
+              <div class="form-group">
+                <label class="form-label">Article Size</label>
+                <input type="text" id="stk-size-input" class="form-input" placeholder="e.g. 16 Inch, 2.4, 14">
+              </div>
+
+              <!-- MRP (Shown if PC is selected) -->
+              <div class="form-group" id="stk-mrp-group">
+                <label class="form-label">Selling MRP (₹) *</label>
+                <input type="number" inputmode="decimal" id="stk-mrp-input" class="form-input" placeholder="e.g. 85000">
+              </div>
+
+              <!-- MC / Making Charges (Shown if WT is selected) -->
+              <div class="form-group" id="stk-mc-group" style="display:none;">
+                <label class="form-label">Making Charge / MC (₹) *</label>
+                <input type="number" inputmode="decimal" id="stk-mc-input" class="form-input" placeholder="e.g. 450">
+              </div>
+            </div>
+
+            <!-- Target Template & Printer -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-top:0.25rem;">
+              <div class="form-group">
+                <label class="form-label">Sticker Format (StickerPC / StickerWt)</label>
+                <div style="display:flex; gap:0.4rem;">
+                  <select id="stk-format-select" class="form-input" style="flex:1;">
+                    <option value="StickerPC">StickerPC (Piece / MRP design)</option>
+                    <option value="StickerWt">StickerWt (Weight / MC design)</option>
+                    <option value="With Making">With Making</option>
+                    <option value="No Making">No Making</option>
+                    <option value="Diamond">Diamond</option>
+                    <option value="81x12_bat">81x12_bat (Butterfly Tag)</option>
+                  </select>
+                  <select id="stk-engine-select" class="form-input" style="width:92px; font-weight:700;" title="Print File Mode: PRN or FRX">
+                    <option value="PRN">PRN</option>
+                    <option value="FRX">FRX</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Barcode Printer</span>
+                  <span id="stk-printer-source-label" style="font-weight:normal; font-size:0.72rem; color:var(--accent-gold);">Settings</span>
+                </label>
+                <select id="stk-printer-select" class="form-input" onchange="onStkPrinterChanged()">
+                  <option value="">Loading installed printers...</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:0.25rem;">
+              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:700; font-size:0.85rem;">
+                <input type="checkbox" id="stk-reprint-queue-toggle" style="width:18px; height:18px; accent-color:var(--accent-gold);" checked>
+                <span>Queue in ERP Database for Reprint Record 🏷️</span>
+              </label>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr; gap:0.6rem; margin-top:1rem;">
+              <button id="stk-save-print-btn" class="btn-gold btn-full" onclick="saveAndPrintSticker(true)" style="padding:0.85rem; font-size:1rem;">
+                🏷️ Save & Print Respective Barcode Design
+              </button>
+              <button id="stk-save-only-btn" class="btn-secondary btn-full" onclick="saveAndPrintSticker(false)" style="padding:0.65rem;">
+                💾 Save to Database Only
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 4: CUSTOMER REQUIREMENT ─────────────────────────────────── -->
+    <section id="view-customer-req" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>📝 Customer Requirement Lead</h2>
+          <p>Record custom design orders, wishlist inquiries, and follow-up leads in ERP database</p>
+        </div>
+      </div>
+
+      <div class="glass-card" style="max-width:700px; margin:0 auto; padding:clamp(1.25rem, 4vw, 2rem);">
+        <form id="customer-req-form" onsubmit="submitCustomerRequirement(event)">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Order Category *</label>
+              <select id="req-order-category" class="form-input" style="font-weight:700;">
+                <option value="Requirement" selected>Requirement</option>
+                <option value="Order">Order</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <div style="position:relative;">
+                <input type="tel" inputmode="tel" id="req-phone" class="form-input" placeholder="e.g. 9876543210" required oninput="onReqPhoneInput(event)" onblur="lookupCustomerByPhone()">
+                <span id="req-phone-status" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:0.85rem; display:none;"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer Name *</label>
+              <input type="text" id="req-name" class="form-input" placeholder="Auto-fills from DB or enter name" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Requested Article / Item Name *</label>
+            <input type="text" id="req-item" class="form-input" placeholder="e.g. Antique Temple Choker or Solitaire Ring" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Target Purity</label>
+              <input type="text" id="req-purity" class="form-input" placeholder="22K / 18K / Platinum" value="22K">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Weight Range</label>
+              <input type="text" id="req-weight" class="form-input" placeholder="e.g. 20g - 25g">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Design Description</label>
+            <textarea id="req-desc" class="form-textarea" placeholder="Ruby stones with floral embossing and antique Polish finish..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Follow-up Remarks</label>
+            <input type="text" id="req-remarks" class="form-input" placeholder="Needed before wedding date in Nov">
+          </div>
+
+          <!-- Reference Design / CAD / Sample Photo -->
+          <div class="form-group">
+            <label class="form-label">Reference Design Photo / CAD Sketch (Optional)</label>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+              <input type="file" id="req-camera-input" style="display:none;" accept="image/*" capture="environment" onchange="handleReqImage(event)">
+              <input type="file" id="req-file-input" style="display:none;" accept="image/*" onchange="handleReqImage(event)">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('req-camera-input').click()">
+                📷 Snap with Camera
+              </button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('req-file-input').click()">
+                📁 Browse File / Gallery
+              </button>
+            </div>
+
+            <!-- Preview Card -->
+            <div id="req-image-preview-container" style="display:none; padding:0.65rem 0.85rem; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-md); align-items:center; justify-content:space-between; gap:0.75rem;">
+              <div style="display:flex; align-items:center; gap:0.75rem; min-width:0;">
+                <img id="req-image-preview" src="" alt="Selected Design" style="width:48px; height:48px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); flex-shrink:0;">
+                <div style="min-width:0;">
+                  <div id="req-image-name" style="font-weight:700; font-size:0.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text-primary);">image.jpg</div>
+                  <div id="req-image-size" style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">0 KB</div>
+                </div>
+              </div>
+              <button type="button" class="btn-icon" onclick="clearReqImage()" title="Remove photo" style="color:var(--status-error); font-size:0.9rem; flex-shrink:0;">✕</button>
+            </div>
+          </div>
+
+          <button type="submit" id="req-submit-btn" class="btn-gold btn-full" style="margin-top:0.75rem;">
+            Log Customer Requirement
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ── MODULE 5: AI BILLER ────────────────────────────────────────────── -->
+    <section id="view-ai-biller" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>🤖 AI Biller & Invoice Scanner</h2>
+          <p>Scan physical purchase bills or vendor invoices using Azure AI Document Intelligence</p>
+        </div>
+      </div>
+
+      <div class="feature-split-layout">
+        <div>
+          <div class="glass-card" style="padding:clamp(1.25rem, 3vw, 1.75rem); text-align:center;">
+            <div style="border:2px dashed var(--border-highlight); padding:clamp(1.25rem, 3vw, 2rem) 1rem; border-radius:var(--radius-md); background:var(--bg-input);">
+              <div style="font-size:clamp(2.2rem, 5vw, 3rem); margin-bottom:0.5rem;">🧾</div>
+              <h3 style="font-size:clamp(1rem, 2.5vw, 1.15rem); margin-bottom:0.3rem;">Select or Snap Bill Image</h3>
+              <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem;">Supports JPEG, PNG, TIFF, or PDF invoices</p>
+              
+              <input type="file" id="ai-bill-file-input" style="display:none;" accept="image/*,.pdf" onchange="handleAiBillFile(event)">
+              <input type="file" id="ai-bill-camera-input" style="display:none;" accept="image/*" capture="environment" onchange="handleAiBillFile(event)">
+              
+              <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="document.getElementById('ai-bill-camera-input').click()">
+                  📷 Snap Bill Photo
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('ai-bill-file-input').click()">
+                  📁 Browse File
+                </button>
+              </div>
+
+              <div id="ai-bill-filename" style="margin-top:0.6rem; font-size:0.8rem; color:var(--accent-gold); font-weight:700; word-break:break-all;"></div>
+            </div>
+
+            <button id="ai-bill-submit-btn" class="btn-gold btn-full" style="margin-top:1rem;" onclick="parseAiBill()" disabled>
+              Scan & Extract with AI ⚡
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div id="ai-bill-result-card" class="glass-card" style="padding:clamp(1rem, 3vw, 1.75rem); display:none;">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.75rem;">Extracted Invoice Data</h3>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; margin-bottom:0.85rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border-subtle);">
+              <div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">Vendor Name:</div>
+                <div id="ai-vendor-name" style="font-weight:800; font-size:0.9rem;">-</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">Invoice No:</div>
+                <div id="ai-invoice-no" style="font-weight:800; font-size:0.9rem;">-</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">Invoice Date:</div>
+                <div id="ai-invoice-date" style="font-weight:700; font-size:0.85rem;">-</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--text-muted);">Total Amount:</div>
+                <div id="ai-invoice-total" style="font-weight:900; color:var(--accent-gold); font-size:1.05rem;">₹0</div>
+              </div>
+            </div>
+
+            <!-- Scrollable Table for Mobile -->
+            <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+              <table style="width:100%; min-width:320px; font-size:0.82rem; text-align:left; border-collapse:collapse;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-subtle); color:var(--text-muted);">
+                    <th style="padding:6px 4px;">#</th>
+                    <th style="padding:6px 4px;">Description</th>
+                    <th style="padding:6px 4px; text-align:center;">Qty</th>
+                    <th style="padding:6px 4px; text-align:right;">Rate</th>
+                    <th style="padding:6px 4px; text-align:right;">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="ai-bill-items-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 6: GENERATE INVOICE ─────────────────────────────────────── -->
+    <section id="view-generate-invoice" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>🧾 Point of Sale (POS) Billing & Quotation</h2>
+          <p>Generate retail tax invoices or customer quotation estimates with automatic 3% GST</p>
+        </div>
+      </div>
+
+      <div class="feature-split-layout">
+        <!-- Billing Details -->
+        <div>
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem); margin-bottom:1.25rem;">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.85rem;">Customer & Bill Mode</h3>
+            
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.65rem;">
+              <div class="form-group">
+                <label class="form-label">Customer Name</label>
+                <input type="text" id="inv-cust-name" class="form-input" placeholder="e.g. Rajesh Verma">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number</label>
+                <input type="tel" inputmode="tel" id="inv-cust-phone" class="form-input" placeholder="e.g. 9876543210">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="form-label" style="margin-bottom:0;">Invoice / Voucher Type</label>
+                <span id="inv-next-vouno-badge" class="tile-badge" style="color:var(--accent-gold); font-weight:800; font-size:0.75rem;">Next: ...</span>
+              </div>
+              <select id="inv-vou-type-select" class="form-select" onchange="onVouTypeChanged()">
+                <option value="GST RETAIL SALE">🧾 GST RETAIL SALE (+3% GST)</option>
+                <option value="ESTIMATE">📋 ESTIMATE / QUOTATION</option>
+              </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.65rem;">
+              <div class="form-group">
+                <label class="form-label">Payment Mode</label>
+                <select id="inv-payment-mode" class="form-select">
+                  <option value="Cash">💵 Cash</option>
+                  <option value="Card">💳 Card / POS</option>
+                  <option value="UPI">📱 UPI / QR</option>
+                  <option value="Bank Transfer">🏦 Bank Transfer</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Discount (₹)</label>
+                <input type="number" id="inv-discount-input" class="form-input" placeholder="0" min="0" value="0" oninput="renderInvoiceItems()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Item by Barcode -->
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem);">
+            <div class="form-group">
+              <label class="form-label">Add Item via Barcode</label>
+              <div style="display:flex; gap:0.5rem;">
+                <input type="text" id="inv-barcode-input" class="form-input" placeholder="e.g. 005008 or BC1002" autocapitalize="characters" onkeydown="if(event.key==='Enter') addInvoiceItemByBarcode()">
+                <button type="button" class="btn-scanner" onclick="openCameraScanner('inv-barcode-input', addInvoiceItemByBarcode)" title="Scan barcode with camera" aria-label="Scan barcode with camera">📷</button>
+                <button class="btn-gold" style="white-space:nowrap;" onclick="addInvoiceItemByBarcode()">➕ Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice Cart Summary -->
+        <div>
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem;">
+              <h3 class="luxury-serif" style="font-size:1.15rem;">Billed Articles</h3>
+              <span id="inv-total-wt" class="tile-badge">0.000g</span>
+            </div>
+
+            <div id="inv-items-container" style="max-height:280px; overflow-y:auto; -webkit-overflow-scrolling:touch; margin-bottom:1rem;">
+              <div style="text-align:center; padding: 2rem; color:var(--text-muted); font-size:0.85rem;">
+                No articles added yet. Enter barcode on the left.
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; font-size:0.85rem; color:var(--text-muted);">
+              <span>Taxable & Making:</span>
+              <span id="inv-taxable-amt">₹0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; font-size:0.85rem; color:var(--text-muted);">
+              <span>GST (3%):</span>
+              <span id="inv-gst-amt">₹0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; font-size:0.85rem; color:var(--text-muted);">
+              <span>Discount:</span>
+              <span id="inv-disp-discount" style="color:var(--status-error);">-₹0</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.85rem 0; border-top:2px solid var(--accent-gold); margin-top:0.4rem;">
+              <span style="font-weight:900; font-size:1rem;">GRAND TOTAL</span>
+              <span id="inv-grand-total" style="font-size:1.5rem; font-weight:900; color:var(--accent-gold);">₹0</span>
+            </div>
+
+            <button id="inv-save-btn" class="btn-gold btn-full" onclick="saveAndPrintInvoice()" style="margin-top:0.6rem; font-size:1rem; font-weight:700;">
+              💾 Save Bill to ERP & Print 🖨️
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 7: DOCUMENTS ────────────────────────────────────────────── -->
+    <section id="view-documents" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>📁 Document & KYC Scanner</h2>
+          <p>Upload customer ID proofs, CAD design sketches, and invoices to server storage</p>
+        </div>
+      </div>
+
+      <div class="glass-card" style="max-width:650px; margin:0 auto; padding:clamp(1.25rem, 4vw, 2rem);">
+        <div class="form-group">
+          <label class="form-label">Document Category</label>
+          <select id="doc-category-select" class="form-select">
+            <option value="KYC / Aadhaar / PAN">KYC / Aadhaar / PAN</option>
+            <option value="Custom Design Sketch">Custom Design CAD / Sketch</option>
+            <option value="Invoice Copy">Purchase Bill / Invoice Copy</option>
+            <option value="Customer ID">Customer ID Proof</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Upload File / Take Photo</label>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+            <input type="file" id="doc-file-input" style="display:none;" accept="image/*,.pdf" onchange="handleDocFile(event)">
+            <input type="file" id="doc-camera-input" style="display:none;" accept="image/*" capture="environment" onchange="handleDocFile(event)">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('doc-camera-input').click()">
+              📷 Take Photo
+            </button>
+            <button type="button" class="btn-secondary" onclick="document.getElementById('doc-file-input').click()">
+              📁 Browse File
+            </button>
+          </div>
+          <div id="doc-file-label" style="font-size:0.78rem; color:var(--text-muted); word-break:break-all;">Select or snap document</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Remarks / Description</label>
+          <input type="text" id="doc-notes-input" class="form-input" placeholder="e.g. Customer PAN card for bill above 2 Lakhs">
+        </div>
+
+        <button id="doc-upload-btn" class="btn-gold btn-full" onclick="uploadDocument()" style="margin-top:0.75rem;">
+          Upload Document to ERP
+        </button>
+      </div>
+    </section>
+
+    <!-- ── MODULE 8: STOCK SUMMARY ────────────────────────────────────────── -->
+    <section id="view-stock-summary" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>📦 Showroom Stock Summary</h2>
+          <p>Real-time inventory statistics, total weight balance, and purity breakdown</p>
+        </div>
+      </div>
+
+      <!-- Overview Stats Grid -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: clamp(0.75rem, 2vw, 1.25rem); margin-bottom:1.5rem;">
+        <div class="glass-card" style="padding:1.25rem 1rem; text-align:center;">
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Articles</div>
+          <div id="stock-total-pieces" style="font-size:clamp(1.6rem, 4vw, 2.2rem); font-weight:900; color:var(--accent-gold); margin-top:0.2rem;">0</div>
+        </div>
+        <div class="glass-card" style="padding:1.25rem 1rem; text-align:center;">
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Gross Wt</div>
+          <div id="stock-total-gross" style="font-size:clamp(1.4rem, 3.5vw, 1.9rem); font-weight:900; margin-top:0.2rem;">0.00 g</div>
+        </div>
+        <div class="glass-card" style="padding:1.25rem 1rem; text-align:center;">
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Net Gold Wt</div>
+          <div id="stock-total-net" style="font-size:clamp(1.4rem, 3.5vw, 1.9rem); font-weight:900; color:var(--status-success); margin-top:0.2rem;">0.00 g</div>
+        </div>
+      </div>
+
+      <!-- Purity Breakdown -->
+      <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem);">
+        <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:1rem;">Inventory Purity Distribution</h3>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:0.75rem;">
+          <div style="padding:0.85rem; background:var(--bg-input); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <div style="font-weight:800; font-size:0.95rem; color:var(--accent-gold);">22K Gold (916)</div>
+            <div id="stock-purity-22k" style="font-size:1.2rem; font-weight:900; margin-top:0.2rem;">0 items</div>
+          </div>
+          <div style="padding:0.85rem; background:var(--bg-input); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <div style="font-weight:800; font-size:0.95rem; color:#60A5FA;">18K Gold (750)</div>
+            <div id="stock-purity-18k" style="font-size:1.2rem; font-weight:900; margin-top:0.2rem;">0 items</div>
+          </div>
+          <div style="padding:0.85rem; background:var(--bg-input); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <div style="font-weight:800; font-size:0.95rem; color:#94A3B8;">Silver Articles</div>
+            <div id="stock-purity-silver" style="font-size:1.2rem; font-weight:900; margin-top:0.2rem;">0 items</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 9: SERVER & SETTINGS ────────────────────────────────────── -->
+    <section id="view-settings" class="view-section" style="display:none;">
+      <div class="view-header">
+        <div class="view-nav">
+          <button class="btn-back" onclick="navigateTo('dashboard')">← Dashboard</button>
+        </div>
+        <div class="view-title-group">
+          <h2>⚙️ Server & Portal Configuration</h2>
+          <p>Manage API connection endpoint, database diagnostics, and visual showroom theme</p>
+        </div>
+      </div>
+
+      <div class="feature-split-layout">
+        <div>
+          <!-- Connection Box -->
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem); margin-bottom:1.25rem;">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.75rem;">📡 API Connection</h3>
+            <div class="form-group">
+              <label class="form-label">Server Base URL (Localhost / Remote)</label>
+              <input type="text" id="settings-server-url" class="form-input" placeholder="http://localhost:5000">
+            </div>
+
+            <div id="settings-conn-status" style="padding:0.75rem 0.85rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:var(--bg-input); margin-bottom:1rem;">
+              <div id="settings-conn-text" style="font-size:0.85rem;">Checking connection...</div>
+              <div id="settings-db-path" style="font-size:0.72rem; color:var(--text-muted); margin-top:3px; word-break:break-all;"></div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem;">
+              <button class="btn-secondary" onclick="testServerConnection()">Test</button>
+              <button class="btn-gold" onclick="saveServerUrl()">Save URL</button>
+            </div>
+          </div>
+
+          <!-- Barcode Printer Box -->
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem); margin-bottom:1.25rem;">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.75rem;">🏷️ Thermal Barcode Printer</h3>
+            <div class="form-group">
+              <label class="form-label">Default Barcode Label Printer</label>
+              <select id="settings-barcode-printer-select" class="form-input">
+                <option value="">Loading installed printers...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Print File Type (PRN / FRX)</label>
+              <select id="settings-barcode-engine-select" class="form-input">
+                <option value="PRN">PRN File (Direct Thermal ZPL / PRN)</option>
+                <option value="FRX">FRX File (FastReport 81x12 StickerPC / StickerWt)</option>
+              </select>
+            </div>
+            <p id="settings-printer-status-hint" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.85rem;">
+              Used for printing barcode jewellery tags via PRN or FRX templates.
+            </p>
+            <button class="btn-gold btn-full" onclick="saveDefaultBarcodePrinter()">Save Default Printer & Mode</button>
+          </div>
+
+          <!-- Software Installation Path Box -->
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem); margin-bottom:1.25rem;">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.75rem;">📁 ERP Software Executable Path</h3>
+            <div class="form-group">
+              <label class="form-label">Software Executable Directory (Server Root)</label>
+              <input type="text" id="settings-software-path-input" class="form-input" placeholder="E:\TATTVA JEWELS26-27\net8.0-windows">
+            </div>
+            <div id="settings-software-path-status" style="padding:0.65rem 0.85rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:var(--bg-input); margin-bottom:0.85rem; font-size:0.8rem;">
+              <div id="settings-software-path-status-text">Checking path...</div>
+              <div id="settings-software-path-subinfo" style="font-size:0.72rem; color:var(--text-muted); margin-top:3px;"></div>
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.85rem; line-height:1.4;">
+              Source directory for PRN barcode sticker templates (<code style="color:var(--accent-gold);">PrintTemplates\BarcodePRN</code>), invoice templates (<code style="color:var(--accent-gold);">Templates</code>), and photos.
+            </p>
+            <button class="btn-gold btn-full" onclick="saveSoftwarePath()">Save Software Path</button>
+          </div>
+        </div>
+
+        <!-- Visual Theme Selection -->
+        <div>
+          <div class="glass-card" style="padding:clamp(1rem, 3vw, 1.5rem);">
+            <h3 class="luxury-serif" style="font-size:1.15rem; margin-bottom:0.85rem;">🎨 Visual Theme</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:0.6rem;">
+              <div class="theme-card-option" data-theme="glassmorphism" onclick="applyTheme('glassmorphism')" style="padding:0.75rem 0.9rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:var(--bg-input); cursor:pointer; display:flex; align-items:center; gap:0.65rem;">
+                <span style="font-size:1.35rem;">✨</span>
+                <div>
+                  <div style="font-weight:800; font-size:0.9rem;">Glassmorphism Luxury</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Frosted dark glass with soft golden glow</div>
+                </div>
+              </div>
+
+              <div class="theme-card-option" data-theme="darkGold" onclick="applyTheme('darkGold')" style="padding:0.75rem 0.9rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:var(--bg-input); cursor:pointer; display:flex; align-items:center; gap:0.65rem;">
+                <span style="font-size:1.35rem;">👑</span>
+                <div>
+                  <div style="font-weight:800; font-size:0.9rem;">Obsidian Gold</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Deep metallic dark with royal gold accents</div>
+                </div>
+              </div>
+
+              <div class="theme-card-option" data-theme="light" onclick="applyTheme('light')" style="padding:0.75rem 0.9rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:var(--bg-input); cursor:pointer; display:flex; align-items:center; gap:0.65rem;">
+                <span style="font-size:1.35rem;">☀️</span>
+                <div>
+                  <div style="font-weight:800; font-size:0.9rem;">Minimal Champagne</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Crisp bright daytime display for showroom floor</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── MOBILE STICKY BOTTOM NAVIGATION BAR ───────────────────────────────── -->
+  <nav class="mobile-bottom-nav">
+    <div class="bottom-nav-item active" onclick="navigateTo('dashboard')">
+      <span class="icon">🏠</span>
+      <span>Home</span>
+    </div>
+    <div class="bottom-nav-item" onclick="navigateTo('valuation')">
+      <span class="icon">🏷️</span>
+      <span>Valuation</span>
+    </div>
+    <div class="bottom-nav-item" onclick="navigateTo('catalogue')">
+      <span class="icon">💎</span>
+      <span>Catalogue</span>
+    </div>
+    <div class="bottom-nav-item" onclick="navigateTo('generate-invoice')">
+      <span class="icon">🧾</span>
+      <span>Billing</span>
+    </div>
+    <div class="bottom-nav-item" onclick="navigateTo('settings')">
+      <span class="icon">⚙️</span>
+      <span>Settings</span>
+    </div>
+  </nav>
+
+  <!-- ── MODAL: Catalogue Detail ─────────────────────────────────────────── -->
+  <div id="cat-detail-modal" class="modal-overlay" onclick="if(event.target===this) closeCatalogueDetail()">
+    <div class="glass-card modal-content">
+      <button class="modal-close-btn" onclick="closeCatalogueDetail()">✕</button>
+      
+      <div style="text-align:center; margin-bottom:1.25rem;">
+        <img id="modal-cat-img" src="" alt="Product Detail" style="max-height:180px; max-width:100%; border-radius:var(--radius-md); border:1px solid var(--border-subtle); object-fit:contain; margin-bottom:0.75rem;">
+        <h2 id="modal-cat-title" class="luxury-serif" style="font-size:1.25rem;">Item Name</h2>
+        <p id="modal-cat-meta" style="color:var(--accent-gold); font-weight:800; font-size:0.85rem;">TAG #000000</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.5rem; text-align:center; padding:0.75rem 0; border-top:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle); margin-bottom:1rem;">
+        <div>
+          <div style="font-size:0.68rem; color:var(--text-muted);">Gross Wt</div>
+          <div id="modal-cat-gross" style="font-weight:800; font-size:0.85rem;">0g</div>
+        </div>
+        <div>
+          <div style="font-size:0.68rem; color:var(--text-muted);">Stone Wt</div>
+          <div id="modal-cat-stone" style="font-weight:800; font-size:0.85rem;">0g</div>
+        </div>
+        <div>
+          <div style="font-size:0.68rem; color:var(--text-muted);">Net Wt</div>
+          <div id="modal-cat-net" style="font-weight:800; font-size:0.85rem; color:var(--accent-gold);">0g</div>
+        </div>
+        <div>
+          <div style="font-size:0.68rem; color:var(--text-muted);">Size</div>
+          <div id="modal-cat-size" style="font-weight:800; font-size:0.85rem;">-</div>
+        </div>
+      </div>
+
+      <p id="modal-cat-desc" style="color:var(--text-secondary); font-size:0.85rem; line-height:1.4; margin-bottom:1.25rem;"></p>
+
+      <button class="btn-secondary btn-full" onclick="closeCatalogueDetail()">Close</button>
+    </div>
+  </div>
+
+  <!-- ── MODAL: Printable Invoice ────────────────────────────────────────── -->
+  <div id="print-invoice-modal" class="modal-overlay" onclick="if(event.target===this) closePrintInvoiceModal()">
+    <div class="glass-card modal-content printable-invoice-container" style="max-width:700px; background:#FFF; color:#0A0A0C;">
+      <button class="modal-close-btn" onclick="closePrintInvoiceModal()">✕</button>
+
+      <div style="text-align:center; padding-bottom:0.75rem; border-bottom:2px solid #0A0A0C; margin-bottom:0.85rem;">
+        <h1 style="font-family:var(--font-serif); font-size:1.35rem; letter-spacing:0.05em;">CONCEPT JEWELLERY PRO</h1>
+        <p style="font-size:0.75rem; color:#64748B;">Luxury Gold & Diamond Showroom • GSTIN: 27AABCC1234F1Z5</p>
+        <h3 id="print-inv-title" style="margin-top:0.4rem; font-size:1rem; color:#B48D2A;">TAX INVOICE</h3>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:0.85rem;">
+        <div>
+          <div><strong>Customer:</strong> <span id="print-cust-name">Walk-in</span></div>
+          <div><strong>Mobile:</strong> <span id="print-cust-phone">-</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div><strong>Invoice No:</strong> <span id="print-inv-no">INV-000000</span></div>
+          <div><strong>Date:</strong> <span id="print-inv-date">01-Jan-2026</span></div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:0.85rem;">
+        <table style="width:100%; min-width:320px; border-collapse:collapse; font-size:0.8rem;">
+          <thead>
+            <tr style="background:#F1F5F9; border-bottom:2px solid #CBD5E1;">
+              <th style="padding:6px 4px; text-align:left;">#</th>
+              <th style="padding:6px 4px; text-align:left;">Item & Tag</th>
+              <th style="padding:6px 4px; text-align:center;">Purity</th>
+              <th style="padding:6px 4px; text-align:right;">Net Wt</th>
+              <th style="padding:6px 4px; text-align:right;">Rate</th>
+              <th style="padding:6px 4px; text-align:right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="print-inv-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-top:2px solid #0A0A0C; margin-bottom:1.25rem;">
+        <span style="font-weight:800; font-size:0.85rem;">Total Wt: <span id="print-total-wt">0g</span></span>
+        <span style="font-size:1.2rem; font-weight:900; color:#B48D2A;">Total: <span id="print-grand-total">₹0</span></span>
+      </div>
+
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn-secondary" style="flex:1;" onclick="closePrintInvoiceModal()">Cancel</button>
+        <button class="btn-gold" style="flex:1;" onclick="window.print()">Print Invoice 🖨️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: Camera Barcode Scanner ───────────────────────────────────── -->
+  <div id="camera-scanner-modal" class="modal-overlay" onclick="if(event.target===this) closeCameraScanner()" style="display:none;">
+    <div class="glass-card modal-content camera-scanner-card">
+      <div class="scanner-modal-header">
+        <div>
+          <h3 class="scanner-modal-title">📷 Barcode Scanner</h3>
+          <p class="scanner-modal-subtitle">Point camera at jewellery tag barcode or QR code</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeCameraScanner()" title="Close Scanner">✕</button>
+      </div>
+
+      <!-- Live Video Viewport Container -->
+      <div class="scanner-viewport-wrapper">
+        <div id="camera-scanner-reader"></div>
+        <div id="scanner-reticle-overlay" class="scanner-reticle-box">
+          <div class="reticle-corner corner-tl"></div>
+          <div class="reticle-corner corner-tr"></div>
+          <div class="reticle-corner corner-bl"></div>
+          <div class="reticle-corner corner-br"></div>
+          <div class="scanner-laser-line"></div>
+        </div>
+        <div id="scanner-loading-overlay" class="scanner-loading-overlay">
+          <div class="scanner-spinner"></div>
+          <div id="scanner-loading-text" style="font-size:0.85rem; color:var(--text-secondary); font-weight:600;">Starting camera feed...</div>
+        </div>
+      </div>
+
+      <!-- Controls Toolbar -->
+      <div class="scanner-controls-toolbar">
+        <button type="button" id="scanner-torch-btn" class="scanner-control-btn" onclick="toggleScannerTorch()" title="Toggle Flashlight" style="display:none;">
+          🔦 <span id="scanner-torch-label">Torch</span>
+        </button>
+        <button type="button" id="scanner-flip-btn" class="scanner-control-btn" onclick="switchScannerCamera()" title="Switch Camera">
+          🔄 <span>Flip Camera</span>
+        </button>
+        <label class="scanner-control-btn" title="Scan Barcode from Image File" style="cursor:pointer; margin:0;">
+          📁 <span>From Photo</span>
+          <input type="file" id="scanner-file-input" accept="image/*" style="display:none;" onchange="handleScannerFileInput(event)">
+        </label>
+      </div>
+
+      <!-- Guidance Status Box -->
+      <div id="scanner-status-text" class="scanner-status-box">
+        Position tag barcode inside the golden frame
+      </div>
+
+      <div style="margin-top:0.85rem;">
+        <button type="button" class="btn-secondary btn-full" onclick="closeCameraScanner()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Notifications Container ───────────────────────────────────── -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/html5-qrcode.min.js"></script>
+  <script src="js/app.js?v=3.2"></script>
+</body>
+</html>

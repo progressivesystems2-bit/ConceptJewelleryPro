@@ -1,0 +1,544 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.SalesPaymentBreakupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+        Title="Sales Payment Breakup (Cash, Paytm, Credits, Old Silver...)"
+        Height="720"
+        Width="1200"
+        MinHeight="550"
+        MinWidth="900"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- KPI Card Style -->
+        <Style x:Key="KpiCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+
+        <!-- Standard Toolbar Button -->
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="MinWidth" Value="85" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <!-- Grid Header Style -->
+        <Style x:Key="GridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="0,0,1,1" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Top Header Bar -->
+            <RowDefinition Height="Auto" /> <!-- KPI Cards Strip -->
+            <RowDefinition Height="*" />    <!-- Main Content: Tabs with Grids -->
+            <RowDefinition Height="Auto" /> <!-- Bottom Status / Footer Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ================= ROW 0: TOP HEADER BAR ================= -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Title and Subtitle with Filter Context -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8A1;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                   Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Sales Payment Breakup"
+                                   FontSize="17"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding FormattedPeriod}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Margin="26,2,0,0" />
+                </StackPanel>
+
+                <!-- Right: Search, Filter, and Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Search Input -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0" VerticalAlignment="Center">
+                        <TextBlock Text="Search:"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+                        <telerik:RadWatermarkTextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     WatermarkContent="Bill no, customer, account..."
+                                                     Width="190"
+                                                     Height="34"
+                                                     FontSize="12"
+                                                     Padding="6,0" />
+                    </StackPanel>
+
+                    <!-- Category Filter -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <TextBlock Text="Mode:"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+                        <telerik:RadComboBox ItemsSource="{Binding CategoryFilterOptions}"
+                                             SelectedItem="{Binding SelectedCategoryFilter, Mode=TwoWay}"
+                                             Width="140"
+                                             Height="34"
+                                             FontSize="12"
+                                             IsEditable="False" />
+                    </StackPanel>
+
+                    <!-- Buttons -->
+                    <telerik:RadButton Content="Refresh"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding RefreshCommand}"
+                                       ToolTip="Reload payments from database" />
+                    <telerik:RadButton Content="Export CSV"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding ExportCsvCommand}"
+                                       ToolTip="Export summary &amp; invoices to CSV file" />
+                    <telerik:RadButton Content="Close (Esc)"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding CloseCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ================= ROW 1: KPI CARDS STRIP ================= -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Card 1: Total Sales -->
+                <Border Grid.Column="0" Style="{StaticResource KpiCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="TOTAL SALES" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBlock FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0">
+                            <Run Text="₹ " /><Run Text="{Binding TotalSalesAmount, StringFormat='N2', Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="{Binding TotalInvoicesCount, StringFormat='{}{0} Invoices'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 2: Cash -->
+                <Border Grid.Column="1" Style="{StaticResource KpiCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="CASH COLLECTED" FontSize="11" FontWeight="SemiBold" Foreground="#10B981" />
+                        <TextBlock FontSize="18" FontWeight="Bold" Foreground="#10B981" Margin="0,2,0,0">
+                            <Run Text="₹ " /><Run Text="{Binding TotalCashAmount, StringFormat='N2', Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="Physical Cash" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 3: Paytm / Bank / Card -->
+                <Border Grid.Column="2" Style="{StaticResource KpiCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="PAYTM / BANK / CARD" FontSize="11" FontWeight="SemiBold" Foreground="#3B82F6" />
+                        <TextBlock FontSize="18" FontWeight="Bold" Foreground="#3B82F6" Margin="0,2,0,0">
+                            <Run Text="₹ " /><Run Text="{Binding TotalPaytmAmount, StringFormat='N2', Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="UPI, Card &amp; Bank" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 4: Old Silver -->
+                <Border Grid.Column="3" Style="{StaticResource KpiCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="OLD SILVER / METAL" FontSize="11" FontWeight="SemiBold" Foreground="#8B5CF6" />
+                        <TextBlock FontSize="18" FontWeight="Bold" Foreground="#8B5CF6" Margin="0,2,0,0">
+                            <Run Text="₹ " /><Run Text="{Binding TotalOldSilverAmount, StringFormat='N2', Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="{Binding TotalOldSilverWeight, StringFormat='{}{0:N3} g'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 5: Credits / Debtors -->
+                <Border Grid.Column="4" Style="{StaticResource KpiCardStyle}" Margin="0">
+                    <StackPanel>
+                        <TextBlock Text="CREDITS / DEBTORS DUE" FontSize="11" FontWeight="SemiBold" Foreground="#F59E0B" />
+                        <TextBlock FontSize="18" FontWeight="Bold" Foreground="#F59E0B" Margin="0,2,0,0">
+                            <Run Text="₹ " /><Run Text="{Binding TotalCreditAmount, StringFormat='N2', Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="Customer Due / Credit" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ================= ROW 2: MAIN TABS & GRIDS ================= -->
+        <telerik:RadBusyIndicator Grid.Row="2"
+                                  IsBusy="{Binding IsBusy}"
+                                  BusyContent="{Binding StatusMessage}">
+            <TabControl Background="Transparent" BorderThickness="0" Margin="12,8,12,0">
+                <!-- ================= TAB 1: SUMMARY BY PAYMENT MODE & ACCOUNT ================= -->
+                <TabItem Header="Payment Mode Summary" FontSize="13" FontWeight="SemiBold">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Summary DataGrid -->
+                        <DataGrid Grid.Row="0"
+                                  ItemsSource="{Binding SummaryItems}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  GridLinesVisibility="All"
+                                  HorizontalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                                  VerticalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                                  Background="{DynamicResource CardBackgroundBrush}"
+                                  Foreground="{DynamicResource PrimaryTextBrush}"
+                                  BorderBrush="{DynamicResource CardBorderBrush}"
+                                  BorderThickness="1"
+                                  RowHeight="36"
+                                  ColumnHeaderHeight="34"
+                                  ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
+                                  FontSize="13">
+                            <DataGrid.Columns>
+                                <!-- Mode / Category Pill -->
+                                <DataGridTemplateColumn Header="Payment Category" Width="170">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding CategoryColor}"
+                                                    CornerRadius="4"
+                                                    Padding="8,3"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Margin="6,0">
+                                                <TextBlock Text="{Binding PaymentCategory}"
+                                                           Foreground="White"
+                                                           FontWeight="Bold"
+                                                           FontSize="11.5" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Ledger / Account Name -->
+                                <DataGridTextColumn Header="Ledger / Account Name"
+                                                    Binding="{Binding AccountName}"
+                                                    Width="*"
+                                                    FontWeight="SemiBold" />
+
+                                <!-- Transactions Count -->
+                                <DataGridTextColumn Header="Bills / Transactions"
+                                                    Binding="{Binding TransactionCount, StringFormat='N0'}"
+                                                    Width="140">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,10,0" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Metal Weight (g) -->
+                                <DataGridTextColumn Header="Weight (g)"
+                                                    Binding="{Binding Weight, StringFormat='N3'}"
+                                                    Width="130">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,10,0" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Total Amount (Rs) -->
+                                <DataGridTextColumn Header="Total Amount (₹)"
+                                                    Binding="{Binding Amount, StringFormat='N2'}"
+                                                    Width="180">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,10,0" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Share % -->
+                                <DataGridTextColumn Header="Share (%)"
+                                                    Binding="{Binding Percentage, StringFormat='{}{0:N2}%'}"
+                                                    Width="110">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,10,0" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Summary Grand Total Footer -->
+                        <Border Grid.Row="1"
+                                Background="{DynamicResource HeaderBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1,0,1,1"
+                                Padding="12,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="GRAND TOTAL" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}" Margin="6,0,0,0" />
+                                <TextBlock Grid.Column="1" Text="(All Payment Modes)" FontStyle="Italic" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Grid.Column="2" Text="{Binding TotalTransactionsCount, StringFormat='N0'}" FontWeight="Bold" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Grid.Column="3" Text="{Binding TotalOldSilverWeight, StringFormat='N3'}" FontWeight="Bold" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Grid.Column="4" Text="{Binding TotalSalesAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{DynamicResource AccentBrush}" />
+                                <TextBlock Grid.Column="5" Text="100.00%" FontWeight="Bold" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!-- ================= TAB 2: INVOICE-WISE PAYMENT BREAKDOWN ================= -->
+                <TabItem Header="Invoice-wise Payment Details" FontSize="13" FontWeight="SemiBold">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <DataGrid Grid.Row="0"
+                                  ItemsSource="{Binding FilteredInvoiceItems}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  GridLinesVisibility="All"
+                                  HorizontalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                                  VerticalGridLinesBrush="{DynamicResource CardBorderBrush}"
+                                  Background="{DynamicResource CardBackgroundBrush}"
+                                  Foreground="{DynamicResource PrimaryTextBrush}"
+                                  BorderBrush="{DynamicResource CardBorderBrush}"
+                                  BorderThickness="1"
+                                  RowHeight="34"
+                                  ColumnHeaderHeight="34"
+                                  ColumnHeaderStyle="{StaticResource GridHeaderStyle}"
+                                  FontSize="12.5">
+                            <DataGrid.Columns>
+                                <!-- Bill No -->
+                                <DataGridTextColumn Header="Bill No"
+                                                    Binding="{Binding VouNo}"
+                                                    Width="105"
+                                                    FontWeight="Bold" />
+
+                                <!-- Bill Date -->
+                                <DataGridTextColumn Header="Date"
+                                                    Binding="{Binding BillDate, StringFormat='dd/MM/yyyy'}"
+                                                    Width="95" />
+
+                                <!-- Voucher Type -->
+                                <DataGridTextColumn Header="Voucher Type"
+                                                    Binding="{Binding VouType}"
+                                                    Width="140" />
+
+                                <!-- Customer Name -->
+                                <DataGridTextColumn Header="Customer Name"
+                                                    Binding="{Binding CustomerName}"
+                                                    Width="180" />
+
+                                <!-- Net Bill Amount -->
+                                <DataGridTextColumn Header="Net Amount (₹)"
+                                                    Binding="{Binding NetAmt, StringFormat='N2'}"
+                                                    Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,6,0" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Cash Amount -->
+                                <DataGridTextColumn Header="Cash (₹)"
+                                                    Binding="{Binding CashAmt, StringFormat='N2'}"
+                                                    Width="110">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,6,0" />
+                                            <Setter Property="Foreground" Value="#10B981" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Paytm / Bank Amount -->
+                                <DataGridTextColumn Header="Paytm/Bank (₹)"
+                                                    Binding="{Binding PaytmAmt, StringFormat='N2'}"
+                                                    Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,6,0" />
+                                            <Setter Property="Foreground" Value="#3B82F6" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Old Silver Amount -->
+                                <DataGridTextColumn Header="Old Silver (₹)"
+                                                    Binding="{Binding OldSilverAmt, StringFormat='N2'}"
+                                                    Width="110">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,6,0" />
+                                            <Setter Property="Foreground" Value="#8B5CF6" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Credit / Due Amount -->
+                                <DataGridTextColumn Header="Credit/Due (₹)"
+                                                    Binding="{Binding CreditAmt, StringFormat='N2'}"
+                                                    Width="110">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="0,0,6,0" />
+                                            <Setter Property="Foreground" Value="#F59E0B" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Payment Summary / Details -->
+                                <DataGridTextColumn Header="Payment Breakdown"
+                                                    Binding="{Binding PaymentSummary}"
+                                                    Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Invoice Table Totals Strip -->
+                        <Border Grid.Row="1"
+                                Background="{DynamicResource HeaderBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1,0,1,1"
+                                Padding="12,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding FilteredInvoiceItems.Count, StringFormat='Showing {0} invoice(s)'}"
+                                           FontWeight="SemiBold"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Total Sales: " FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalSalesAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,16,0" />
+
+                                    <TextBlock Text="Cash: " FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalCashAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="#10B981" Margin="0,0,16,0" />
+
+                                    <TextBlock Text="Paytm: " FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalPaytmAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="#3B82F6" Margin="0,0,16,0" />
+
+                                    <TextBlock Text="Old Silver: " FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalOldSilverAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="#8B5CF6" Margin="0,0,16,0" />
+
+                                    <TextBlock Text="Credits: " FontWeight="SemiBold" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalCreditAmount, StringFormat='₹ {0:N2}'}" FontWeight="Bold" FontSize="13" Foreground="#F59E0B" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </telerik:RadBusyIndicator>
+
+        <!-- ================= ROW 3: FOOTER BAR ================= -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource PanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,6">
+            <Grid>
+                <TextBlock Text="Press Esc to close window | Use Search box or Mode filter to refine records"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource AccentBrush}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

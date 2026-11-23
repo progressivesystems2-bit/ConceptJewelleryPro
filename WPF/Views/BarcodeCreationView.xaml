@@ -1,0 +1,1469 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.BarcodeCreationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding NewCommand}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="M" Modifiers="Alt" Command="{Binding ModifyCommand}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding DeleteCommand}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="P" Modifiers="Alt" Command="{Binding PrintStickerCommand}"/>
+        <KeyBinding Key="F9" Command="{Binding RefreshLookupsCommand}"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+
+        <Style x:Key="SectionBoxStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="#0F4C5C"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="PrimaryToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="#0F4C5C"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style x:Key="DangerToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#991B1B"/>
+        </Style>
+
+        <!-- Form Teal Label Block (matching the screenshot) -->
+        <Style x:Key="FieldLabelBlock" TargetType="Border">
+            <Setter Property="Background" Value="#003B46"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,1.5,4,1.5"/>
+            <Setter Property="Padding" Value="6,0"/>
+        </Style>
+
+        <Style x:Key="FieldLabelText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,1.5"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadNumericUpDown}" BasedOn="{StaticResource RadNumericUpDownStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,1.5"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="ShowButtons" Value="False"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="telerik:RadWatermarkTextBox" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type DatePicker}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="0,1.5"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,1.5"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="CaretBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="telerik:RadWatermarkTextBox" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="CaretBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="15"/>
+                </Style>
+                <!-- Dropdown ToggleButton inherits clean vector chevron style -->
+                <Style TargetType="telerik:RadToggleButton" BasedOn="{StaticResource ComboBoxDropDownToggleButtonStyle}" />
+            </Style.Resources>
+            <Style.Triggers>
+                <!-- OVERRIDE Telerik Windows11 theme's IsEditable trigger which sets semi-transparent Foreground (#9B000000) -->
+                <Trigger Property="IsEditable" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="telerik:RadComboBoxItem" BasedOn="{StaticResource RadComboBoxItemStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification Overlay in Bottom Right Corner -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Row 0: Header / Toolbar -->
+                    <RowDefinition Height="Auto"/> <!-- Row 1: Active Mode & Barcode Status Banner -->
+                    <RowDefinition Height="Auto"/> <!-- Row 2: Main 3-Box Barcode Form -->
+                    <RowDefinition Height="*"/>    <!-- Row 3: Recent Barcodes Grid -->
+                </Grid.RowDefinitions>
+
+                <!-- Header & Top Action Toolbar -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource HeaderBackgroundBrush}"
+                        BorderBrush="{DynamicResource HeaderBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        CornerRadius="6"
+                        Padding="12,8"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Module Title & Icon -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="34" Height="34" CornerRadius="6" Background="#003B46" Margin="0,0,10,0">
+                                <TextBlock Text="&#xE8FE;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Barcode Creation" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                                    <!-- Mode & Active Barcode Pill Badge beside title -->
+                                    <Border Margin="10,0,0,0"
+                                            CornerRadius="12"
+                                            Padding="8,2"
+                                            VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#F1F5F9"/>
+                                                <Setter Property="BorderBrush" Value="#CBD5E1"/>
+                                                <Setter Property="BorderThickness" Value="1"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                        <Setter Property="Background" Value="#DCFCE7"/>
+                                                        <Setter Property="BorderBrush" Value="#10B981"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                        <Setter Property="Background" Value="#FEF3C7"/>
+                                                        <Setter Property="BorderBrush" Value="#F59E0B"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                        <Setter Property="Background" Value="#DBEAFE"/>
+                                                        <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock FontSize="11" FontWeight="Bold" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#64748B"/>
+                                                        <Setter Property="Text" Value="● READY"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                                <Setter Property="Foreground" Value="#15803D"/>
+                                                                <Setter Property="Text" Value="● NEW: "/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                                <Setter Property="Foreground" Value="#B45309"/>
+                                                                <Setter Property="Text" Value="● EDIT: "/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                                <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                                <Setter Property="Text" Value="● BARCODE: "/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding CurrentBarcodeDisplay}"
+                                                       FontSize="11.5"
+                                                       FontWeight="Bold"
+                                                       FontFamily="Consolas, Segoe UI"
+                                                       VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#64748B"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                                <Setter Property="Foreground" Value="#15803D"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                                <Setter Property="Foreground" Value="#B45309"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                                <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="Voucher: 9 (Opening Stock)" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Action Toolbar Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <telerik:RadButton x:Name="AddNewButton" Style="{StaticResource PrimaryToolbarButtonStyle}" Command="{Binding NewCommand}" Click="AddNewButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Add New (Alt+A)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton x:Name="SaveButton" Style="{StaticResource ToolbarButtonStyle}" Command="{Binding SaveCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Save (Alt+S)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding PrintStickerCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Print Sticker (Alt+P)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadComboBox Width="68"
+                                                 Height="30"
+                                                 Margin="0,0,6,0"
+                                                 ItemsSource="{Binding BarcodePrintEngineOptions}"
+                                                 SelectedItem="{Binding BarcodePrintEngine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="False"
+                                                 FontWeight="SemiBold"
+                                                 FontSize="11.5"
+                                                 VerticalContentAlignment="Center"
+                                                 ToolTip="Select Barcode Print File Mode: PRN File (.prn) or FRX File (.frx)"/>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding ModifyCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Modify (Alt+M)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}" Command="{Binding DeleteCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Delete (Alt+D)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding CancelCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Cancel (Alt+C)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding RefreshLookupsCommand}" ToolTip="Refresh Comboboxes / Dropdown Lists (F9)">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Refresh (F9)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </StackPanel>
+
+                        <!-- Barcode Search Dropdown & Current Barcode Display Badge -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- Search Barcode for Modification -->
+                            <Border Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="6,2"
+                                    Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Modify Barcode:"
+                                               FontSize="11.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0"/>
+                                    <telerik:RadWatermarkTextBox x:Name="SearchBarcodeTextBox"
+                                                                 Width="135"
+                                                                 WatermarkContent="Barcode # + Enter"
+                                                                 Text="{Binding SearchBarcodeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 FontSize="13"
+                                                                 KeyDown="SearchBarcodeTextBox_KeyDown"/>
+                                    <telerik:RadButton Command="{Binding SearchAndLoadBarcodeCommand}"
+                                                       CommandParameter="{Binding SearchBarcodeText}"
+                                                       Width="28"
+                                                       Margin="4,0,0,0"
+                                                       Padding="0"
+                                                       ToolTip="Search Barcode (Press Enter)"
+                                                       Style="{StaticResource ToolbarButtonStyle}">
+                                        <TextBlock Text="&#xE721;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </telerik:RadButton>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Current Barcode Badge -->
+                            <Border CornerRadius="4"
+                                    BorderThickness="1.5"
+                                    Padding="10,4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                <Setter Property="Background" Value="#DCFCE7"/>
+                                                <Setter Property="BorderBrush" Value="#10B981"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                <Setter Property="Background" Value="#FEF3C7"/>
+                                                <Setter Property="BorderBrush" Value="#F59E0B"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                <Setter Property="Background" Value="#DBEAFE"/>
+                                                <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock FontSize="12" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+                                                <Setter Property="Text" Value="Barcode # "/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                        <Setter Property="Foreground" Value="#15803D"/>
+                                                        <Setter Property="Text" Value="NEW # "/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                        <Setter Property="Foreground" Value="#B45309"/>
+                                                        <Setter Property="Text" Value="EDIT # "/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                        <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                        <Setter Property="Text" Value="BARCODE # "/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding CurrentBarcodeDisplay}"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               FontFamily="Consolas, Segoe UI"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                        <Setter Property="Foreground" Value="#15803D"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                        <Setter Property="Foreground" Value="#B45309"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                        <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Row 1: Active Mode & Barcode Status Banner (Unmissable visual cue directly above form) -->
+                <Border Grid.Row="1"
+                        CornerRadius="6"
+                        BorderThickness="1.5"
+                        Padding="14,8"
+                        Margin="0,0,0,10">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                    <Setter Property="Background" Value="#F0FDF4"/>
+                                    <Setter Property="BorderBrush" Value="#10B981"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                    <Setter Property="Background" Value="#FFFBEB"/>
+                                    <Setter Property="BorderBrush" Value="#F59E0B"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                    <Setter Property="Background" Value="#EFF6FF"/>
+                                    <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Status Icon, Mode Badge, Prominent Barcode Number, and Subtitle -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- Mode Badge Pill -->
+                            <Border CornerRadius="4"
+                                    Padding="10,4"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,12,0">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#64748B"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                <Setter Property="Background" Value="#059669"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                <Setter Property="Background" Value="#D97706"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                <Setter Property="Background" Value="#2563EB"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="&#xE946;"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                        <Setter Property="Text" Value="&#xE710;"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                        <Setter Property="Text" Value="&#xE70F;"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                        <Setter Property="Text" Value="&#xE8FE;"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding BarcodeStatusModeText}"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Prominent High-Contrast Barcode Number Badge -->
+                            <Border CornerRadius="4"
+                                    BorderThickness="1.5"
+                                    Padding="12,3"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,14,0">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+                                        <Setter Property="BorderBrush" Value="#CBD5E1"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                <Setter Property="Background" Value="#FFFFFF"/>
+                                                <Setter Property="BorderBrush" Value="#10B981"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                <Setter Property="Background" Value="#FFFFFF"/>
+                                                <Setter Property="BorderBrush" Value="#F59E0B"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                <Setter Property="Background" Value="#FFFFFF"/>
+                                                <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Barcode: "
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding CurrentBarcodeDisplay}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               FontFamily="Consolas, Segoe UI"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                        <Setter Property="Foreground" Value="#065F46"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                        <Setter Property="Foreground" Value="#92400E"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                        <Setter Property="Foreground" Value="#1E40AF"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Subtitle / Contextual Guidance -->
+                            <TextBlock Text="{Binding BarcodeStatusSubtitle}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+
+                        <!-- Right: Action Hints & Shortcut Guide -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border CornerRadius="12"
+                                    Padding="10,4"
+                                    VerticalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#E2E8F0"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                <Setter Property="Background" Value="#DCFCE7"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                <Setter Property="Background" Value="#FEF3C7"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                <Setter Property="Background" Value="#DBEAFE"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#475569"/>
+                                            <Setter Property="Text" Value="● READY (Alt+A for New)"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCreating}" Value="True">
+                                                    <Setter Property="Foreground" Value="#15803D"/>
+                                                    <Setter Property="Text" Value="● ADD MODE  |  Save: Alt+S  •  Cancel: Alt+C"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsModifying}" Value="True">
+                                                    <Setter Property="Foreground" Value="#B45309"/>
+                                                    <Setter Property="Text" Value="● MODIFY MODE  |  Save: Alt+S  •  Cancel: Alt+C"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsViewingActiveBarcode}" Value="True">
+                                                    <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                    <Setter Property="Text" Value="● VIEW ONLY  |  Edit: Alt+M  •  New: Alt+A"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Row 2: Main Form (3 Columns matching user's layout) -->
+                <Grid Grid.Row="2" Margin="0,0,0,10" IsHitTestVisible="{Binding IsFormEnabled}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.1*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="0.9*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ================= BOX 1: LEFT COLUMN ================= -->
+                    <Border Grid.Column="0" Style="{StaticResource SectionBoxStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- TYPE PC/WT -->
+                                <RowDefinition Height="Auto"/> <!-- Item Name -->
+                                <RowDefinition Height="Auto"/> <!-- Purity -->
+                                <RowDefinition Height="Auto"/> <!-- Description -->
+                                <RowDefinition Height="Auto"/> <!-- HUID -->
+                                <RowDefinition Height="Auto"/> <!-- Size -->
+                                <RowDefinition Height="Auto"/> <!-- Qty -->
+                                <RowDefinition Height="Auto"/> <!-- Gross Weight -->
+                                <RowDefinition Height="Auto"/> <!-- Less Weight -->
+                                <RowDefinition Height="Auto"/> <!-- Net Weight -->
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- TYPE PC/WT -->
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="TYPE PC/WT" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadComboBox x:Name="TypePcWtComboBox"
+                                                 Grid.Row="0" Grid.Column="1"
+                                                 ItemsSource="{Binding TypeOptions}"
+                                                 SelectedItem="{Binding TypePcWt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding TypePcWt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 SelectionChanged="TypePcWtComboBox_SelectionChanged"
+                                                 IsEditable="True"/>
+
+                            <!-- Item Name -->
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Item Name" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadComboBox Grid.Row="1" Grid.Column="1"
+                                                 ItemsSource="{Binding AvailableItems}"
+                                                 DisplayMemberPath="ItemName"
+                                                 SelectedValuePath="ItemName"
+                                                 SelectedValue="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"/>
+
+                            <!-- Purity -->
+                            <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Purity" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadComboBox Grid.Row="2" Grid.Column="1"
+                                                 ItemsSource="{Binding FilteredPurities}"
+                                                 SelectedItem="{Binding Purity, Mode=TwoWay}"
+                                                 Text="{Binding Purity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"/>
+
+                            <!-- Description -->
+                            <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Description" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadWatermarkTextBox Grid.Row="3" Grid.Column="1"
+                                                         Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Item description"/>
+
+                            <!-- HUID -->
+                            <Border Grid.Row="4" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="HUID" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadWatermarkTextBox Grid.Row="4" Grid.Column="1"
+                                                         Text="{Binding HUID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="e.g. 6-digit alphanumeric"/>
+
+                            <!-- Size -->
+                            <Border Grid.Row="5" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Size" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadComboBox Grid.Row="5" Grid.Column="1"
+                                                 ItemsSource="{Binding SizeOptions}"
+                                                 Text="{Binding Size, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 SelectedItem="{Binding Size, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"/>
+
+                            <!-- Qty -->
+                            <Border Grid.Row="6" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Qty" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadNumericUpDown Grid.Row="6" Grid.Column="1"
+                                                      Value="{Binding Qty, Mode=TwoWay}"
+                                                      NumberDecimalDigits="0"
+                                                      Minimum="1"/>
+
+                            <!-- Gross Weight -->
+                            <Border Grid.Row="7" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Gross Weight" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <Grid Grid.Row="7" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <telerik:RadNumericUpDown Grid.Column="0"
+                                                          Value="{Binding GrossWeight, Mode=TwoWay}"
+                                                          NumberDecimalDigits="3"
+                                                          Minimum="0"/>
+                                <!-- Pull-from-scale button: only shown when WeightEnabled -->
+                                <telerik:RadButton Grid.Column="1"
+                                                   Command="{Binding PullWeightCommand}"
+                                                   Width="34" Height="34"
+                                                   Margin="3,2,0,2"
+                                                   Padding="0"
+                                                   IsTabStop="False"
+                                                   Focusable="False"
+                                                   Background="#0F4C5C"
+                                                   Foreground="White"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Content="+"
+                                                   Visibility="{Binding WeightEnabled, Converter={StaticResource BoolToVis}}">
+                                    <telerik:RadButton.ToolTip>
+                                        <ToolTip Content="Pull live weight from scale (⚖)"/>
+                                    </telerik:RadButton.ToolTip>
+                                </telerik:RadButton>
+                            </Grid>
+
+                            <!-- Less Weight -->
+                            <Border Grid.Row="8" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Less Weight" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadNumericUpDown Grid.Row="8" Grid.Column="1"
+                                                      Value="{Binding LessWeight, Mode=TwoWay}"
+                                                      NumberDecimalDigits="3"
+                                                      Minimum="0"/>
+
+                            <!-- Net Weight -->
+                            <Border Grid.Row="9" Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                <TextBlock Text="Net Weight" Style="{StaticResource FieldLabelText}"/>
+                            </Border>
+                            <telerik:RadNumericUpDown Grid.Row="9" Grid.Column="1"
+                                                      Value="{Binding NetWeight, Mode=OneWay}"
+                                                      NumberDecimalDigits="3"
+                                                      Minimum="0"
+                                                      IsReadOnly="True"
+                                                      IsTabStop="False"
+                                                      Focusable="False"
+                                                      Background="{DynamicResource PanelBrush}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- ================= BOX 2: MIDDLE COLUMN ================= -->
+                    <Border Grid.Column="1" Style="{StaticResource SectionBoxStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- Making & Mc Type -->
+                                <RowDefinition Height="Auto"/> <!-- Stone Value -->
+                                <RowDefinition Height="Auto"/> <!-- Cost Touch & Cost /Gram -->
+                                <RowDefinition Height="Auto"/> <!-- Cost MC & Cost Price -->
+                                <RowDefinition Height="Auto"/> <!-- Cost Rate & Multiplier -->
+                                <RowDefinition Height="Auto"/> <!-- MRP Price -->
+                                <RowDefinition Height="Auto"/> <!-- Supplier -->
+                                <RowDefinition Height="Auto"/> <!-- Invoice Date & Invoice No -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Row 0: Making & Mc Type -->
+                            <Grid Grid.Row="0" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Making" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown Grid.Column="1"
+                                                          Value="{Binding Making, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="Mc Type" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadComboBox Grid.Column="3"
+                                                     ItemsSource="{Binding MakingTypeOptions}"
+                                                     SelectedItem="{Binding MakingType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsEditable="True"/>
+                            </Grid>
+
+                            <!-- Row 1: Stone Value -->
+                            <Grid Grid.Row="1" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Stone Value" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown x:Name="StoneValueUpDown"
+                                                          Grid.Column="1"
+                                                          Value="{Binding StoneValue, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                            </Grid>
+
+                            <!-- Row 2: Cost Touch & Cost /Gram -->
+                            <Grid Grid.Row="2" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Cost Tounch" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown x:Name="CostTounchUpDown"
+                                                          Grid.Column="1"
+                                                          Value="{Binding CostTounch, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="Cost /Gram" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown Grid.Column="3"
+                                                          Value="{Binding CostPerGram, Mode=OneWay}"
+                                                          NumberDecimalDigits="2"
+                                                          IsReadOnly="True"
+                                                          IsTabStop="False"
+                                                          KeyboardNavigation.IsTabStop="False"
+                                                          Focusable="False"
+                                                          Background="{DynamicResource PanelBrush}"/>
+                            </Grid>
+
+                            <!-- Row 3: Cost MC & Cost Price -->
+                            <Grid Grid.Row="3" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Cost MC" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown x:Name="CostMCUpDown"
+                                                          Grid.Column="1"
+                                                          Value="{Binding CostMC, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="Cost Price" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown Grid.Column="3"
+                                                          Value="{Binding CostPrice, Mode=OneWay}"
+                                                          NumberDecimalDigits="2"
+                                                          IsReadOnly="True"
+                                                          IsTabStop="False"
+                                                          KeyboardNavigation.IsTabStop="False"
+                                                          Focusable="False"
+                                                          Background="{DynamicResource PanelBrush}"/>
+                            </Grid>
+
+                            <!-- Row 4: Cost Rate & Min Rate (as per Image 2) -->
+                            <Grid Grid.Row="4" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Cost Rate" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown x:Name="CostRateUpDown"
+                                                          Grid.Column="1"
+                                                          Value="{Binding CostRate, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="Min Rate" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown Grid.Column="3"
+                                                          Value="{Binding MinRate, Mode=OneWay}"
+                                                          NumberDecimalDigits="2"
+                                                          IsReadOnly="True"
+                                                          IsTabStop="False"
+                                                          KeyboardNavigation.IsTabStop="False"
+                                                          Focusable="False"
+                                                          Background="{DynamicResource PanelBrush}"/>
+                            </Grid>
+
+                            <!-- Row 5: ProfitMultiple (discreet, unlabeled) & MRP (Right after it) -->
+                            <Grid Grid.Row="5" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Col 0 is blank to keep ProfitMultiple discreet without any label -->
+                                <telerik:RadNumericUpDown x:Name="ProfitMultipleUpDown"
+                                                          Grid.Column="1"
+                                                          Value="{Binding ProfitMultiple, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"
+                                                          Minimum="0"
+                                                          ToolTip="Profit Multiple"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="MRP" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadNumericUpDown x:Name="MrpPriceUpDown"
+                                                          Grid.Column="3"
+                                                          Value="{Binding MrpPrice, Mode=TwoWay}"
+                                                          NumberDecimalDigits="2"/>
+                            </Grid>
+
+                            <!-- Row 6: Supplier -->
+                            <Grid Grid.Row="6" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Supplier" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadComboBox x:Name="SupplierComboBox"
+                                                     Grid.Column="1"
+                                                     ItemsSource="{Binding Suppliers}"
+                                                     DisplayMemberPath="AccountName"
+                                                     SelectedValuePath="AccountName"
+                                                     SelectedValue="{Binding Supplier, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Text="{Binding Supplier, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     TextSearch.TextPath="AccountName"
+                                                     IsEditable="True"
+                                                     IsFilteringEnabled="True"
+                                                     TextSearchMode="Contains"
+                                                     IsTextSearchEnabled="True"
+                                                     ClearSelectionButtonVisibility="Collapsed"
+                                                     DropDownWidth="300"/>
+                            </Grid>
+
+                            <!-- Row 7: Invoice Date & Invoice No -->
+                            <Grid Grid.Row="7" Margin="0,1.5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Invoice Date" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <DatePicker Grid.Column="1"
+                                            SelectedDate="{Binding InvoiceDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Border Grid.Column="2" Style="{StaticResource FieldLabelBlock}" Margin="4,1.5,4,1.5">
+                                    <TextBlock Text="Invoice No" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadWatermarkTextBox Grid.Column="3"
+                                                             Text="{Binding InvoiceNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             WatermarkContent="Inv #"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- ================= BOX 3: RIGHT COLUMN ================= -->
+                    <Border Grid.Column="2" Style="{StaticResource SectionBoxStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- Weight Display -->
+                                <RowDefinition Height="Auto"/> <!-- Sticker Format -->
+                                <RowDefinition Height="*"/>    <!-- Photo Area -->
+                                <RowDefinition Height="Auto"/> <!-- Snap Button -->
+                                <RowDefinition Height="Auto"/> <!-- Box No -->
+                                <RowDefinition Height="Auto"/> <!-- Godown -->
+                                <RowDefinition Height="Auto"/> <!-- Clock / Timestamp -->
+                            </Grid.RowDefinitions>
+
+                            <!-- ⚖ Weight Display Widget (Row 0) -->
+                            <Border Grid.Row="0"
+                                    Margin="0,0,0,6"
+                                    CornerRadius="5"
+                                    Padding="8,6"
+                                    Background="#1C2B2F"
+                                    BorderThickness="1"
+                                    Visibility="{Binding WeightEnabled, Converter={StaticResource BoolToVis}}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Scale icon -->
+                                    <TextBlock Grid.Column="0"
+                                               Text="⚖"
+                                               FontSize="18"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"
+                                               Foreground="#7EC8C8"/>
+
+                                    <!-- Weight value + status -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock FontSize="20"
+                                                   FontWeight="Bold"
+                                                   Foreground="White">
+                                            <Run Text="{Binding LiveWeight, StringFormat='{}{0:F3}', Mode=OneWay}"/>
+                                            <Run Text=" g" Foreground="#A0C8C8"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding WeightStatusText, Mode=OneWay}"
+                                                   FontSize="10"
+                                                   Foreground="#7EC8C8"
+                                                   Margin="0,1,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Stable indicator dot -->
+                                    <Ellipse Grid.Column="2"
+                                             Width="10" Height="10"
+                                             VerticalAlignment="Center"
+                                             Margin="8,0,0,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#555"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding WeightIsStable}" Value="True">
+                                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding WeightIsConnected}" Value="False">
+                                                        <Setter Property="Fill" Value="#F44336"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </Grid>
+                            </Border>
+
+                            <!-- Sticker Format -->
+                            <Grid Grid.Row="1" Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="68"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Sticker Format" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadComboBox x:Name="StickerFormatComboBox"
+                                                     Grid.Column="1"
+                                                     ItemsSource="{Binding StickerFormats}"
+                                                     SelectedItem="{Binding StickerFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Text="{Binding StickerFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsEditable="True"
+                                                     Tag="EnterToSave"
+                                                     PreviewKeyDown="StickerFormatComboBox_PreviewKeyDown"/>
+                                <telerik:RadComboBox Grid.Column="2"
+                                                     Margin="4,1.5,0,1.5"
+                                                     ItemsSource="{Binding BarcodePrintEngineOptions}"
+                                                     SelectedItem="{Binding BarcodePrintEngine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsEditable="False"
+                                                     FontWeight="SemiBold"
+                                                     ToolTip="Print Mode: PRN File (.prn) or FRX File (.frx)"/>
+                            </Grid>
+
+                            <!-- Camera Photo Box -->
+                            <Border Grid.Row="2"
+                                    Background="#3A3D40"
+                                    BorderBrush="#252526"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    MinHeight="140"
+                                    Margin="0,0,0,6"
+                                    Focusable="False">
+                                <Grid Focusable="False">
+                                    <!-- Photo Display if available -->
+                                    <Image Source="{Binding PhotoPath, Converter={StaticResource NonLockingImageConverter}}"
+                                           Stretch="Uniform"
+                                           MaxHeight="300"
+                                           Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVis}}"
+                                           Focusable="False"/>
+
+                                    <!-- Placeholder if no photo -->
+                                    <StackPanel VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                                                Focusable="False">
+                                        <TextBlock Text="&#xE722;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="42"
+                                                   Foreground="#A0A0A0"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="No image"
+                                                   FontSize="12"
+                                                   Foreground="#D0D0D0"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Photo Action Buttons: SNAP, CLEAR, AI ENHANCE & SETTINGS -->
+                            <StackPanel Grid.Row="3" Margin="0,0,0,6">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                    <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}"
+                                                       Command="{Binding SnapPhotoCommand}"
+                                                       MinWidth="95"
+                                                       
+                                                       Content="SNAP / BROWSE"
+                                                       IsTabStop="False"
+                                                       Focusable="False"/>
+                                    <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}"
+                                                       Command="{Binding ClearPhotoCommand}"
+                                                       MinWidth="65"
+                                                       
+                                                       Content="Clear"
+                                                       Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVis}}"
+                                                       IsTabStop="False"
+                                                       Focusable="False"/>
+
+
+                                    <Button Command="{Binding AiEnhancePhotoCommand}"
+         Background="{DynamicResource AccentGradient}"
+         BorderThickness="0"
+         Cursor="Hand"
+         Padding="10,0"
+         Margin="0,0,4,0"
+         IsTabStop="False"
+         Focusable="False"
+         ToolTip="1-Click AI Image Enhancement (Neutralize Background, Auto-Lighting &amp; Luster)">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="&#xE706;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="White" VerticalAlignment="Center" />
+                                            <TextBlock Text=" AI Enhance" FontSize="11.5" FontWeight="Bold" Foreground="White" Margin="5,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+
+
+
+                                    <Button Command="{Binding OpenAiEnhanceSettingsCommand}"
+          Background="{DynamicResource PanelBrush}"
+          BorderBrush="{DynamicResource CardBorderBrush}"
+          BorderThickness="1"
+          Cursor="Hand"
+          Width="30"
+          Padding="0"
+          IsTabStop="False"
+          Focusable="False"
+          ToolTip="AI Enhancement Settings &amp; Fine-Tune Sliders">
+                                        <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Button>
+
+
+                                </StackPanel>
+
+                               
+                            </StackPanel>
+
+                            <!-- Box No -->
+                            <Grid Grid.Row="4" Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Box No" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadComboBox Grid.Column="1"
+                                                     ItemsSource="{Binding AvailableBoxes}"
+                                                     SelectedValuePath="BoxNo"
+                                                     SelectedValue="{Binding BoxNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Text="{Binding BoxNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     TextSearch.TextPath="BoxNo"
+                                                     IsEditable="True"
+                                                     IsFilteringEnabled="True"
+                                                     TextSearchMode="Contains"
+                                                     IsTextSearchEnabled="True"
+                                                     ClearSelectionButtonVisibility="Collapsed">
+                                    <telerik:RadComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" MinWidth="60"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding BoxNo}" FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding DisplayText}" Foreground="#64748B" Margin="8,0,0,0"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </telerik:RadComboBox.ItemTemplate>
+                                </telerik:RadComboBox>
+                                <Button Grid.Column="2"
+                                        Command="{Binding OpenBoxMasterCommand}"
+                                        ToolTip="Open Box Master / Select Box"
+                                        Width="34"
+                                        Height="34"
+                                        Margin="4,0,0,0"
+                                        Background="{DynamicResource PanelBrush}"
+                                        BorderBrush="{DynamicResource CardBorderBrush}"
+                                        BorderThickness="1"
+                                        Cursor="Hand"
+                                        IsTabStop="False"
+                                        Focusable="False">
+                                    <TextBlock Text="&#xE8F1;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- Godown -->
+                            <Grid Grid.Row="5" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource FieldLabelBlock}">
+                                    <TextBlock Text="Godown" Style="{StaticResource FieldLabelText}"/>
+                                </Border>
+                                <telerik:RadWatermarkTextBox Grid.Column="1"
+                                                             Text="{Binding Godown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                             WatermarkContent="Storage location"/>
+                            </Grid>
+
+                            <!-- Real-time Timestamp Display -->
+                            <Border Grid.Row="6"
+                                    Background="{DynamicResource PanelBrush}"
+                                    CornerRadius="4"
+                                    Padding="8,4"
+                                    HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentClockText}"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Section 3: Recent Barcodes Data Grid -->
+                <Border Grid.Row="3" Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Recent Barcode Items (Voucher: 9)"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Text="{Binding RecentBarcodes.Count, StringFormat=' ({0} records)'}"
+                                           FontSize="11.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="6,0,0,0"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <telerik:RadButton Grid.Column="1"
+                                               Style="{StaticResource ToolbarButtonStyle}"
+                                               Command="{Binding RefreshCommand}"
+                                               Height="28"
+                                               MinWidth="70">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </Grid>
+
+                        <telerik:RadGridView Grid.Row="1"
+                                             ItemsSource="{Binding RecentBarcodes}"
+                                             SelectedItem="{Binding SelectedRecentBarcode, Mode=TwoWay}"
+                                             AutoGenerateColumns="False"
+                                             IsReadOnly="True"
+                                             ShowGroupPanel="False"
+                                             RowIndicatorVisibility="Visible"
+                                             GridLinesVisibility="Both"
+                                             Height="240"
+                                             EnableRowVirtualization="True"
+                                             EnableColumnVirtualization="True"
+                                             Background="{DynamicResource SurfaceBackgroundBrush}">
+                            <telerik:RadGridView.Columns>
+                                <telerik:GridViewDataColumn Header="Barcode" DataMemberBinding="{Binding Barcode}" Width="100" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Type" DataMemberBinding="{Binding BType}" Width="60" TextAlignment="Center"/>
+                                <telerik:GridViewDataColumn Header="Item Name" DataMemberBinding="{Binding ItemName}" Width="160"/>
+                                <telerik:GridViewDataColumn Header="Purity" DataMemberBinding="{Binding Purity}" Width="100"/>
+                                <telerik:GridViewDataColumn Header="HUID" DataMemberBinding="{Binding HUID}" Width="110"/>
+                                <telerik:GridViewDataColumn Header="Qty" DataMemberBinding="{Binding Qty}" Width="60" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Gross Wt" DataMemberBinding="{Binding GrossWt}" DataFormatString="{}{0:N3}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Less Wt" DataMemberBinding="{Binding StoneWt}" DataFormatString="{}{0:N3}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Net Wt" DataMemberBinding="{Binding NetWt}" DataFormatString="{}{0:N3}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Making" DataMemberBinding="{Binding Making}" DataFormatString="{}{0:N2}" Width="90" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="MRP" DataMemberBinding="{Binding MRP}" DataFormatString="{}{0:N2}" Width="100" TextAlignment="Right"/>
+                                <telerik:GridViewDataColumn Header="Supplier" DataMemberBinding="{Binding SupplierName}" Width="140"/>
+                                <telerik:GridViewDataColumn Header="Box No" DataMemberBinding="{Binding BoxNo}" Width="90"/>
+                                <telerik:GridViewDataColumn Header="Godown" DataMemberBinding="{Binding Godown}" Width="100"/>
+                                <telerik:GridViewDataColumn Header="Punched On" DataMemberBinding="{Binding PunchedOn}" DataFormatString="{}{0:dd/MM/yyyy HH:mm}" Width="130" TextAlignment="Center"/>
+                            </telerik:RadGridView.Columns>
+                        </telerik:RadGridView>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,486 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.BarcodeCreationBulkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding NewVoucherCommand}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SaveVoucherCommand}"/>
+        <KeyBinding Key="M" Modifiers="Alt" Command="{Binding ModifyVoucherCommand}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding DeleteVoucherCommand}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding CancelVoucherCommand}"/>
+        <KeyBinding Key="F9" Command="{Binding RefreshLookupsCommand}"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14"/>
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="PrimaryToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="#003B46"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style x:Key="DangerToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#991B1B"/>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="{x:Type DatePicker}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="6,0,4,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsEditable" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+                <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification Overlay in Bottom Right Corner -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header / Toolbar -->
+                    <RowDefinition Height="Auto"/> <!-- Header Details Card -->
+                    <RowDefinition Height="*"/>    <!-- Items Grid & Totals Card -->
+                </Grid.RowDefinitions>
+
+                <!-- Header & Top Action Toolbar -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource HeaderBackgroundBrush}"
+                        BorderBrush="{DynamicResource HeaderBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        CornerRadius="8"
+                        Padding="14,10"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Module Title & Icon -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="34" Height="34" CornerRadius="6" Background="#003B46" Margin="0,0,10,0">
+                                <TextBlock Text="&#xE8FE;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="16"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Barcode Creation (Bulk)" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Text="{Binding VouNo, StringFormat='Voucher: {0}', FallbackValue='Voucher: -'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Action Toolbar Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <telerik:RadButton Style="{StaticResource PrimaryToolbarButtonStyle}" Command="{Binding NewVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Add New (Alt+A)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding SaveVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Save (Alt+S)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding PrintVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Print" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding ModifyVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Modify (Alt+M)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}" Command="{Binding DeleteVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Delete (Alt+D)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding CancelVoucherCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Cancel (Alt+C)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding RefreshLookupsCommand}" ToolTip="Refresh Comboboxes / Dropdown Lists (F9)">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Refresh (F9)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </StackPanel>
+
+                        <!-- Recent Voucher Selector -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Recent:" VerticalAlignment="Center" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,6,0"/>
+                            <telerik:RadComboBox Width="190"
+                                                 ItemsSource="{Binding RecentVouchers}"
+                                                 SelectedItem="{Binding SelectedRecentVoucher, Mode=TwoWay}"
+                                                 DisplayMemberPath="DisplayText"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"
+                                                 Height="28"
+                                                 Background="{DynamicResource InputBackgroundBrush}"
+                                                 BorderBrush="{DynamicResource InputBorderBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Section 1: Header Details Card -->
+                <Border Grid.Row="1"
+                        Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,12"
+                        IsEnabled="{Binding IsFormEnabled}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 0, Col 0: Voucher Number -->
+                        <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="Voucher No:" Style="{StaticResource FieldLabelStyle}" Width="100"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding VouNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="e.g. BC-1"
+                                                         IsReadOnly="True"/>
+                        </DockPanel>
+
+                        <!-- Row 0, Col 2: Voucher Date -->
+                        <DockPanel Grid.Column="2" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="Voucher Date:" Style="{StaticResource FieldLabelStyle}" Width="100"/>
+                            <telerik:RadDatePicker SelectedDate="{Binding VouDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                   Height="34"
+                                                   VerticalContentAlignment="Center"/>
+                        </DockPanel>
+
+                        <!-- Row 0, Col 4: Entry User -->
+                        <DockPanel Grid.Column="4" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="Operator:" Style="{StaticResource FieldLabelStyle}" Width="80"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding EntryUser, Mode=OneWay}"
+                                                         IsReadOnly="True"
+                                                         Background="{DynamicResource PanelBrush}"/>
+                        </DockPanel>
+
+                        <!-- Row 1, Col 0: Supplier / Artisan Name -->
+                        <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" Margin="0,8,0,0">
+                            <TextBlock Text="Supplier / Party:" Style="{StaticResource FieldLabelStyle}" Width="100"/>
+                            <telerik:RadComboBox ItemsSource="{Binding Suppliers}"
+                                                 DisplayMemberPath="AccountName"
+                                                 SelectedValuePath="AccountName"
+                                                 SelectedValue="{Binding ArtisianName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding ArtisianName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"/>
+                        </DockPanel>
+
+                        <!-- Row 1, Col 2: Supplier Bill No -->
+                        <DockPanel Grid.Column="2" Grid.Row="1" LastChildFill="True" Margin="0,8,0,0">
+                            <TextBlock Text="Supp Bill No:" Style="{StaticResource FieldLabelStyle}" Width="100"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding SuppBillNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Supplier bill/inv #"/>
+                        </DockPanel>
+
+                        <!-- Row 1, Col 4: Computer Name -->
+                        <DockPanel Grid.Column="4" Grid.Row="1" LastChildFill="True" Margin="0,8,0,0">
+                            <TextBlock Text="Terminal:" Style="{StaticResource FieldLabelStyle}" Width="80"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding ComputerName, Mode=OneWay}"
+                                                         IsReadOnly="True"
+                                                         Background="{DynamicResource PanelBrush}"/>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Section 2: Items Grid & Summary Cards -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Items RadGridView -->
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Grid Header & Row Action Buttons -->
+                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Voucher Barcode Items"
+                                               FontSize="13.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding TotalItemsCount, StringFormat=' ({0} items)'}"
+                                               FontSize="11.5"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="6,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <telerik:RadButton Content="+ Add Item"
+                                                       Command="{Binding AddLineCommand}"
+                                                       Style="{StaticResource ToolbarButtonStyle}"
+                                                       Height="30"
+                                                       MinWidth="85"
+                                                       Margin="0,0,6,0"/>
+                                    <telerik:RadButton Content="✕ Remove Item"
+                                                       Command="{Binding RemoveLineCommand}"
+                                                       Style="{StaticResource DangerToolbarButtonStyle}"
+                                                       Height="30"
+                                                       MinWidth="95"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- RadGridView for Voucher Items -->
+                            <telerik:RadGridView Grid.Row="1"
+                                                 ItemsSource="{Binding Lines}"
+                                                 SelectedItem="{Binding SelectedLine, Mode=TwoWay}"
+                                                 AutoGenerateColumns="False"
+                                                 CanUserInsertRows="True"
+                                                 CanUserDeleteRows="True"
+                                                 IsReadOnly="{Binding IsFormEnabled, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                                                 ShowGroupPanel="False"
+                                                 RowIndicatorVisibility="Visible"
+                                                 GridLinesVisibility="Both"
+                                                 MinHeight="300"
+                                                 Background="{DynamicResource SurfaceBackgroundBrush}">
+                                <telerik:RadGridView.Columns>
+                                    <telerik:GridViewComboBoxColumn Header="Type"
+                                                                    DataMemberBinding="{Binding BType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ItemsSource="{Binding DataContext.TypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    Width="70"/>
+                                    <telerik:GridViewComboBoxColumn Header="Item Name"
+                                                                    DataMemberBinding="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ItemsSource="{Binding DataContext.AvailableItems, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    SelectedValueMemberPath="ItemName"
+                                                                    DisplayMemberPath="ItemName"
+                                                                    Width="160"/>
+                                    <telerik:GridViewComboBoxColumn Header="Purity"
+                                                                    DataMemberBinding="{Binding Purity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ItemsSource="{Binding DataContext.AvailablePurities, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    SelectedValueMemberPath="Purity"
+                                                                    DisplayMemberPath="Purity"
+                                                                    Width="100"/>
+                                    <telerik:GridViewDataColumn Header="Description"
+                                                                DataMemberBinding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="120"/>
+                                    <telerik:GridViewDataColumn Header="HUID"
+                                                                DataMemberBinding="{Binding HUID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="100"/>
+                                    <telerik:GridViewDataColumn Header="Size"
+                                                                DataMemberBinding="{Binding Size, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="70"/>
+                                    <telerik:GridViewDataColumn Header="Qty"
+                                                                DataMemberBinding="{Binding Qty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N0}"
+                                                                TextAlignment="Right"
+                                                                Width="60"/>
+                                    <telerik:GridViewDataColumn Header="Gross Wt"
+                                                                DataMemberBinding="{Binding GrossWt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N3}"
+                                                                TextAlignment="Right"
+                                                                Width="100"/>
+                                    <telerik:GridViewDataColumn Header="Less Wt"
+                                                                DataMemberBinding="{Binding StoneWt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N3}"
+                                                                TextAlignment="Right"
+                                                                Width="100"/>
+                                    <telerik:GridViewDataColumn Header="Net Wt"
+                                                                DataMemberBinding="{Binding NetWt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N3}"
+                                                                TextAlignment="Right"
+                                                                Width="100"/>
+                                    <telerik:GridViewDataColumn Header="Making"
+                                                                DataMemberBinding="{Binding Making, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                TextAlignment="Right"
+                                                                Width="90"/>
+                                    <telerik:GridViewComboBoxColumn Header="Mc Type"
+                                                                    DataMemberBinding="{Binding MakingType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ItemsSource="{Binding DataContext.MakingTypeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    Width="80"/>
+                                    <telerik:GridViewDataColumn Header="MRP"
+                                                                DataMemberBinding="{Binding MRP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                TextAlignment="Right"
+                                                                Width="100"/>
+                                    <telerik:GridViewComboBoxColumn Header="Sticker"
+                                                                    DataMemberBinding="{Binding Sti, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ItemsSource="{Binding DataContext.StickerFormats, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    Width="110"/>
+                                </telerik:RadGridView.Columns>
+                            </telerik:RadGridView>
+                        </Grid>
+                    </Border>
+
+                    <!-- Summary Totals Footer Card -->
+                    <Border Grid.Row="1"
+                            Style="{StaticResource CardStyle}"
+                            Background="{DynamicResource PanelBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock Text="Voucher Totals" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Total Items -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Items:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10,3">
+                                    <TextBlock Text="{Binding TotalItemsCount}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Total Qty -->
+                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Qty:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10,3">
+                                    <TextBlock Text="{Binding TotalQty, StringFormat='{}{0:N0}'}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Total Gross Wt -->
+                            <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Gross Wt:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10,3">
+                                    <TextBlock Text="{Binding TotalGrossWeight, StringFormat='{}{0:N3}g'}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Total Net Wt -->
+                            <StackPanel Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Net Wt:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12,3">
+                                    <TextBlock Text="{Binding TotalNetWeight, StringFormat='{}{0:N3}g'}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Total MRP -->
+                            <StackPanel Grid.Column="9" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Total MRP:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12,3">
+                                    <TextBlock Text="{Binding TotalMRP, StringFormat='₹ {0:N2}'}" FontSize="13" FontWeight="Bold" Foreground="#007ACC"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

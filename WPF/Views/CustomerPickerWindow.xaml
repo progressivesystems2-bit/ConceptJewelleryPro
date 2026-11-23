@@ -1,0 +1,107 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.CustomerPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="Search &amp; Select Customer"
+        Width="820" Height="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="HeaderLabelStyle">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search Bar -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <telerik:RadWatermarkTextBox x:Name="SearchBox"
+                                         Grid.Column="0"
+                                         WatermarkContent="Type Name, Mobile number, City, or Code to filter..."
+                                         Height="36"
+                                         FontSize="14"
+                                         Padding="8,0"
+                                         Foreground="{DynamicResource PrimaryTextBrush}"
+                                         TextChanged="SearchBox_TextChanged"
+                                         PreviewKeyDown="SearchBox_PreviewKeyDown" />
+
+            <TextBlock Grid.Column="1"
+                       x:Name="CountTextBlock"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       FontSize="12" />
+        </Grid>
+
+        <!-- Results Grid -->
+        <telerik:RadGridView x:Name="CustomersGrid"
+                             Grid.Row="1"
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             CanUserReorderColumns="False"
+                             CanUserResizeColumns="True"
+                             RowIndicatorVisibility="Collapsed"
+                             SelectionMode="Single"
+                             ShowGroupPanel="False"
+                             FontSize="13"
+                             MouseDoubleClick="CustomersGrid_MouseDoubleClick"
+                             PreviewKeyDown="CustomersGrid_PreviewKeyDown">
+            <telerik:RadGridView.Columns>
+                <telerik:GridViewDataColumn Header="Name" DataMemberBinding="{Binding Name}" Width="230" />
+                <telerik:GridViewDataColumn Header="Mobile / Phone" DataMemberBinding="{Binding Phone}" Width="130" />
+                <telerik:GridViewDataColumn Header="City" DataMemberBinding="{Binding City}" Width="120" />
+                <telerik:GridViewDataColumn Header="Address" DataMemberBinding="{Binding Address}" Width="*" />
+                <telerik:GridViewDataColumn Header="Code" DataMemberBinding="{Binding Code}" Width="90" />
+            </telerik:RadGridView.Columns>
+        </telerik:RadGridView>
+
+        <!-- Footer Buttons -->
+        <Border Grid.Row="2"
+                Margin="0,12,0,0"
+                Padding="0,10,0,0"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource CardBorderBrush}">
+            <Grid>
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           FontSize="12"
+                           Text="Tip: Press Enter to select, Esc to cancel, Up/Down arrow to navigate" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <telerik:RadButton Content="Select Customer (Enter)"
+                                       Click="SelectButton_Click"
+                                       MinWidth="150"
+                                       Height="34"
+                                       Margin="0,0,8,0"
+                                       Background="{DynamicResource AccentBrush}"
+                                       Foreground="{DynamicResource AccentTextBrush}"
+                                       FontWeight="SemiBold" />
+
+                    <telerik:RadButton Content="Cancel (Esc)"
+                                       Click="CancelButton_Click"
+                                       MinWidth="90"
+                                       Height="34"
+                                       Background="{DynamicResource PanelBrush}"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       BorderBrush="{DynamicResource CardBorderBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

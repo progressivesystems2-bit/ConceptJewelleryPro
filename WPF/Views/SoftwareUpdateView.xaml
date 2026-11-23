@@ -1,0 +1,333 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.SoftwareUpdateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="AccentToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notifications -->
+        <controls:ToastNotification Grid.Row="0"
+                                     Grid.RowSpan="2"
+                                     Panel.ZIndex="99"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,24,24"
+                                     Message="{Binding ToastMessage}"
+                                     ToastType="{Binding ToastType}" />
+
+        <!-- Header / Actions Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="8" Background="{DynamicResource PanelBrush}">
+                        <TextBlock Text="&#xE895;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="18"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Software Updates"
+                                   FontSize="17"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="Check for new versions from GitHub Releases, download securely, or install offline update packages"
+                                   FontSize="11.5"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Content="Check for Updates"
+                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                       Command="{Binding CheckForUpdatesCommand}" />
+
+                    <telerik:RadButton Content="Install Local ZIP..."
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding InstallFromLocalZipCommand}" />
+
+                    <telerik:RadButton Content="GitHub Releases"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding OpenReleasesPageCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <telerik:RadBusyIndicator Grid.Row="1"
+                                  IsBusy="{Binding IsBusy, Mode=OneWay}"
+                                  BusyContent="{Binding BusyMessage}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="24,20,24,30" MaxWidth="980" HorizontalAlignment="Left">
+
+                    <!-- CARD 1: Update Status & Action -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Text="{Binding StatusBannerTitle}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                    <TextBlock Text="{Binding StatusBannerDetail}"
+                                               FontSize="12.5"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,16,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <telerik:RadButton Content="Download &amp; Install Update"
+                                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                                       Visibility="{Binding CanDownloadUpdate, Converter={StaticResource BoolToVis}}"
+                                                       Command="{Binding DownloadAndInstallCommand}" />
+                                    <telerik:RadButton Content="Cancel Download"
+                                                       Style="{StaticResource ToolbarButtonStyle}"
+                                                       Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}"
+                                                       Command="{Binding CancelDownloadCommand}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Download Progress -->
+                            <StackPanel Margin="0,16,0,0"
+                                        Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">
+                                <ProgressBar Height="10"
+                                             Minimum="0"
+                                             Maximum="100"
+                                             Value="{Binding DownloadProgress, Mode=OneWay}"
+                                             Foreground="{DynamicResource AccentBrush}" />
+                                <TextBlock Text="{Binding DownloadStatusText}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,6,0,0" />
+                            </StackPanel>
+
+                            <!-- Version Summary Grid -->
+                            <Border Background="{DynamicResource PanelBrush}"
+                                    CornerRadius="6"
+                                    Padding="14,12"
+                                    Margin="0,16,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Installed Version" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding CurrentVersionLabel}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Latest Available" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding LatestVersionDisplay}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Published Date" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding PublishedDateDisplay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,3,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3">
+                                        <TextBlock Text="Package Size" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="{Binding PackageSizeDisplay}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}">
+                                        <Run Text="Runtime: " FontWeight="SemiBold" />
+                                        <Run Text="{Binding RuntimeInfo, Mode=OneWay}" />
+                                        <Run Text="   |   Last Checked: " FontWeight="SemiBold" />
+                                        <Run Text="{Binding LastCheckedDisplay, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis">
+                                        <Run Text="Install Folder: " FontWeight="SemiBold" />
+                                        <Run Text="{Binding InstallDirectory, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <telerik:RadButton Grid.Column="1"
+                                                   Content="Open Install Folder"
+                                                   Style="{StaticResource ToolbarButtonStyle}"
+                                                   Margin="12,0,0,0"
+                                                   Command="{Binding OpenInstallFolderCommand}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CARD 2: Release Notes -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,18">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="&#xE8A5;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Text="Release Notes"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ReleaseName}"
+                                           FontSize="12.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0" />
+                            </StackPanel>
+
+                            <Border Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12">
+                                <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                    <TextBox Text="{Binding ReleaseNotes, Mode=OneWay}"
+                                             IsReadOnly="True"
+                                             TextWrapping="Wrap"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             FontSize="12.5"
+                                             Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CARD 3: Update Source Settings -->
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <TextBlock Text="&#xE713;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0" />
+                                <TextBlock Text="Update Source Configuration (GitHub Releases)"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="12" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="12" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="GitHub Owner / Organization" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding GitHubOwner, UpdateSourceTrigger=PropertyChanged}" Height="34" VerticalContentAlignment="Center" Padding="10,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="2">
+                                    <TextBlock Text="GitHub Repository Name" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding GitHubRepo, UpdateSourceTrigger=PropertyChanged}" Height="34" VerticalContentAlignment="Center" Padding="10,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0">
+                                    <TextBlock Text="Release Asset Name Prefix" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding AssetNamePattern, UpdateSourceTrigger=PropertyChanged}" Height="34" VerticalContentAlignment="Center" Padding="10,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="2">
+                                    <TextBlock Text="GitHub Access Token (Optional — only for private repos)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding GitHubToken, UpdateSourceTrigger=PropertyChanged}" Height="34" VerticalContentAlignment="Center" Padding="10,0" />
+                                </StackPanel>
+
+                                <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Content="Include pre-release / beta builds when checking for updates"
+                                              IsChecked="{Binding IncludePreReleases}"
+                                              VerticalAlignment="Center"
+                                              Foreground="{DynamicResource PrimaryTextBrush}" />
+                                    <telerik:RadButton Grid.Column="1"
+                                                       Content="Save Update Settings"
+                                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                                       Margin="0"
+                                                       Command="{Binding SaveSettingsCommand}" />
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </telerik:RadBusyIndicator>
+    </Grid>
+</UserControl>

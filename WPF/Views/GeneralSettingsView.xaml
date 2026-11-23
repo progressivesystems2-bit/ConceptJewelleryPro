@@ -1,0 +1,1224 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.GeneralSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <Style x:Key="AccentToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+
+        <Style x:Key="MiniActionButton" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+
+        <Style x:Key="VariableTagButton" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="6,1" />
+            <Setter Property="Margin" Value="0,0,4,4" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notifications Container -->
+        <controls:ToastNotification Grid.Row="0"
+                                     Grid.RowSpan="2"
+                                     Panel.ZIndex="99"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,20,20"
+                                     Message="{Binding ToastMessage}"
+                                     ToastType="{Binding ToastType}" />
+
+        <!-- Header / Actions Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="32" Height="32" CornerRadius="6" Background="{DynamicResource PanelBrush}">
+                        <TextBlock Text="&#xE713;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="15"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="General Settings" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="File storage, WhatsApp messaging gateway, weighing scale &amp; customer greetings" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <telerik:RadButton Content="Save Changes"
+                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                       Command="{Binding SaveCommand}" />
+
+                    <telerik:RadButton Content="Refresh"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Command="{Binding RefreshCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Settings 3-Column Layout in ScrollViewer -->
+        <telerik:RadBusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, Mode=OneWay}" BusyContent="Loading settings...">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid Margin="14,12,14,16">
+                    <Grid.ColumnDefinitions>
+                        <!-- Column 1: System & Hardware -->
+                        <ColumnDefinition Width="1*" MinWidth="300" />
+                        <!-- Column 2: WhatsApp Messaging -->
+                        <ColumnDefinition Width="1.15*" MinWidth="340" />
+                        <!-- Column 3: Customer Greetings -->
+                        <ColumnDefinition Width="1*" MinWidth="300" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ==================================================================== -->
+                    <!-- COLUMN 1: System, Storage, E-Invoice & Weight Machine               -->
+                    <!-- ==================================================================== -->
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+
+                        <!-- SECTION: Database & Historical Financial Years -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="&#xE753;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <TextBlock Text="Database &amp; Historical Years (Analytics)"
+                                               FontSize="12.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="Configure active database and attach previous years' databases for customer &amp; sales analytics."
+                                           FontSize="10.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,0,0,8" />
+
+                                <TextBlock Text="Database Engine"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,3" />
+                                <telerik:RadComboBox Height="30"
+                                                     FontSize="11.5"
+                                                     SelectedIndex="{Binding ConnectionSettings.SelectedProviderIndex}">
+                                    <telerik:RadComboBoxItem Content="Microsoft Access (.mdb / .accdb)" />
+                                    <telerik:RadComboBoxItem Content="SQL Server" />
+                                </telerik:RadComboBox>
+
+                                <!-- Microsoft Access Section -->
+                                <StackPanel Margin="0,8,0,0"
+                                            Visibility="{Binding ConnectionSettings.IsAccessSelected, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Current Financial Year Database File"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,0,0,3" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                     Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0"
+                                                                     FontSize="11.5"
+                                                                     WatermarkContent="Path to current MDB / ACCDB..."
+                                                                     Text="{Binding ConnectionSettings.AccessDatabasePath, UpdateSourceTrigger=PropertyChanged}" />
+                                        <telerik:RadButton Grid.Column="1"
+                                                           Content="Browse..."
+                                                           Style="{StaticResource MiniActionButton}"
+                                                           Height="30"
+                                                           Margin="6,0,0,0"
+                                                           Command="{Binding ConnectionSettings.BrowseAccessDatabaseCommand}" />
+                                    </Grid>
+
+                                    <!-- Previous Years MDB List -->
+                                    <TextBlock Text="Attached Previous Years (MDB Files)"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,12,0,2" />
+                                    <TextBlock Text="Attach previous years' MDB files to enable historical reports:"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Margin="0,0,0,6" />
+
+                                    <ItemsControl ItemsSource="{Binding ConnectionSettings.PreviousYearsAccess}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="75" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                                 Height="28"
+                                                                                 VerticalContentAlignment="Center"
+                                                                                 Padding="4,0"
+                                                                                 FontSize="11"
+                                                                                 WatermarkContent="FY (24-25)"
+                                                                                 Text="{Binding FinancialYear, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <telerik:RadWatermarkTextBox Grid.Column="1"
+                                                                                 Height="28"
+                                                                                 Margin="4,0,0,0"
+                                                                                 VerticalContentAlignment="Center"
+                                                                                 Padding="4,0"
+                                                                                 FontSize="11"
+                                                                                 WatermarkContent="MDB database path..."
+                                                                                 Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <telerik:RadButton Grid.Column="2"
+                                                                       Content="..."
+                                                                       Margin="4,0,0,0"
+                                                                       Height="28"
+                                                                       Width="28"
+                                                                       FontSize="11"
+                                                                       ToolTip="Browse Previous Year MDB"
+                                                                       Command="{Binding DataContext.ConnectionSettings.BrowsePreviousYearAccessCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                       CommandParameter="{Binding}" />
+                                                    <telerik:RadButton Grid.Column="3"
+                                                                       Content="✕"
+                                                                       Margin="4,0,0,0"
+                                                                       Height="28"
+                                                                       Width="28"
+                                                                       FontSize="10"
+                                                                       Background="#FFE8E8"
+                                                                       Foreground="#D32F2F"
+                                                                       ToolTip="Remove Year"
+                                                                       Command="{Binding DataContext.ConnectionSettings.RemovePreviousYearAccessCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                       CommandParameter="{Binding}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <telerik:RadButton Content="+ Attach Previous Year MDB"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="26"
+                                                       HorizontalAlignment="Left"
+                                                       Margin="0,2,0,0"
+                                                       Command="{Binding ConnectionSettings.AddPreviousYearAccessCommand}" />
+                                </StackPanel>
+
+                                <!-- SQL Server Section -->
+                                <StackPanel Margin="0,8,0,0"
+                                            Visibility="{Binding ConnectionSettings.IsSqlSelected, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Server Name"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,0,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="e.g. localhost or SERVER\SQLEXPRESS"
+                                                                 Text="{Binding ConnectionSettings.SqlServerName, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Text="Current Year Database Name"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,8,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="e.g. ConceptJewelleryPro"
+                                                                 Text="{Binding ConnectionSettings.SqlDatabaseName, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Text="SQL Username"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,8,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="e.g. sa"
+                                                                 Text="{Binding ConnectionSettings.SqlUsername, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Text="SQL Password"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,8,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 Text="{Binding ConnectionSettings.SqlPassword, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <!-- Previous Years SQL Databases List -->
+                                    <TextBlock Text="Attached Previous Years (SQL Databases)"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,12,0,2" />
+                                    <TextBlock Text="Attach previous years' SQL databases on this server:"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Margin="0,0,0,6" />
+
+                                    <ItemsControl ItemsSource="{Binding ConnectionSettings.PreviousYearsSql}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="75" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                                 Height="28"
+                                                                                 VerticalContentAlignment="Center"
+                                                                                 Padding="4,0"
+                                                                                 FontSize="11"
+                                                                                 WatermarkContent="FY (24-25)"
+                                                                                 Text="{Binding FinancialYear, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <telerik:RadWatermarkTextBox Grid.Column="1"
+                                                                                 Height="28"
+                                                                                 Margin="4,0,0,0"
+                                                                                 VerticalContentAlignment="Center"
+                                                                                 Padding="4,0"
+                                                                                 FontSize="11"
+                                                                                 WatermarkContent="SQL Database name (e.g. RGRG2425)..."
+                                                                                 Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <telerik:RadButton Grid.Column="2"
+                                                                       Content="✕"
+                                                                       Margin="4,0,0,0"
+                                                                       Height="28"
+                                                                       Width="28"
+                                                                       FontSize="10"
+                                                                       Background="#FFE8E8"
+                                                                       Foreground="#D32F2F"
+                                                                       ToolTip="Remove Year"
+                                                                       Command="{Binding DataContext.ConnectionSettings.RemovePreviousYearSqlCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                       CommandParameter="{Binding}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <telerik:RadButton Content="+ Attach Previous Year SQL Database"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="26"
+                                                       HorizontalAlignment="Left"
+                                                       Margin="0,2,0,0"
+                                                       Command="{Binding ConnectionSettings.AddPreviousYearSqlCommand}" />
+                                </StackPanel>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadButton Content="Save Database Settings"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="28"
+                                                       Command="{Binding ConnectionSettings.SaveCommand}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding ConnectionSettings.SaveStatusMessage}"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0,0,0" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SECTION 1: Storage & File Locations -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="&#xED25;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <TextBlock Text="Storage &amp; File Locations"
+                                               FontSize="12.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <TextBlock Text="Save Path (SavePath)"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,4" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                 Height="32"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="e.g. C:\ConceptJewellery\Exports"
+                                                                 Text="{Binding SavePath, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <telerik:RadButton Grid.Column="1"
+                                                       Content="Browse..."
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="32"
+                                                       Margin="6,0,0,0"
+                                                       Command="{Binding BrowseSavePathCommand}" />
+                                </Grid>
+                                <TextBlock Text="Default folder for invoice PDFs, exports, and backups."
+                                           FontSize="10.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,4,0,10" />
+
+                                <TextBlock Text="FastReport FRX Path (PrintFiles)"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,4" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                 Height="32"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="e.g. D:\Concept\FRX"
+                                                                 Text="{Binding PrintFiles, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <telerik:RadButton Grid.Column="1"
+                                                       Content="Browse..."
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="32"
+                                                       Margin="6,0,0,0"
+                                                       Command="{Binding BrowsePrintFilesCommand}" />
+                                </Grid>
+                                <TextBlock Text="Primary folder for FastReport (.frx) print formats. Falls back to SavePath\FRX and then the Application folder if a file is not found."
+                                           FontSize="10.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SECTION: Web App & Background API Server -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="&#xE753;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource AccentBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,6,0" />
+                                        <TextBlock Text="Web App &amp; API Server"
+                                                   FontSize="12.5"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <!-- Live Status Badge -->
+                                    <Border Grid.Column="1"
+                                            CornerRadius="10"
+                                            Padding="8,2"
+                                            VerticalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#252528" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsWebServerRunning}" Value="True">
+                                                        <Setter Property="Background" Value="#1B382B" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="7" Height="7" Margin="0,0,5,0" VerticalAlignment="Center">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#888888" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsWebServerRunning}" Value="True">
+                                                                <Setter Property="Fill" Value="#4CAF50" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock FontSize="10.5" FontWeight="SemiBold" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="{Binding WebServerStatusText}" />
+                                                        <Setter Property="Foreground" Value="#AAAAAA" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsWebServerRunning}" Value="True">
+                                                                <Setter Property="Foreground" Value="#81C784" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Port & Host Grid -->
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="1.5*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Port -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Server Port"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   Margin="0,0,0,4" />
+                                        <telerik:RadWatermarkTextBox Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0"
+                                                                     FontSize="11.5"
+                                                                     WatermarkContent="5080"
+                                                                     Text="{Binding WebServerPort, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <!-- Host Binding -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Binding Host (0.0.0.0 for network)"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   Margin="0,0,0,4" />
+                                        <telerik:RadWatermarkTextBox Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0"
+                                                                     FontSize="11.5"
+                                                                     WatermarkContent="0.0.0.0 or localhost"
+                                                                     Text="{Binding WebServerHost, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Executable Path -->
+                                <TextBlock Text="Server Executable (ConceptJewelleryPro.API.exe)"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,2,0,4" />
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadWatermarkTextBox Grid.Column="0"
+                                                                 Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0"
+                                                                 FontSize="11"
+                                                                 WatermarkContent="Auto-detected or browse..."
+                                                                 Text="{Binding WebServerExePath, UpdateSourceTrigger=PropertyChanged}" />
+                                    <telerik:RadButton Grid.Column="1"
+                                                       Content="Browse..."
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="30"
+                                                       Margin="5,0,0,0"
+                                                       Command="{Binding BrowseWebServerExeCommand}" />
+                                    <telerik:RadButton Grid.Column="2"
+                                                       Content="Auto-Detect"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="30"
+                                                       Margin="5,0,0,0"
+                                                       Command="{Binding AutoDetectWebServerExeCommand}" />
+                                    <telerik:RadButton Grid.Column="3"
+                                                       Content="📂 Open Folder"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="30"
+                                                       Margin="5,0,0,0"
+                                                       Command="{Binding OpenPublishFolderCommand}"
+                                                       ToolTip="Opens the publish directory in Windows Explorer so you can replace publish files." />
+                                </Grid>
+
+                                <!-- Background Service Status Box -->
+                                <Border Background="{DynamicResource InputBackgroundBrush}"
+                                        BorderBrush="{DynamicResource InputBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="8,6"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource AccentBrush}" />
+                                            <TextBlock Text="Always-On Service: " FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                            <TextBlock Text="{Binding AutoStartStatusText}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <TextBlock Text="Ensures web portal always runs on Windows boot and auto-restarts within 1 min if terminated."
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   Margin="16,2,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Action Buttons: Add/Remove Service & Start/Stop -->
+                                <Grid Margin="0,2,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="6" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 1-Click Install Background Service Button -->
+                                    <telerik:RadButton Grid.Column="0"
+                                                       Content="⚡ Enable Always-On Service"
+                                                       Height="32"
+                                                       Style="{StaticResource AccentToolbarButtonStyle}"
+                                                       Command="{Binding InstallAutoStartCommand}"
+                                                       ToolTip="Registers in Windows Task Scheduler &amp; Startup with auto-restart on crash." />
+
+                                    <!-- Stop / Remove Service Button -->
+                                    <telerik:RadButton Grid.Column="2"
+                                                       Content="⏹ Stop &amp; Remove Service"
+                                                       Height="32"
+                                                       Style="{StaticResource ToolbarButtonStyle}"
+                                                       Command="{Binding RemoveAutoStartCommand}"
+                                                       ToolTip="Stops all running server processes and removes from Windows auto-start." />
+                                </Grid>
+
+                                <!-- Quick Process Controls & Browser Launch -->
+                                <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <telerik:RadButton Content="▶ Start Now"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="28"
+                                                       Margin="0,0,5,4"
+                                                       Command="{Binding StartWebServerCommand}" />
+                                    <telerik:RadButton Content="⏹ Stop Now"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="28"
+                                                       Margin="0,0,5,4"
+                                                       Command="{Binding StopWebServerCommand}" />
+                                    <telerik:RadButton Content="🌐 Open Web App ↗"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="28"
+                                                       Margin="0,0,5,4"
+                                                       Command="{Binding OpenWebPortalCommand}" />
+                                    <telerik:RadButton Content="📖 API Docs ↗"
+                                                       Style="{StaticResource MiniActionButton}"
+                                                       Height="28"
+                                                       Margin="0,0,0,4"
+                                                       Command="{Binding OpenSwaggerDocsCommand}" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SECTION 2: E-Invoice & Billing Rules -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Text="&#xEA69;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <TextBlock Text="E-Invoice &amp; Billing Rules"
+                                               FontSize="12.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- E-Invoice Mode -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="E-Invoice Mode"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   Margin="0,0,0,4" />
+                                        <telerik:RadComboBox Height="32"
+                                                             ItemsSource="{Binding AvailableEinvoiceModes}"
+                                                             SelectedItem="{Binding EinvoiceMode, Mode=TwoWay}"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+
+                                    <!-- Weight Tolerance -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Allow NtWt Mod (±g)"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   Margin="0,0,0,4" />
+                                        <telerik:RadWatermarkTextBox Height="32"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0"
+                                                                     FontSize="11.5"
+                                                                     WatermarkContent="0.000"
+                                                                     Text="{Binding AllowNtWtModUpto, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Background="{DynamicResource InputBackgroundBrush}"
+                                        BorderBrush="{DynamicResource InputBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="8,6"
+                                        Margin="0,2,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="• E-Invoice: DEMO (Sandbox) / LIVE (Official GST IRN)." FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <TextBlock Text="• Allow NtWt Mod: Max ±g weight deviation in billing (0 = strict)." FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SECTION 3: Weight Machine (Serial Port) -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12,10">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="&#xE8B5;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource AccentBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,6,0" />
+                                        <TextBlock Text="Weight Scale (Serial Port)"
+                                                   FontSize="12.5"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1"
+                                              IsChecked="{Binding WeightEnabled, Mode=TwoWay}"
+                                              Content="Enabled"
+                                              FontSize="11"
+                                              FontWeight="SemiBold"
+                                              VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- Row 1: COM Port + Baud Rate -->
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="COM Port" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadWatermarkTextBox Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0" FontSize="11.5"
+                                                                     WatermarkContent="COM1"
+                                                                     Text="{Binding WeightCommPort, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Baud Rate" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadComboBox Height="30"
+                                                             ItemsSource="{Binding AvailableBaudRates}"
+                                                             SelectedItem="{Binding WeightBaudRate, Mode=TwoWay}"
+                                                             IsEditable="True"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Row 2: Data Bits + Stop Bits + Parity -->
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Data Bits" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadComboBox Height="30"
+                                                             ItemsSource="{Binding AvailableDataBits}"
+                                                             SelectedItem="{Binding WeightDataBits, Mode=TwoWay}"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Stop Bits" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadComboBox Height="30"
+                                                             ItemsSource="{Binding AvailableStopBits}"
+                                                             SelectedItem="{Binding WeightStopBits, Mode=TwoWay}"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Parity" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadComboBox Height="30"
+                                                             ItemsSource="{Binding AvailableParityOptions}"
+                                                             SelectedItem="{Binding WeightParity, Mode=TwoWay}"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Row 3: Handshake + Stable Prefix + Timeout -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="80" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Handshake" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadComboBox Height="30"
+                                                             ItemsSource="{Binding AvailableHandshakeOptions}"
+                                                             SelectedItem="{Binding WeightHandshake, Mode=TwoWay}"
+                                                             FontSize="11.5"
+                                                             VerticalContentAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Stable Prefix" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadWatermarkTextBox Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0" FontSize="11.5"
+                                                                     WatermarkContent="ST,GS"
+                                                                     Text="{Binding WeightStablePrefix, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Timeout ms" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                        <telerik:RadWatermarkTextBox Height="30"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="6,0" FontSize="11.5"
+                                                                     WatermarkContent="500"
+                                                                     Text="{Binding WeightTimeoutMs, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+
+                    <!-- ==================================================================== -->
+                    <!-- COLUMN 2: WhatsApp Messaging & Invoice Notifications                 -->
+                    <!-- ==================================================================== -->
+                    <Border Grid.Column="1"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            Margin="0,0,10,0">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE717;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <TextBlock Text="WhatsApp Messaging &amp; Gateway"
+                                               FontSize="12.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <telerik:RadButton Grid.Column="1"
+                                                   Content="Sync Replies"
+                                                   Style="{StaticResource MiniActionButton}"
+                                                   Command="{Binding SyncWhatsAppRepliesCommand}"
+                                                   ToolTip="Sync pending customer replies from webhook server" />
+                            </Grid>
+
+                            <!-- Send Method + Business No -->
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Send Method (WaSendMethod)" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                    <telerik:RadComboBox Height="30"
+                                                         ItemsSource="{Binding AvailableSendMethods}"
+                                                         SelectedItem="{Binding WaSendMethod, Mode=TwoWay}"
+                                                         FontSize="11.5"
+                                                         VerticalContentAlignment="Center" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Business No (WaBusinessNo)" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0" FontSize="11.5"
+                                                                 WatermarkContent="+91 9876543210"
+                                                                 Text="{Binding WaBusinessNo, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- API Key & Auto Send -->
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="WhatsApp API Key / Token (WaAPIKey)" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,3" />
+                                    <telerik:RadWatermarkTextBox Height="30"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0" FontSize="11.5"
+                                                                 WatermarkContent="Gateway API Token / Secret"
+                                                                 Text="{Binding WaAPIKey, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+
+                                <CheckBox Grid.Column="1"
+                                          IsChecked="{Binding WaAutoSend, Mode=TwoWay}"
+                                          Content="Auto-Send on Invoice Save"
+                                          FontSize="11"
+                                          FontWeight="SemiBold"
+                                          VerticalAlignment="Bottom"
+                                          Margin="0,0,0,6" />
+                            </Grid>
+
+                            <!-- SUB-SECTION A: Official Cloud API Template -->
+                            <Border Background="{DynamicResource InputBackgroundBrush}"
+                                    BorderBrush="{DynamicResource InputBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    Padding="10,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <TextBlock Text="&#xE774;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource AccentBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,5,0" />
+                                        <TextBlock Text="Cloud API Template (Method = API)"
+                                                   FontSize="11.5"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                                    </StackPanel>
+
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="110" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Template Name" FontSize="10.5" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,2" />
+                                            <telerik:RadWatermarkTextBox Height="28"
+                                                                         VerticalContentAlignment="Center"
+                                                                         Padding="6,0" FontSize="11"
+                                                                         WatermarkContent="e.g. invoice_bill_notification"
+                                                                         Text="{Binding WaApiTemplateName, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Language" FontSize="10.5" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,2" />
+                                            <telerik:RadComboBox Height="28"
+                                                                 ItemsSource="{Binding AvailableWaLanguages}"
+                                                                 SelectedItem="{Binding WaApiLanguage, Mode=TwoWay}"
+                                                                 IsEditable="True"
+                                                                 FontSize="11"
+                                                                 VerticalContentAlignment="Center" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Parameters -->
+                                    <TextBlock Text="Parameters Sequence: {{1}}, {{2}}, {{3}}..." FontSize="10.5" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,2" />
+                                    <telerik:RadWatermarkTextBox Height="28"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="6,0" FontSize="11"
+                                                                 WatermarkContent="{}{CustomerName}, {InvoiceNo}, {BillDate}, {NetAmount}, {Balance}, {StoreName}"
+                                                                 Text="{Binding WaApiParameters, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <!-- Param Quick Insert Chips -->
+                                    <WrapPanel Orientation="Horizontal" Margin="0,4,0,4">
+                                        <telerik:RadButton Content="{}{CustomerName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{CustomerName}" />
+                                        <telerik:RadButton Content="{}{InvoiceNo}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{InvoiceNo}" />
+                                        <telerik:RadButton Content="{}{BillDate}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{BillDate}" />
+                                        <telerik:RadButton Content="{}{NetAmount}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{NetAmount}" />
+                                        <telerik:RadButton Content="{}{Balance}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{Balance}" />
+                                        <telerik:RadButton Content="{}{StoreName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertApiParameterVariableCommand}" CommandParameter="{}{StoreName}" />
+                                    </WrapPanel>
+
+                                    <!-- PDF Option + Document URL -->
+                                    <Grid Margin="0,2,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding WaAttachPdf, Mode=TwoWay}"
+                                                  Content="Attach PDF Header"
+                                                  FontSize="10.5"
+                                                  FontWeight="SemiBold"
+                                                  VerticalAlignment="Center" />
+
+                                        <telerik:RadWatermarkTextBox Grid.Column="2"
+                                                                     Height="26"
+                                                                     VerticalContentAlignment="Center"
+                                                                     Padding="4,0" FontSize="10.5"
+                                                                     WatermarkContent="Doc URL pattern (blank = local PDF upload)"
+                                                                     Text="{Binding WaApiDocumentUrl, UpdateSourceTrigger=PropertyChanged}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SUB-SECTION B: Web & Desktop Message Template -->
+                            <StackPanel>
+                                <TextBlock Text="Web &amp; Desktop Message Template (WaTemplate)"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,3" />
+
+                                <telerik:RadWatermarkTextBox Height="65"
+                                                             AcceptsReturn="True"
+                                                             TextWrapping="Wrap"
+                                                             VerticalScrollBarVisibility="Auto"
+                                                             Padding="6"
+                                                             FontSize="11.5"
+                                                             WatermarkContent="Write WhatsApp Web/Desktop message template here..."
+                                                             Text="{Binding WaTemplate, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <telerik:RadButton Content="{}{CustomerName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{CustomerName}" />
+                                    <telerik:RadButton Content="{}{InvoiceNo}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{InvoiceNo}" />
+                                    <telerik:RadButton Content="{}{BillDate}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{BillDate}" />
+                                    <telerik:RadButton Content="{}{NetAmount}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{NetAmount}" />
+                                    <telerik:RadButton Content="{}{Balance}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{Balance}" />
+                                    <telerik:RadButton Content="{}{StoreName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{StoreName}" />
+                                    <telerik:RadButton Content="{}{Phone}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertTemplateVariableCommand}" CommandParameter="{}{Phone}" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ==================================================================== -->
+                    <!-- COLUMN 3: Customer Celebration Wishes & Greetings                   -->
+                    <!-- ==================================================================== -->
+                    <Border Grid.Column="2"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,10">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="&#xE734;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,6,0" />
+                                <TextBlock Text="Celebration Wishes &amp; Greetings"
+                                           FontSize="12.5"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Wishes Mode ComboBox -->
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Text="Wishes Delivery Mode (WishesMode)"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           Margin="0,0,0,3" />
+                                <telerik:RadComboBox Height="30"
+                                                     ItemsSource="{Binding AvailableWishesModes}"
+                                                     SelectedItem="{Binding WishesMode, Mode=TwoWay}"
+                                                     FontSize="11.5"
+                                                     VerticalContentAlignment="Center" />
+                                <TextBlock Text="Options: WhatsappCloud (API), WhatsAppWeb, or WhatsappDesktop"
+                                           FontSize="10.5"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <!-- Birthday Message Template Editor -->
+                            <Border Background="{DynamicResource InputBackgroundBrush}"
+                                    BorderBrush="{DynamicResource InputBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    Padding="10,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Birthday Greeting Message (BirthdayMessage)"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,0,0,3" />
+
+                                    <telerik:RadWatermarkTextBox Height="75"
+                                                                 AcceptsReturn="True"
+                                                                 TextWrapping="Wrap"
+                                                                 VerticalScrollBarVisibility="Auto"
+                                                                 Padding="6"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="Write your birthday message template here..."
+                                                                 Text="{Binding BirthdayMessage, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <telerik:RadButton Content="{}{CustomerName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertBirthdayTemplateVariableCommand}" CommandParameter="{}{CustomerName}" />
+                                        <telerik:RadButton Content="{}{StoreName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertBirthdayTemplateVariableCommand}" CommandParameter="{}{StoreName}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Anniversary Message Template Editor -->
+                            <Border Background="{DynamicResource InputBackgroundBrush}"
+                                    BorderBrush="{DynamicResource InputBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock Text="Anniversary Greeting Message (AnniversaryMessage)"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               Margin="0,0,0,3" />
+
+                                    <telerik:RadWatermarkTextBox Height="75"
+                                                                 AcceptsReturn="True"
+                                                                 TextWrapping="Wrap"
+                                                                 VerticalScrollBarVisibility="Auto"
+                                                                 Padding="6"
+                                                                 FontSize="11.5"
+                                                                 WatermarkContent="Write your anniversary message template here..."
+                                                                 Text="{Binding AnniversaryMessage, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <telerik:RadButton Content="{}{CustomerName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertAnniversaryTemplateVariableCommand}" CommandParameter="{}{CustomerName}" />
+                                        <telerik:RadButton Content="{}{StoreName}" Style="{StaticResource VariableTagButton}" Command="{Binding InsertAnniversaryTemplateVariableCommand}" CommandParameter="{}{StoreName}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+            </ScrollViewer>
+        </telerik:RadBusyIndicator>
+    </Grid>
+</UserControl>

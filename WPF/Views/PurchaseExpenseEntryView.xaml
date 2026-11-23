@@ -1,0 +1,536 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.PurchaseExpenseEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             FontFamily="Segoe UI"
+             TextOptions.TextFormattingMode="Display">
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding NewExpenseCommand}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SaveExpenseCommand}"/>
+        <KeyBinding Key="M" Modifiers="Alt" Command="{Binding ModifyExpenseCommand}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding DeleteExpenseCommand}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding CancelExpenseCommand}"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="PrimaryToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="CadetBlue"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style x:Key="DangerToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#991B1B"/>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+
+        <Style TargetType="{x:Type telerik:RadWatermarkTextBox}" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="5,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="{x:Type DatePicker}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="{x:Type telerik:RadComboBox}" BasedOn="{StaticResource RadComboBoxStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="5,0,4,0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TotalsNumericStyle" TargetType="telerik:RadNumericUpDown">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="NumberDecimalDigits" Value="2"/>
+            <Setter Property="Minimum" Value="-999999999"/>
+            <Setter Property="Maximum" Value="999999999"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <!-- Toast Notification Overlay -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="4000"
+                                     FontSize="13"
+                                     VerticalAlignment="Top"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Header / Toolbar -->
+                    <RowDefinition Height="Auto"/> <!-- Supplier & Header Details -->
+                    <RowDefinition Height="*"/>    <!-- Items Grid & Totals Card -->
+                </Grid.RowDefinitions>
+
+                <!-- Header & Top Action Toolbar -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource HeaderBackgroundBrush}"
+                        BorderBrush="{DynamicResource HeaderBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Module Title & Icon -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="32" Height="32" CornerRadius="6" Background="{DynamicResource PanelBrush}" Margin="0,0,8,0">
+                                <TextBlock Text="&#xE8A5;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Purchases Expenses" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Text="{Binding VouNo, StringFormat='Voucher: {0}', FallbackValue='Voucher: -'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Action Toolbar Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <telerik:RadButton Style="{StaticResource PrimaryToolbarButtonStyle}" Command="{Binding NewExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Add New (Alt+A)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding SaveExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Save (Alt+S)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding PrintExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Print" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding ModifyExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Modify (Alt+M)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource DangerToolbarButtonStyle}" Command="{Binding DeleteExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Delete (Alt+D)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding CancelExpenseCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Cancel (Alt+C)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+
+                            <telerik:RadButton Style="{StaticResource ToolbarButtonStyle}" Command="{Binding ListExpensesCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Recent List" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </telerik:RadButton>
+                        </StackPanel>
+
+                        <!-- Recent Expenses Dropdown -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Width="230">
+                            <TextBlock Text="Recent Expenses" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="2,0,0,2"/>
+                            <telerik:RadComboBox ItemsSource="{Binding RecentExpenses}"
+                                                 SelectedItem="{Binding SelectedRecentExpense, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 DisplayMemberPath="DisplayText"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"
+                                                 Height="28"
+                                                 Background="{DynamicResource InputBackgroundBrush}"
+                                                 BorderBrush="{DynamicResource InputBorderBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Section 1: Header Form Details -->
+                <Border Grid.Row="1"
+                        Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,10"
+                        IsEnabled="{Binding IsFormEnabled}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1.1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1.1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Col 1, Row 0: Supplier Name -->
+                        <DockPanel Grid.Column="0" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="Supplier Name:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadComboBox ItemsSource="{Binding Suppliers}"
+                                                 DisplayMemberPath="AccountName"
+                                                 SelectedValuePath="AccountName"
+                                                 SelectedValue="{Binding AccountName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"/>
+                        </DockPanel>
+
+                        <!-- Col 1, Row 1: Purchase Head -->
+                        <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="Purchase Head:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadComboBox ItemsSource="{Binding Accounts}"
+                                                 DisplayMemberPath="AccountName"
+                                                 SelectedValuePath="AccountName"
+                                                 SelectedValue="{Binding PurchaseHead, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"
+                                                 IsTextSearchEnabled="True"/>
+                        </DockPanel>
+
+                        <!-- Col 1, Row 2: Entry Date -->
+                        <DockPanel Grid.Column="0" Grid.Row="2" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="Entry Date:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <DatePicker SelectedDate="{Binding BillDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+
+                        <!-- Col 2, Row 0: GST Bill From -->
+                        <DockPanel Grid.Column="2" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="GST BILL FROM:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding GstBillFrom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Party/Trade Name"/>
+                        </DockPanel>
+
+                        <!-- Col 2, Row 1: GSTIN -->
+                        <DockPanel Grid.Column="2" Grid.Row="1" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="GSTIN:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding Gstin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="15-digit GSTIN"/>
+                        </DockPanel>
+
+                        <!-- Col 2, Row 2: Supp Bill Date -->
+                        <DockPanel Grid.Column="2" Grid.Row="2" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="SUPP BILL DATE:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <DatePicker SelectedDate="{Binding SuppBillDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+
+                        <!-- Col 3, Row 0: Supp Bill No -->
+                        <DockPanel Grid.Column="4" Grid.Row="0" LastChildFill="True">
+                            <TextBlock Text="Supp Bill No:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadWatermarkTextBox Text="{Binding SuppBillNo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         WatermarkContent="Invoice / Ref No."/>
+                        </DockPanel>
+
+                        <!-- Col 3, Row 1: Reverse Charge -->
+                        <DockPanel Grid.Column="4" Grid.Row="1" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="Reverse Charge?" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <CheckBox IsChecked="{Binding Reverse, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center"
+                                      Content="Yes (RCM)"/>
+                        </DockPanel>
+
+                        <!-- Col 3, Row 2: Reverse GST% -->
+                        <DockPanel Grid.Column="4" Grid.Row="2" LastChildFill="True" Margin="0,4,0,0">
+                            <TextBlock Text="Reverse GST%:" Style="{StaticResource FieldLabelStyle}" Width="110"/>
+                            <telerik:RadComboBox ItemsSource="{Binding TaxRates}"
+                                                 SelectedItem="{Binding ReverseTaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEditable="True"/>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Section 2: Items Grid & Totals Card -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="420"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Expense Items Grid & Line Actions -->
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Items Section Header & Line Buttons -->
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Expense Items &amp; Services"
+                                               FontSize="13.5"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding TotalQuantity, StringFormat=' (Qty: {0:N2})'}"
+                                               FontSize="11.5"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="6,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <telerik:RadButton Content="+ Add Row"
+                                                       Command="{Binding AddLineCommand}"
+                                                       Style="{StaticResource ToolbarButtonStyle}"
+                                                       Height="30"
+                                                       MinWidth="75"
+                                                       Margin="0,0,4,0"/>
+                                    <telerik:RadButton Content="✕ Remove Row"
+                                                       Command="{Binding RemoveLineCommand}"
+                                                       Style="{StaticResource DangerToolbarButtonStyle}"
+                                                       Height="30"
+                                                       MinWidth="85"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- RadGridView for Items -->
+                            <telerik:RadGridView Grid.Row="1"
+                                                 ItemsSource="{Binding Lines}"
+                                                 SelectedItem="{Binding SelectedLine, Mode=TwoWay}"
+                                                 AutoGenerateColumns="False"
+                                                 CanUserInsertRows="True"
+                                                 CanUserDeleteRows="True"
+                                                 IsReadOnly="{Binding IsFormEnabled, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                                                 ShowColumnFooters="True"
+                                                 ShowGroupPanel="False"
+                                                 RowIndicatorVisibility="Visible"
+                                                 GridLinesVisibility="Both"
+                                                 MinHeight="360"
+                                                 Background="{DynamicResource SurfaceBackgroundBrush}">
+                                <telerik:RadGridView.Columns>
+                                    <telerik:GridViewDataColumn Header="Item / Description"
+                                                                DataMemberBinding="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="*"/>
+                                    <telerik:GridViewDataColumn Header="HSN Code"
+                                                                DataMemberBinding="{Binding Hsn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Width="95"/>
+                                    <telerik:GridViewDataColumn Header="Qty"
+                                                                DataMemberBinding="{Binding Qty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                Width="75"/>
+                                    <telerik:GridViewDataColumn Header="Rate"
+                                                                DataMemberBinding="{Binding Rate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                Width="85"/>
+                                    <telerik:GridViewDataColumn Header="Tax %"
+                                                                DataMemberBinding="{Binding TaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                Width="75"/>
+                                    <telerik:GridViewDataColumn Header="Tax Amount"
+                                                                DataMemberBinding="{Binding TaxAmount, Mode=OneWay}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                IsReadOnly="True"
+                                                                Width="95"/>
+                                    <telerik:GridViewDataColumn Header="Amount"
+                                                                DataMemberBinding="{Binding GrossAmount, Mode=OneWay}"
+                                                                DataFormatString="{}{0:N2}"
+                                                                IsReadOnly="True"
+                                                                Width="105"/>
+                                </telerik:RadGridView.Columns>
+                            </telerik:RadGridView>
+                        </Grid>
+                    </Border>
+
+                    <!-- Right: Totals Summary Card & Narration -->
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                       Text="Voucher Summary &amp; Taxes"
+                                       FontSize="13.5"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Margin="0,0,0,10"/>
+
+                            <!-- Calculation Rows -->
+                            <Grid Grid.Row="1" IsEnabled="{Binding IsFormEnabled}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Taxable Amount -->
+                                <TextBlock Grid.Row="0" Text="Taxable Amount:" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="0" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding TaxableAmount, Mode=OneWay}"
+                                                          IsReadOnly="True"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- IGST -->
+                                <TextBlock Grid.Row="1" Text="IGST:" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="1" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding Igst, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- CGST -->
+                                <TextBlock Grid.Row="2" Text="CGST:" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="2" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding Cgst, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- SGST -->
+                                <TextBlock Grid.Row="3" Text="SGST:" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="3" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding Sgst, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- Exclusive Account & Amount -->
+                                <TextBlock Grid.Row="4" Text="Exclusive Charge:" Style="{StaticResource FieldLabelStyle}"/>
+                                <DockPanel Grid.Row="4" Grid.Column="1" LastChildFill="True" Margin="0,2">
+                                    <telerik:RadComboBox ItemsSource="{Binding Accounts}"
+                                                         DisplayMemberPath="AccountName"
+                                                         SelectedValuePath="AccountName"
+                                                         SelectedValue="{Binding ExclusiveAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         IsEditable="True"
+                                                         IsTextSearchEnabled="True"
+                                                         Width="130"
+                                                         Height="30"
+                                                         Margin="0,0,4,0"/>
+                                    <telerik:RadNumericUpDown Style="{StaticResource TotalsNumericStyle}"
+                                                              Width="120"
+                                                              Value="{Binding Exclusive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              HorizontalAlignment="Right"/>
+                                </DockPanel>
+
+                                <!-- Sub Total -->
+                                <TextBlock Grid.Row="5" Text="Sub Total:" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="5" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding SubTotal, Mode=OneWay}"
+                                                          IsReadOnly="True"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- Rounded Off -->
+                                <TextBlock Grid.Row="6" Text="Rounded Off (+/-):" Style="{StaticResource FieldLabelStyle}"/>
+                                <telerik:RadNumericUpDown Grid.Row="6" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Value="{Binding RoundedOff, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          HorizontalAlignment="Right"/>
+
+                                <!-- Net Total -->
+                                <TextBlock Grid.Row="7" Text="Net Total (₹):"
+                                           FontSize="13.5"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,6,0,6"/>
+                                <telerik:RadNumericUpDown Grid.Row="7" Grid.Column="1"
+                                                          Style="{StaticResource TotalsNumericStyle}"
+                                                          Height="34"
+                                                          FontSize="14"
+                                                          FontWeight="Bold"
+                                                          Value="{Binding NetTotal, Mode=OneWay}"
+                                                          IsReadOnly="True"
+                                                          HorizontalAlignment="Right"
+                                                          Margin="0,6,0,6"/>
+                            </Grid>
+
+                            <!-- Narration / Note -->
+                            <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                                <TextBlock Text="Narration / Remarks:" Style="{StaticResource FieldLabelStyle}" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True"
+                                         Height="75"
+                                         TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Background="{DynamicResource InputBackgroundBrush}"
+                                         BorderBrush="{DynamicResource InputBorderBrush}"
+                                         IsEnabled="{Binding IsFormEnabled}"
+                                         Padding="6"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

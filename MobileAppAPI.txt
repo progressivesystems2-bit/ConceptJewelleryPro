@@ -1,0 +1,15 @@
+We will be creating a mobile app for which we need some APIs
+
+AuthApi (designed Already)
+Barcode/Upload (designed already)
+Invoice/Parse (designed already)
+
+
+Valuations (it will receive a barcode no, based on rate in RateMaster for the purity of the barcode, calculate current price of the  article
+User will send Barcode, MakingPerGram or  MakingPercent, InclusiveGST/ExclusiveGST)
+
+UploadDocs (it will save the image sent to the API in SavePath\Docs)
+
+Catalogue (it will send a list in json format having Barcode, ItemName, GrWt, NtWt, Description, Size), it will recive parameters for Filtering content, ItemName(optional), Barcode(Optional), Size(Optional), FromWt(Optional), ToWt(Optional), Description(Optional)
+
+CustomerRequirement (it will simply log the inward details in Customer Requirement table)

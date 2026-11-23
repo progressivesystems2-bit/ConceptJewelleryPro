@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="2026-11-19" ReportInfo.Modified="2026-11-19" ReportInfo.CreatorVersion="2027.1.0.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="Voucher" ReferenceName="Voucher" DataType="System.Int32" Enabled="true">
+      <Column Name="CompanyName" DataType="System.String"/>
+      <Column Name="CompanyAddress" DataType="System.String"/>
+      <Column Name="CompanyPhone" DataType="System.String"/>
+      <Column Name="CompanyGstin" DataType="System.String"/>
+      <Column Name="VoucherTitle" DataType="System.String"/>
+      <Column Name="VouNo" DataType="System.String"/>
+      <Column Name="VouDate" DataType="System.String"/>
+      <Column Name="PaymentMode" DataType="System.String"/>
+      <Column Name="DrAccountLabel" DataType="System.String"/>
+      <Column Name="DrAccount" DataType="System.String"/>
+      <Column Name="CrAccountLabel" DataType="System.String"/>
+      <Column Name="CrAccount" DataType="System.String"/>
+      <Column Name="PartyLabel" DataType="System.String"/>
+      <Column Name="PartyName" DataType="System.String"/>
+      <Column Name="CashBankLabel" DataType="System.String"/>
+      <Column Name="CashBankAccount" DataType="System.String"/>
+      <Column Name="Amount" DataType="System.Decimal"/>
+      <Column Name="AmountFormatted" DataType="System.String"/>
+      <Column Name="AmountInWords" DataType="System.String"/>
+      <Column Name="ChequeNo" DataType="System.String"/>
+      <Column Name="ChqDate" DataType="System.String"/>
+      <Column Name="BankName" DataType="System.String"/>
+      <Column Name="CardType" DataType="System.String"/>
+      <Column Name="CardCommText" DataType="System.String"/>
+      <Column Name="ReferenceSummary" DataType="System.String"/>
+      <Column Name="Narration" DataType="System.String"/>
+      <Column Name="PreparedBy" DataType="System.String"/>
+    </BusinessObjectDataSource>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="210" PaperHeight="148" Landscape="true" LeftMargin="10" TopMargin="10" RightMargin="10" BottomMargin="10" Watermark.Font="Arial, 60pt">
+    <DataBand Name="Data1" Width="718" Height="465" DataSource="Voucher">
+      <!-- Outer Frame -->
+      <TextObject Name="OuterFrame" Left="0" Top="0" Width="718" Height="460" Border.Lines="All" Border.Color="SlateGray" Border.Width="1.2" Fill.Color="White"/>
+
+      <!-- Header Banner -->
+      <TextObject Name="HeaderBg" Left="1" Top="1" Width="716" Height="64" Fill.Color="#F8FAFC" Border.Lines="Bottom" Border.Color="#CBD5E1" Border.Width="1"/>
+      <TextObject Name="txtCompanyName" Left="12" Top="6" Width="460" Height="24" Text="[Voucher.CompanyName]" Font="Segoe UI, 14pt, style=Bold" TextFill.Color="#0F172A" VertAlign="Center"/>
+      <TextObject Name="txtCompanyAddress" Left="12" Top="30" Width="460" Height="16" Text="[Voucher.CompanyAddress]" Font="Segoe UI, 8.5pt" TextFill.Color="#475569" VertAlign="Center"/>
+      <TextObject Name="txtCompanyGstin" Left="12" Top="46" Width="460" Height="14" Text="GSTIN: [Voucher.CompanyGstin]   Ph: [Voucher.CompanyPhone]" Font="Segoe UI, 8pt" TextFill.Color="#475569" VertAlign="Center"/>
+
+      <!-- Title Badge -->
+      <TextObject Name="txtBadge" Left="492" Top="14" Width="212" Height="36" Text="PAYMENT VOUCHER" Font="Segoe UI, 12pt, style=Bold" TextFill.Color="White" Fill.Color="#991B1B" HorzAlign="Center" VertAlign="Center" Border.Lines="All" Border.Color="#7F1D1D"/>
+
+      <!-- Meta Strip -->
+      <TextObject Name="MetaBg" Left="1" Top="65" Width="716" Height="32" Fill.Color="#FEF2F2" Border.Lines="Bottom" Border.Color="#E2E8F0" Border.Width="1"/>
+      <TextObject Name="txtVouNo" Left="12" Top="69" Width="220" Height="24" Text="Voucher No: [Voucher.VouNo]" Font="Segoe UI, 10pt, style=Bold" TextFill.Color="#0F172A" VertAlign="Center"/>
+      <TextObject Name="txtMode" Left="250" Top="69" Width="220" Height="24" Text="Mode: [Voucher.PaymentMode]" Font="Segoe UI, 10pt, style=Bold" TextFill.Color="#991B1B" HorzAlign="Center" VertAlign="Center"/>
+      <TextObject Name="txtDate" Left="490" Top="69" Width="214" Height="24" Text="Date: [Voucher.VouDate]" Font="Segoe UI, 10pt, style=Bold" TextFill.Color="#0F172A" HorzAlign="Right" VertAlign="Center"/>
+
+      <!-- Main Details -->
+      <TextObject Name="lblPaidTo" Left="16" Top="112" Width="170" Height="24" Text="Paid To (Debit A/c):" Font="Segoe UI, 9.5pt, style=Bold" TextFill.Color="#475569" VertAlign="Center"/>
+      <TextObject Name="txtPaidTo" Left="190" Top="112" Width="512" Height="24" Text="[Voucher.DrAccount]" Font="Segoe UI, 10.5pt, style=Bold" TextFill.Color="#0F172A" VertAlign="Center" Border.Lines="Bottom" Border.Color="#E2E8F0" Border.Style="Dot"/>
+
+      <TextObject Name="lblPaidFrom" Left="16" Top="146" Width="170" Height="24" Text="Paid From (Credit A/c):" Font="Segoe UI, 9.5pt, style=Bold" TextFill.Color="#475569" VertAlign="Center"/>
+      <TextObject Name="txtPaidFrom" Left="190" Top="146" Width="512" Height="24" Text="[Voucher.CrAccount]" Font="Segoe UI, 10pt" TextFill.Color="#0F172A" VertAlign="Center" Border.Lines="Bottom" Border.Color="#E2E8F0" Border.Style="Dot"/>
+
+      <!-- Amount Highlight Box -->
+      <TextObject Name="AmountBoxBg" Left="16" Top="184" Width="686" Height="54" Fill.Color="#FFF7ED" Border.Lines="All" Border.Color="#FDBA74" Border.Width="1"/>
+      <TextObject Name="lblAmount" Left="26" Top="190" Width="150" Height="22" Text="Amount Paid:" Font="Segoe UI, 10pt, style=Bold" TextFill.Color="#9A3412" VertAlign="Center"/>
+      <TextObject Name="txtAmount" Left="190" Top="188" Width="500" Height="26" Text="[Voucher.AmountFormatted]" Font="Segoe UI, 13pt, style=Bold" TextFill.Color="#991B1B" VertAlign="Center"/>
+      <TextObject Name="txtAmountWords" Left="26" Top="214" Width="664" Height="20" Text="In Words: [Voucher.AmountInWords]" Font="Segoe UI, 8.5pt, style=Italic" TextFill.Color="#334155" VertAlign="Center"/>
+
+      <!-- Reference / Bank / Cheque -->
+      <TextObject Name="lblRef" Left="16" Top="250" Width="170" Height="22" Text="Payment Ref / Bank:" Font="Segoe UI, 9.5pt, style=Bold" TextFill.Color="#475569" VertAlign="Top"/>
+      <TextObject Name="txtRef" Left="190" Top="250" Width="512" Height="28" Text="[Voucher.ReferenceSummary]" Font="Segoe UI, 9.5pt" TextFill.Color="#0F172A" VertAlign="Top" CanGrow="true"/>
+
+      <!-- Narration -->
+      <TextObject Name="lblNarration" Left="16" Top="286" Width="170" Height="22" Text="Narration / Remarks:" Font="Segoe UI, 9.5pt, style=Bold" TextFill.Color="#475569" VertAlign="Top"/>
+      <TextObject Name="txtNarration" Left="190" Top="286" Width="512" Height="44" Text="[Voucher.Narration]" Font="Segoe UI, 9.5pt" TextFill.Color="#0F172A" VertAlign="Top" CanGrow="true" Border.Lines="Bottom" Border.Color="#E2E8F0"/>
+
+      <!-- Signature Footer -->
+      <LineObject Name="SignDivider" Left="16" Top="376" Width="686" Height="0" Border.Color="#CBD5E1"/>
+      <TextObject Name="txtPrepSign" Left="16" Top="414" Width="210" Height="34" Text="Prepared By: [Voucher.PreparedBy]" Font="Segoe UI, 9pt" TextFill.Color="#334155" HorzAlign="Left" VertAlign="Bottom" Border.Lines="Top" Border.Color="#64748B"/>
+      <TextObject Name="txtRecvSign" Left="254" Top="414" Width="210" Height="34" Text="Receiver's Signature" Font="Segoe UI, 9pt, style=Bold" TextFill.Color="#334155" HorzAlign="Center" VertAlign="Bottom" Border.Lines="Top" Border.Color="#64748B"/>
+      <TextObject Name="txtAuthSign" Left="492" Top="414" Width="210" Height="34" Text="Authorized Signatory" Font="Segoe UI, 9pt, style=Bold" TextFill.Color="#334155" HorzAlign="Right" VertAlign="Bottom" Border.Lines="Top" Border.Color="#64748B"/>
+    </DataBand>
+  </ReportPage>
+</Report>

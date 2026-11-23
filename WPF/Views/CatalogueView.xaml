@@ -1,0 +1,486 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.CatalogueView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+              xmlns:conv="clr-namespace:ConceptJewelleryPro.WPF.Converters"
+              xmlns:controls="clr-namespace:ConceptJewelleryPro.WPF.Controls"
+              FontFamily="Segoe UI"
+              TextOptions.TextFormattingMode="Display">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InvBoolToVis" />
+        <conv:ImageThumbnailConverter x:Key="ThumbConverter" DecodePixelWidth="280" />
+
+      
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14" />
+        </Style>
+
+        <Style x:Key="FilterLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="MinWidth" Value="85" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <!-- Catalogue Item Card Style in ListBox -->
+        <Style x:Key="CatalogueCardItemContainerStyle" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="6,6,10,10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="CardBorder"
+                                Width="265"
+                                Height="365"
+                                Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10"
+                                                  ShadowDepth="2"
+                                                  Direction="270"
+                                                  Opacity="0.08"
+                                                  Color="#000000" />
+                            </Border.Effect>
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="CardBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="16"
+                                                          ShadowDepth="4"
+                                                          Direction="270"
+                                                          Opacity="0.22"
+                                                          Color="#000000" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="CardBorder" Property="BorderThickness" Value="2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Header -->
+            <RowDefinition Height="Auto" /> <!-- Filters Bar -->
+            <RowDefinition Height="Auto" /> <!-- Summary Metrics -->
+            <RowDefinition Height="*" />    <!-- Catalogue Grid -->
+        </Grid.RowDefinitions>
+
+        <!-- Toast Notifications Container -->
+        <controls:ToastNotification x:Name="ToastNotification"
+                                     Grid.Row="0"
+                                     Grid.RowSpan="4"
+                                     Panel.ZIndex="99"
+                                     Message="{Binding ToastMessage, FallbackValue=''}"
+                                     ToastType="{Binding ToastType, FallbackValue=Info}"
+                                     AutoCloseDelay="5000"
+                                     FontSize="14" />
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                BorderBrush="{DynamicResource HeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="34" Height="34" CornerRadius="6" Background="{DynamicResource PanelBrush}">
+                        <TextBlock Text="&#xE8B9;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="15"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Jewellery Catalogue" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="Visual gallery of barcode stock with weights, photos and quick search" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <telerik:RadButton Content="📊 Export to Excel" Style="{StaticResource ToolbarButtonStyle}" Command="{Binding ExportToExcelCommand}" ToolTip="Export current catalogue items to CSV" />
+                    <telerik:RadButton Content="🖨 Print Catalogue" Style="{StaticResource ToolbarButtonStyle}" Command="{Binding PrintCommand}" ToolTip="Print catalogue summary" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Filters Section -->
+        <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,0,0,1" Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" /> <!-- 0: Item Name -->
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="150" />  <!-- 2: Size -->
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="150" /> <!-- 4: Barcode -->
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="150" />  <!-- 6: From Wt -->
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="150" />  <!-- 8: To Wt -->
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />   <!-- 10: Description -->
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="Auto" /><!-- 12: Buttons -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Item Name -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Item Name" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadComboBox IsEditable="True"
+                                         
+                                         FontSize="12"
+                                         ItemsSource="{Binding AvailableItemNames}"
+                                         SelectedItem="{Binding SelectedItemName, Mode=TwoWay}"
+                                         Text="{Binding ItemName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Filter by Item Name" />
+                </StackPanel>
+
+                <!-- Size -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Size" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadComboBox IsEditable="True"
+                                         
+                                         FontSize="12"
+                                         ItemsSource="{Binding AvailableSizes}"
+                                         SelectedItem="{Binding SelectedSize, Mode=TwoWay}"
+                                         Text="{Binding Size, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Filter by Size" />
+                </StackPanel>
+
+                <!-- Barcode -->
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Barcode No" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadWatermarkTextBox 
+                                                 FontSize="12"
+                        Width="140"
+                                                 Text="{Binding Barcode, UpdateSourceTrigger=PropertyChanged}"
+                                                 WatermarkContent="Barcode..."
+                                                 ToolTip="Filter by Barcode Number" />
+                </StackPanel>
+
+                <!-- From Weight (g) -->
+                <StackPanel Grid.Column="6">
+                    <TextBlock Text="From Wt (g)" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadNumericUpDown
+                                             IsInteger="False"
+                        Width="140"
+                                             NumberDecimalDigits="3"
+                                             Value="{Binding FromWt}"
+                                             ToolTip="Minimum Gross Weight (g)" />
+                </StackPanel>
+
+                <!-- To Weight (g) -->
+                <StackPanel Grid.Column="8">
+                    <TextBlock Text="To Wt (g)" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadNumericUpDown 
+                        Width="140"
+                                             IsInteger="False"
+                                             NumberDecimalDigits="3"
+                                             Value="{Binding ToWt}"
+                                             ToolTip="Maximum Gross Weight (g)" />
+                </StackPanel>
+
+                <!-- Description / Pattern -->
+                <StackPanel Grid.Column="10">
+                    <TextBlock Text="Description / Pattern" Style="{StaticResource FilterLabelStyle}" />
+                    <telerik:RadWatermarkTextBox Height="32"
+                                                 FontSize="12"
+                                                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                                 WatermarkContent="Search description keywords..."
+                                                 ToolTip="Filter by description keywords" />
+                </StackPanel>
+
+                <!-- Action Buttons & Include Sold Checkbox -->
+                <StackPanel Grid.Column="12" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <CheckBox Content="Include Sold"
+                              IsChecked="{Binding IncludeSold, Mode=TwoWay}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,10,0"
+                              FontWeight="SemiBold"
+                              FontSize="11.5"
+                              ToolTip="Check to include sold / billed items in the catalogue search" />
+
+                    <telerik:RadButton Content="🔄 Refresh"
+                                       Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                       Height="32"
+                                       MinWidth="95"
+                                       Margin="0,0,6,0"
+                                       Command="{Binding RefreshCommand}"
+                                       ToolTip="Load catalogue items with current filters" />
+                    <telerik:RadButton Content="❌ Clear"
+                                       Style="{StaticResource ToolbarButtonStyle}"
+                                       Height="32"
+                                       MinWidth="75"
+                                       Command="{Binding ClearFilterCommand}"
+                                       ToolTip="Reset all filters" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Summary Metrics Strip -->
+        <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource HeaderBorderBrush}" BorderThickness="0,0,0,1" Padding="16,6">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="ITEMS IN STOCK: " FontSize="11" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding TotalCount}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+
+                    <Border Width="1" Background="{DynamicResource SeparatorBrush}" Margin="0,2,16,2" />
+
+                    <TextBlock Text="TOTAL GROSS WT: " FontSize="11" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding TotalGrossWt, StringFormat='{}{0:F3} g'}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+
+                    <Border Width="1" Background="{DynamicResource SeparatorBrush}" Margin="0,2,16,2" />
+
+                    <TextBlock Text="TOTAL NET WT: " FontSize="11" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding TotalNetWt, StringFormat='{}{0:F3} g'}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                </StackPanel>
+
+                <TextBlock Text="Double-click any card to open in Barcode Creation"
+                           FontSize="11"
+                           FontStyle="Italic"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <!-- Catalogue Cards Gallery Grid -->
+        <telerik:RadBusyIndicator Grid.Row="3" IsBusy="{Binding IsBusy}" BusyContent="Loading Catalogue...">
+            <Grid>
+                <!-- Empty State Message when no items loaded yet -->
+                <Border HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20" IsHitTestVisible="False">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Items.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="44" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                        <TextBlock Text="No Catalogue Items Loaded" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                        <TextBlock Text="{Binding StatusMessage}" FontSize="12.5" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="14">
+                    <ListBox ItemsSource="{Binding Items}"
+                             SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                             ItemContainerStyle="{StaticResource CatalogueCardItemContainerStyle}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             MouseDoubleClick="CatalogueListBox_MouseDoubleClick">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="185" /> <!-- Image Header -->
+                                    <RowDefinition Height="*" />   <!-- Details Body -->
+                                    <RowDefinition Height="Auto" /><!-- Quick Info Footer -->
+                                </Grid.RowDefinitions>
+
+                                <!-- Product Image Container -->
+                                <Border Grid.Row="0"
+                                        Background="#18000000"
+                                        CornerRadius="9,9,0,0"
+                                        ClipToBounds="True">
+                                    <Grid>
+                                        <!-- Placeholder when no image -->
+                                        <StackPanel VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Visibility="{Binding HasImage, Converter={StaticResource InvBoolToVis}}">
+                                            <TextBlock Text="&#xE8B9;"
+                                                       FontFamily="Segoe MDL2 Assets"
+                                                       FontSize="32"
+                                                       Foreground="#A0A0A0"
+                                                       HorizontalAlignment="Center" />
+                                            <TextBlock Text="No Image"
+                                                       FontSize="11"
+                                                       Foreground="#A0A0A0"
+                                                       Margin="0,4,0,0"
+                                                       HorizontalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <!-- Actual Thumbnail Photo with hover tooltip -->
+                                        <Image Source="{Binding ImagePath, Converter={StaticResource ThumbConverter}}"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Visibility="{Binding HasImage, Converter={StaticResource BoolToVis}}">
+                                            <Image.ToolTip>
+                                                <ToolTip Background="White" BorderBrush="#CCCCCC" BorderThickness="1" Padding="6">
+                                                    <StackPanel>
+                                                        <Image Source="{Binding ImagePath}" MaxWidth="360" MaxHeight="360" Stretch="Uniform" />
+                                                        <TextBlock Text="{Binding Barcode, StringFormat='Barcode: {0}'}" FontWeight="Bold" FontSize="12" Margin="0,4,0,0" />
+                                                        <TextBlock Text="{Binding ItemName}" FontSize="11" Foreground="#555555" />
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Image.ToolTip>
+                                        </Image>
+
+                                        <!-- Top Left: Barcode Pill Badge -->
+                                        <Border HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Background="#D9A825"
+                                                CornerRadius="0,0,6,0"
+                                                Padding="8,3">
+                                            <TextBlock Text="{Binding Barcode}"
+                                                       FontSize="11"
+                                                       FontWeight="Bold"
+                                                       Foreground="#1A1A1A" />
+                                        </Border>
+
+                                        <!-- Top Right: SOLD, Purity & Size Pills -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Top"
+                                                    Margin="0,4,4,0">
+                                            <Border Background="#E53E3E"
+                                                    CornerRadius="4"
+                                                    Padding="6,2"
+                                                    Margin="0,0,4,0"
+                                                    Visibility="{Binding IsSold, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="SOLD"
+                                                           FontSize="9.5"
+                                                           FontWeight="Bold"
+                                                           Foreground="White" />
+                                            </Border>
+                                            <Border Background="#CC000000"
+                                                    CornerRadius="4"
+                                                    Padding="5,2"
+                                                    Margin="0,0,4,0">
+                                                <TextBlock Text="{Binding Purity}"
+                                                           FontSize="9.5"
+                                                           FontWeight="Bold"
+                                                           Foreground="White" />
+                                            </Border>
+                                            <Border Background="#CC2A4365"
+                                                    CornerRadius="4"
+                                                    Padding="5,2"
+                                                    Visibility="{Binding Size, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding Size, StringFormat='Sz: {0}'}"
+                                                           FontSize="9.5"
+                                                           FontWeight="Bold"
+                                                           Foreground="White" />
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Details Body -->
+                                <StackPanel Grid.Row="1" Margin="12,8">
+                                    <TextBlock Text="{Binding ItemName}"
+                                               FontSize="13.5"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Height="32"
+                                               Margin="0,2,0,0"
+                                               TextWrapping="Wrap"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <!-- Weights Box -->
+                                    <Border Background="{DynamicResource PanelBrush}"
+                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="6,4"
+                                            Margin="0,6,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Gross Wt -->
+                                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                                <TextBlock Text="GR WT" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding GrossWt, StringFormat='{}{0:F3}'}" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <!-- Net Wt -->
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                                <TextBlock Text="NT WT" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding NetWt, StringFormat='{}{0:F3}'}" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <!-- Stone Wt -->
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                                <TextBlock Text="ST WT" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding StoneWt, StringFormat='{}{0:F3}'}" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Footer -->
+                                <Border Grid.Row="2"
+                                        Background="{DynamicResource PanelBrush}"
+                                        BorderBrush="{DynamicResource CardBorderBrush}"
+                                        BorderThickness="0,1,0,0"
+                                        CornerRadius="0,0,9,9"
+                                        Padding="8,5">
+                                    <TextBlock Text="&#xE8EC; Double click to open"
+                                               FontFamily="Segoe MDL2 Assets, Segoe UI"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Grid>
+    </telerik:RadBusyIndicator>
+</Grid>
+</UserControl>

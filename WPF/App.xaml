@@ -1,0 +1,596 @@
+<Application x:Class="ConceptJewelleryPro.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
+             xmlns:conv="clr-namespace:ConceptJewelleryPro.WPF.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Telerik.Windows.Themes.Windows11;component/Themes/System.Windows.xaml" />
+                <ResourceDictionary Source="/Telerik.Windows.Themes.Windows11;component/Themes/Telerik.Windows.Controls.xaml" />
+                <ResourceDictionary Source="/Telerik.Windows.Themes.Windows11;component/Themes/Telerik.Windows.Controls.Input.xaml" />
+                <ResourceDictionary Source="/Telerik.Windows.Themes.Windows11;component/Themes/Telerik.Windows.Controls.Navigation.xaml" />
+                <ResourceDictionary Source="/Telerik.Windows.Themes.Windows11;component/Themes/Telerik.Windows.Controls.GridView.xaml" />
+                <!-- Active theme palette (swapped at runtime by ThemeManager) -->
+                <ResourceDictionary Source="/ConceptJewelleryPro.WPF;component/Themes/FluentLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:EqualityToBoolConverter x:Key="EqualityToBoolConverter" />
+            <conv:NonLockingImageConverter x:Key="NonLockingImageConverter" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <!-- Theme-aware default styles for standard Telerik controls.
+                 NOTE: BasedOn must use Telerik's named style keys (e.g. RadButtonStyle),
+                 NOT {x:Type ...}. A type-key BasedOn inside this same dictionary resolves
+                 circularly to the implicit style itself, dropping the theme template. -->
+            <Style TargetType="telerik:RadButton"
+                   BasedOn="{StaticResource RadButtonStyle}">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource AccentHoverBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentHoverBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource HoverBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+            </Style>
+
+
+            <Style x:Key="ToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="MinWidth" Value="80"/>
+                <Setter Property="Padding" Value="10,0"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="0,0,6,0"/>
+            </Style>
+
+            <Style x:Key="PrimaryToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+                <Setter Property="Background" Value="#0F4C5C"/>
+                <Setter Property="Background" Value="{DynamicResource AccentGradient}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource AccentHoverBrush}" />
+                <Setter Property="Height" Value="40"/>
+            </Style>
+
+
+            <Style x:Key="DangerToolbarButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource ToolbarButtonStyle}">
+                <Setter Property="Background" Value="#FEE2E2"/>
+                <Setter Property="Foreground" Value="#991B1B"/>
+            </Style>
+
+            <!-- Modern DropDown Chevron ToggleButton Style for RadComboBox -->
+            <Style x:Key="ComboBoxDropDownToggleButtonStyle" TargetType="telerik:RadToggleButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="0,0,6,0" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="IsChecked" Value="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=telerik:RadComboBox}}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="telerik:RadToggleButton">
+                            <Grid Background="Transparent" SnapsToDevicePixels="True">
+                                <Border x:Name="ButtonBorder"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Width="26"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Stretch"
+                                        SnapsToDevicePixels="True">
+                                    <Path x:Name="Chevron"
+                                          Data="M 3 5.5 L 7.5 10 L 12 5.5"
+                                          Stroke="{DynamicResource SecondaryTextBrush}"
+                                          StrokeThickness="1.5"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          Fill="Transparent"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RenderTransformOrigin="0.5,0.5">
+                                        <Path.RenderTransform>
+                                            <RotateTransform x:Name="ChevronRotate" Angle="0" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                </Border>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="Chevron"
+                                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                To="180" Duration="0:0:0.15" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="Chevron"
+                                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                To="0" Duration="0:0:0.15" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+                                    <Setter TargetName="Chevron" Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Chevron" Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Chevron" Property="Opacity" Value="0.4" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="RadComboBoxDropDownToggleButtonStyle"
+                   TargetType="telerik:RadToggleButton"
+                   BasedOn="{StaticResource ComboBoxDropDownToggleButtonStyle}" />
+
+            <Style TargetType="telerik:RadComboBox"
+                   BasedOn="{StaticResource RadComboBoxStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="8,0,4,0" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.ReadOnlyBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+
+                <Style.Resources>
+                    <!-- Inner Editable TextBox: No double border, transparent, standard padding and alignment -->
+                    <Style TargetType="TextBox">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="8,0,4,0" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Height" Value="Auto" />
+                        <Setter Property="MinHeight" Value="0" />
+                        <Setter Property="VerticalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="CaretBrush" Value="{DynamicResource InputCaretBrush}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsFocused" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <!-- RadWatermarkTextBox if used internally -->
+                    <Style TargetType="telerik:RadWatermarkTextBox" BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Padding" Value="8,0,4,0" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Height" Value="Auto" />
+                        <Setter Property="MinHeight" Value="0" />
+                        <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                        <Setter Property="VerticalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="CaretBrush" Value="{DynamicResource InputCaretBrush}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsFocused" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <!-- Dropdown ToggleButton inherits clean vector chevron style -->
+                    <Style TargetType="telerik:RadToggleButton" BasedOn="{StaticResource ComboBoxDropDownToggleButtonStyle}" />
+                </Style.Resources>
+
+                <Style.Triggers>
+                    <!-- Ensure editable combobox text does not fade/wash out from Windows11 theme default -->
+                    <Trigger Property="IsEditable" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    </Trigger>
+
+                    <!-- Ensure text doesn't fade when the window/control loses focus -->
+                    <Trigger Property="IsFocused" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                    </Trigger>
+
+                    <!-- Keep selected item readable in non-editable mode -->
+                    <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                    </Trigger>
+
+                    <!-- Handle Disabled state cleanly -->
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.6" />
+                        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="telerik:RadComboBoxItem"
+                   BasedOn="{StaticResource RadComboBoxItemStyle}">
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="8,6" />
+                <Setter Property="MinHeight" Value="28" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+
+            <!-- Modern Style for standard WPF ComboBox -->
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="Height" Value="35" />
+                <Setter Property="MinHeight" Value="28" />
+                <Setter Property="FontSize" Value="14.5" />
+                <Setter Property="Padding" Value="8,0,4,0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ComboBox}">
+                            <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="32" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Outer Card / Box Container -->
+                                <Border x:Name="Border"
+                                        Grid.ColumnSpan="2"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="6" />
+
+                                <!-- Non-editable content display -->
+                                <ContentPresenter x:Name="ContentSite"
+                                                  Grid.Column="0"
+                                                  IsHitTestVisible="False"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Stretch"
+                                                  Visibility="Hidden" />
+
+                                <!-- Editable inner TextBox: No double border, transparent, vertically centered -->
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         Grid.Column="0"
+                                         Style="{x:Null}"
+                                         Background="Transparent"
+                                         BorderBrush="Transparent"
+                                         BorderThickness="0"
+                                         Padding="{TemplateBinding Padding}"
+                                         Margin="0"
+                                         VerticalAlignment="Stretch"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="{TemplateBinding FontSize}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         CaretBrush="{DynamicResource InputCaretBrush}"
+                                         IsReadOnly="{TemplateBinding IsReadOnly}"
+                                         Visibility="Hidden">
+                                    <TextBox.Template>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <ScrollViewer x:Name="PART_ContentHost"
+                                                          Background="Transparent"
+                                                          BorderThickness="0"
+                                                          Padding="{TemplateBinding Padding}"
+                                                          VerticalAlignment="Center" />
+                                        </ControlTemplate>
+                                    </TextBox.Template>
+                                </TextBox>
+
+                                <!-- Transparent Chevron ToggleButton -->
+                                <ToggleButton x:Name="DropDownToggle"
+                                              Grid.Column="1"
+                                              Focusable="False"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ClickMode="Press"
+                                              Background="Transparent"
+                                              BorderBrush="Transparent"
+                                              BorderThickness="0"
+                                              Cursor="Hand">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="Transparent" BorderThickness="0">
+                                                <Path x:Name="Chevron"
+                                                      Data="M 4 7 L 10 13 L 16 7"
+                                                      Stroke="{DynamicResource SecondaryTextBrush}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round"
+                                                      Fill="Transparent"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <RotateTransform x:Name="ChevronRotate" Angle="0" />
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetName="Chevron"
+                                                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                                 To="180" Duration="0:0:0.2" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                    <Trigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetName="Chevron"
+                                                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                                 To="0" Duration="0:0:0.2" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.ExitActions>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Chevron" Property="Stroke" Value="{DynamicResource AccentBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+
+                                <!-- Modern DropDown Popup: Rounded card (CornerRadius="6") with soft drop shadow (BlurRadius="12", Opacity="0.15") -->
+                                <Popup x:Name="PART_Popup"
+                                       AllowsTransparency="True"
+                                       IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Placement="Bottom"
+                                       PopupAnimation="Fade"
+                                       VerticalOffset="4">
+                                    <Border x:Name="DropDownBorder"
+                                            MinWidth="{Binding ActualWidth, ElementName=MainGrid}"
+                                            MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                            Margin="8"
+                                            Background="{DynamicResource CardBackgroundBrush}"
+                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="6">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="12"
+                                                              Opacity="0.15"
+                                                              ShadowDepth="4"
+                                                              Direction="270"
+                                                              Color="Black" />
+                                        </Border.Effect>
+                                        <ScrollViewer x:Name="DropDownScrollViewer" SnapsToDevicePixels="True">
+                                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                            KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEditable" Value="True">
+                                    <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden" />
+                                </Trigger>
+                                <Trigger Property="IsEditable" Value="False">
+                                    <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Hidden" />
+                                    <Setter TargetName="ContentSite" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.6" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type ComboBoxItem}">
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                <Setter Property="FontSize" Value="14.5" />
+                <Setter Property="Padding" Value="8,6" />
+                <Setter Property="MinHeight" Value="32" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                            <Border x:Name="ItemBorder"
+                                    Background="{TemplateBinding Background}"
+                                    Padding="{TemplateBinding Padding}"
+                                    CornerRadius="4"
+                                    Margin="2,1">
+                                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource HoverBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CaretBrush" Value="{DynamicResource InputCaretBrush}" />
+            </Style>
+
+            <DataTemplate x:Key="ModernDateTimeWatermarkTemplate">
+                <TextBlock Text="{Binding}"
+                           Foreground="{DynamicResource InputPlaceholderBrush}"
+                           FontStyle="Normal"
+                           FontSize="12.5"
+                           Margin="2,0,0,0"
+                           VerticalAlignment="Center" />
+            </DataTemplate>
+
+            <Style TargetType="telerik:RadDateTimePicker"
+                   BasedOn="{StaticResource RadDateTimePickerStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="DateTimeWatermarkTemplate" Value="{StaticResource ModernDateTimeWatermarkTemplate}" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+            </Style>
+
+            <Style TargetType="telerik:RadDatePicker"
+                   BasedOn="{StaticResource RadDateTimePickerStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="DateTimeWatermarkTemplate" Value="{StaticResource ModernDateTimeWatermarkTemplate}" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+            </Style>
+
+            <Style TargetType="telerik:RadWatermarkTextBox"
+                   BasedOn="{StaticResource RadWatermarkTextBoxStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="CaretBrush" Value="{DynamicResource InputCaretBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="WatermarkTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"
+                                       Foreground="{DynamicResource InputPlaceholderBrush}"
+                                       FontStyle="Normal"
+                                       FontSize="12.5"
+                                       VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsFocused" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="telerik:RadPasswordBox"
+                   BasedOn="{StaticResource RadPasswordBoxStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="CaretBrush" Value="{DynamicResource InputCaretBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+            </Style>
+
+            <Style TargetType="telerik:RadNumericUpDown"
+                   BasedOn="{StaticResource RadNumericUpDownStyle}">
+                <Setter Property="Height" Value="32" />
+                <Setter Property="MinHeight" Value="26" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="helpers:ThemeHelper.CornerRadius" Value="6" />
+                <Setter Property="helpers:ThemeHelper.FocusVisualMargin" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBackgroundBrush" Value="{DynamicResource InputBackgroundBrush}" />
+                <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="IsTabStop" Value="True" />
+            </Style>
+
+            <Style TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

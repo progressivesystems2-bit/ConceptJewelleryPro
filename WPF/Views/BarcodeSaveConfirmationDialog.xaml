@@ -1,0 +1,104 @@
+<Window x:Class="ConceptJewelleryPro.WPF.Views.BarcodeSaveConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        Title="Save Barcode"
+        Width="460"
+        Height="210"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStyle="SingleBorderWindow"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        FontFamily="Segoe UI"
+        FocusManager.FocusedElement="{Binding ElementName=SaveAndPrintButton}">
+
+    <Window.Resources>
+        <Style x:Key="DialogButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource RadButtonStyle}">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="110"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PrimaryDialogButtonStyle" TargetType="telerik:RadButton" BasedOn="{StaticResource DialogButtonStyle}">
+            <Setter Property="Background" Value="#003B46"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#38BDF8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Message Header & Icon -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Width="40" Height="40" CornerRadius="8" Background="#E0F2FE" Margin="0,0,14,0">
+                <TextBlock Text="&#xE74E;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="20"
+                           Foreground="#0284C7"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Save Barcode" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                <TextBlock x:Name="SubtitleText" Text="Do you want to save the barcode?" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,2,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Barcode Info / Confirmation Details -->
+        <TextBlock x:Name="BarcodeDetailText"
+                   Grid.Row="1"
+                   Text="Barcode will be saved to Opening Stock (VouNo: 9)."
+                   FontSize="12"
+                   Foreground="{DynamicResource SecondaryTextBrush}"
+                   VerticalAlignment="Center"
+                   Margin="54,0,0,0"/>
+
+        <!-- Action Buttons: Save & Print | Save Only | Cancel -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    KeyboardNavigation.DirectionalNavigation="Cycle"
+                    KeyboardNavigation.TabNavigation="Cycle">
+            <telerik:RadButton x:Name="SaveAndPrintButton"
+                               Style="{StaticResource PrimaryDialogButtonStyle}"
+                               Content="Save &amp; Print"
+                               Click="SaveAndPrint_Click"
+                               IsDefault="True"
+                               TabIndex="0"/>
+
+            <telerik:RadButton x:Name="SaveOnlyButton"
+                               Style="{StaticResource DialogButtonStyle}"
+                               Content="Save Only"
+                               Click="SaveOnly_Click"
+                               TabIndex="1"/>
+
+            <telerik:RadButton x:Name="CancelButton"
+                               Style="{StaticResource DialogButtonStyle}"
+                               Content="Cancel"
+                               Click="Cancel_Click"
+                               IsCancel="True"
+                               TabIndex="2"/>
+        </StackPanel>
+    </Grid>
+</Window>

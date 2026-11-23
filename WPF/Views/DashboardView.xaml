@@ -1,0 +1,1199 @@
+<UserControl x:Class="ConceptJewelleryPro.WPF.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
+             xmlns:vm="clr-namespace:ConceptJewelleryPro.WPF.ViewModels"
+             xmlns:conv="clr-namespace:ConceptJewelleryPro.WPF.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1400"
+             Background="{DynamicResource WindowBackgroundBrush}"
+             Foreground="{DynamicResource PrimaryTextBrush}">
+
+    <UserControl.Resources>
+        <conv:EqualityToBoolConverter x:Key="EqualityToBoolConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!-- Card Style -->
+        <Style x:Key="DashboardCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+
+        <!-- KPI Mini Card Style -->
+        <Style x:Key="KpiCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14,10" />
+        </Style>
+
+        <!-- Quick Launch Button Style -->
+        <Style x:Key="QuickLaunchButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="52" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="10,6">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TopBarGlassHoverBrush}" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.85" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Filter Pill Radio Button Style -->
+        <Style x:Key="FilterPillStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                Padding="10,3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="16,12,16,16">
+        <Grid.RowDefinitions>
+            <!-- Row 0: Top Header & Metal Rates Ticker Bar -->
+            <RowDefinition Height="Auto" />
+            <!-- Row 1: Status Notification Bar (Conditional) -->
+            <RowDefinition Height="Auto" />
+            <!-- Row 2: Section 1 (Today at a Glance Compact Ribbon) -->
+            <RowDefinition Height="Auto" />
+            <!-- Row 3: Main Dashboard Content (2 Columns) -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ROW 0: TOP HEADER & LIVE METAL RATES BAR -->
+        <Border Grid.Row="0"
+                Style="{StaticResource DashboardCardStyle}"
+                Padding="16,10"
+                Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Showroom Title & Live Clock -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="32" Height="32" CornerRadius="8" Background="{DynamicResource AccentBrush}" Margin="0,0,10,0">
+                            <TextBlock Text="&#xE80F;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource AccentTextBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Jewellery Showroom Dashboard"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text="{Binding CurrentDateTimeString}"
+                                       FontSize="11.5"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="0,1,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Center: Live Metal Rates Ticker -->
+                <Border Grid.Column="1"
+                        Margin="24,0"
+                        Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,4"
+                        VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Rates Icon & Label -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                            <TextBlock Text="&#xEC05;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="13"
+                                       Foreground="DarkGoldenrod"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,6,0" />
+                            <TextBlock Text="Live Metal Rates:"
+                                       FontSize="11.5"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Horizontal List of Rates -->
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding MetalRates}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="10,0" Padding="6,2" CornerRadius="4" Background="#15F5BB4A">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding PurityName}"
+                                                       FontSize="11.5"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Text=": ₹"
+                                                       FontSize="11.5"
+                                                       Foreground="DarkGoldenrod"
+                                                       VerticalAlignment="Center"
+                                                       Margin="2,0,0,0" />
+                                            <TextBlock Text="{Binding CurrentRate, StringFormat='{}{0:N0}'}"
+                                                       FontSize="12"
+                                                       FontWeight="Bold"
+                                                       Foreground="{DynamicResource AccentBrush}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Text="/g"
+                                                       FontSize="10.5"
+                                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="1,0,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 1-Click F2 Update Rates Button -->
+                        <Button Grid.Column="2"
+                                Command="{Binding OpenRateUpdateCommand}"
+                                ToolTip="Update Daily Metal Rates (F2)"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Padding="6,2"
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE70F;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Edit (F2)"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           Margin="4,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Right: Auto-Refresh & Manual Refresh -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Auto-refresh interval dropdown -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                        <TextBlock Text="Auto:"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,4,0" />
+                        <telerik:RadComboBox ItemsSource="{Binding AutoRefreshOptions}"
+                                  SelectedItem="{Binding SelectedAutoRefreshInterval, Mode=TwoWay}"
+                                  Width="85"
+                                  Height="40"
+                                  FontSize="11"
+                                  VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Manual Refresh Button -->
+                    <telerik:RadButton Command="{Binding RefreshCommand}"
+                                       
+                                       Padding="12,0"
+                                       ToolTip="Refresh all dashboard statistics">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE72C;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="12"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Refresh"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Margin="6,0,0,0"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </telerik:RadButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ROW 1: STATUS NOTIFICATION (IF ANY) -->
+        <Border Grid.Row="1"
+                Background="#203B82F6"
+                BorderBrush="#603B82F6"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12,6"
+                Margin="0,0,0,8"
+                Visibility="{Binding HasStatusNotification, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="&#xE946;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="14"
+                           Foreground="#3B82F6"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding StatusNotification}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <!-- ROW 2: SECTION 1 - TODAY AT A GLANCE (COMPACT RIBBON) -->
+        <Grid Grid.Row="2" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <!-- 1. Today's Invoices & Sales -->
+                <ColumnDefinition Width="*" />
+                <!-- 2. Active Staff Count -->
+                <ColumnDefinition Width="0.85*" />
+                <!-- 3. Barcodes Created Today -->
+                <ColumnDefinition Width="0.85*" />
+                <!-- 4. Metal Sold Today (Gold & Silver Wt) -->
+                <ColumnDefinition Width="1.1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Today's Invoices & Sales -->
+            <Border Grid.Column="0" Style="{StaticResource KpiCardStyle}" Margin="0,0,6,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="40" Height="40" CornerRadius="8" Background="#2010B981" BorderBrush="#4010B981" BorderThickness="1" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="TODAY'S INVOICES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding GlanceMetrics.BillsCountToday}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text=" Bills" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="4,0,0,2" />
+                            <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="4,0,4,2" />
+                            <TextBlock Text="₹" FontSize="12" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding GlanceMetrics.BillsAmountToday, StringFormat='{}{0:N0}'}" FontSize="15" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Bottom" Margin="1,0,0,2" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Card 2: Active Showroom Staff -->
+            <Border Grid.Column="1" Style="{StaticResource KpiCardStyle}" Margin="6,0,6,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="40" Height="40" CornerRadius="8" Background="#203B82F6" BorderBrush="#403B82F6" BorderThickness="1" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#3B82F6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="ACTIVE STAFF" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding GlanceMetrics.ActiveStaffCount}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text=" Staff Active" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="4,0,0,2" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Card 3: Barcodes Created Today -->
+            <Border Grid.Column="2" Style="{StaticResource KpiCardStyle}" Margin="6,0,6,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="40" Height="40" CornerRadius="8" Background="#20F59E0B" BorderBrush="#40F59E0B" BorderThickness="1" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8FE;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#F59E0B" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="BARCODES CREATED" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding GlanceMetrics.BarcodesCreatedToday}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text=" Tags Generated" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="4,0,0,2" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Card 4: Gold & Silver Sold Today -->
+            <Border Grid.Column="3" Style="{StaticResource KpiCardStyle}" Margin="6,0,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="40" Height="40" CornerRadius="8" Background="#208B5CF6" BorderBrush="#408B5CF6" BorderThickness="1" VerticalAlignment="Center">
+                        <TextBlock Text="&#xEC05;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#8B5CF6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="METAL SOLD TODAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="Gold: " FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding GlanceMetrics.GoldGrossWeightSoldToday, StringFormat='{}{0:F3}g'}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                            <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="4,0,4,2" />
+                            <TextBlock Text="Rec: ₹" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding GlanceMetrics.ReceiptsCollectedToday, StringFormat='{}{0:N0}'}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Bottom" Margin="1,0,0,2" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ROW 3: MAIN TWO-COLUMN DASHBOARD BODY -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <!-- Left Column (60%): Section 2 Orders & Section 4 Scheme Dues -->
+                <ColumnDefinition Width="1.4*" />
+                <!-- Right Column (40%): Section 3 Celebrations, Section 5 Status & Section 6 Launchpad -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ========================================== -->
+            <!-- LEFT COLUMN: ORDERS & SCHEMES              -->
+            <!-- ========================================== -->
+            <Grid Grid.Column="0" Margin="0,0,6,0">
+                <Grid.RowDefinitions>
+                    <!-- Section 2: Customer Orders Pending Today -->
+                    <RowDefinition Height="1.1*" />
+                    <!-- Section 4: Scheme Due Tracker (-3 to +7 Days) -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- SECTION 2: CUSTOMER ORDERS PENDING TODAY -->
+                <Border Grid.Row="0" Style="{StaticResource DashboardCardStyle}" Margin="0,0,0,8" Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Section Header & Filter Pills -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Customer Orders Pending Today &amp; Overdue"
+                                           FontSize="13.5"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                                <Border Background="{DynamicResource PanelBrush}" CornerRadius="10" Padding="8,2" Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding FilteredPendingOrders.Count, StringFormat='{}{0} Orders'}"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Filters: All / Due Today / Overdue & + New Order Button -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <RadioButton Content="All"
+                                             GroupName="OrderFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedOrderFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='All'}"
+                                             Command="{Binding DataContext.SelectOrderFilterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             CommandParameter="All" />
+                                <RadioButton Content="Due Today"
+                                             GroupName="OrderFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedOrderFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Due Today'}" />
+                                <RadioButton Content="Overdue"
+                                             GroupName="OrderFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedOrderFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Overdue'}" />
+
+                                <Button Command="{Binding DataContext.OpenOrderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Background="{DynamicResource AccentBrush}"
+                                        Foreground="Black"
+                                        BorderThickness="0"
+                                        Padding="10,4"
+                                        Margin="10,0,0,0"
+                                        FontWeight="Bold"
+                                        FontSize="11"
+                                        Cursor="Hand"
+                                        ToolTip="Create New Customer Requirement / Order">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                        <TextBlock Text="New Order" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Orders Grid -->
+                        <telerik:RadGridView x:Name="PendingOrdersGrid"
+                                             Grid.Row="1"
+                                             ItemsSource="{Binding FilteredPendingOrders}"
+                                             AutoGenerateColumns="False"
+                                             CanUserFreezeColumns="False"
+                                             RowIndicatorVisibility="Collapsed"
+                                             ShowGroupPanel="False"
+                                             IsReadOnly="True"
+                                             BorderThickness="1"
+                                             BorderBrush="{DynamicResource CardBorderBrush}"
+                                             Background="Transparent"
+                                             FontSize="12"
+                                             Cursor="Hand"
+                                             MouseDoubleClick="PendingOrdersGrid_MouseDoubleClick">
+                            <telerik:RadGridView.Columns>
+                                <!-- Urgency Pill -->
+                                <telerik:GridViewDataColumn Header="Status" Width="100">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#203B82F6" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsOverdue}" Value="True">
+                                                                <Setter Property="Background" Value="#30EF4444" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsDueToday}" Value="True">
+                                                                <Setter Property="Background" Value="#30F59E0B" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding UrgencyLabel}" FontSize="11" FontWeight="Bold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#3B82F6" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsOverdue}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#EF4444" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsDueToday}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#F59E0B" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Order No & Delivery Date -->
+                                <telerik:GridViewDataColumn Header="Order No" Width="110">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding OrderNo}" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                <TextBlock Text="{Binding DeliveryDate, StringFormat='{}{0:dd MMM yyyy}'}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Customer Details -->
+                                <telerik:GridViewDataColumn Header="Customer" Width="140">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding CustomerName}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Phone}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Item Description & Purity -->
+                                <telerik:GridViewDataColumn Header="Item &amp; Purity" Width="*">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding ItemName}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" TextTrimming="CharacterEllipsis" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Purity}" FontSize="10.5" Foreground="DarkGoldenrod" FontWeight="Bold" />
+                                                    <TextBlock Text=" • " FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text="{Binding AppWeight, StringFormat='{}{0:F3}g'}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text=" • " FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text="{Binding KarigarName}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Approx Value & Balance Due -->
+                                <telerik:GridViewDataColumn Header="Balance Due" Width="110" TextAlignment="Right">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding BalanceDue, StringFormat='{}₹{0:N0}'}" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Right" />
+                                                <TextBlock Text="{Binding AppValue, StringFormat='{}Tot: ₹{0:N0}'}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Right" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- 1-Click Action Button -->
+                                <telerik:GridViewDataColumn Header="Action" Width="75">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.OpenOrderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="{DynamicResource PanelBrush}"
+                                                    BorderBrush="{DynamicResource CardBorderBrush}"
+                                                    BorderThickness="1"
+                                                    Cursor="Hand"
+                                                    Padding="6,3"
+                                                    ToolTip="Open Order Requirement Window">
+                                                <TextBlock Text="Open" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+                            </telerik:RadGridView.Columns>
+                        </telerik:RadGridView>
+                    </Grid>
+                </Border>
+
+                <!-- SECTION 4: SCHEME DUE TRACKER (-3 TO +7 DAYS) -->
+                <Border Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="0,4,0,0" Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header & Filters -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE8CB;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="DarkGoldenrod" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Scheme Due Tracker (Last 3 Days &amp; Next 7 Days)"
+                                           FontSize="13.5"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                                <Border Background="{DynamicResource PanelBrush}" CornerRadius="10" Padding="8,2" Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding FilteredSchemeDues.Count, StringFormat='{}{0} Dues'}"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="DarkGoldenrod" />
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Filters: All / Overdue / Due Today / Next 7 Days -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <RadioButton Content="All"
+                                             GroupName="SchemeFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedSchemeFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='All'}" />
+                                <RadioButton Content="Overdue"
+                                             GroupName="SchemeFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedSchemeFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Overdue'}" />
+                                <RadioButton Content="Due Today"
+                                             GroupName="SchemeFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedSchemeFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Due Today'}" />
+                                <RadioButton Content="Next 7 Days"
+                                             GroupName="SchemeFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedSchemeFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Next 7 Days'}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Schemes Grid -->
+                        <telerik:RadGridView Grid.Row="1"
+                                             ItemsSource="{Binding FilteredSchemeDues}"
+                                             AutoGenerateColumns="False"
+                                             CanUserFreezeColumns="False"
+                                             RowIndicatorVisibility="Collapsed"
+                                             ShowGroupPanel="False"
+                                             IsReadOnly="True"
+                                             BorderThickness="1"
+                                             BorderBrush="{DynamicResource CardBorderBrush}"
+                                             Background="Transparent"
+                                             FontSize="12">
+                            <telerik:RadGridView.Columns>
+                                <!-- Timeline Offset Status -->
+                                <telerik:GridViewDataColumn Header="Due Status" Width="110">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#2010B981" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Category}" Value="Overdue">
+                                                                <Setter Property="Background" Value="#30EF4444" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Category}" Value="Due Today">
+                                                                <Setter Property="Background" Value="#30F59E0B" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding OffsetLabel}" FontSize="11" FontWeight="Bold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#10B981" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Category}" Value="Overdue">
+                                                                    <Setter Property="Foreground" Value="#EF4444" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Category}" Value="Due Today">
+                                                                    <Setter Property="Foreground" Value="#F59E0B" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Scheme Code & Customer -->
+                                <telerik:GridViewDataColumn Header="Scheme / Customer" Width="*">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Scode}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                                    <TextBlock Text=" - " Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text="{Binding CustomerName}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                                                    <TextBlock Text="{Binding Phone}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text=" • Staff: " FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    <TextBlock Text="{Binding Staff}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- Installment Amount & Paid Months -->
+                                <telerik:GridViewDataColumn Header="Installment" Width="120" TextAlignment="Right">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding InstallmentAmt, StringFormat='{}₹{0:N0}'}" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" />
+                                                <TextBlock Text="{Binding PaidCount, StringFormat='{}Paid: {0} / '}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Right">
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+
+                                <!-- 1-Click Collect Receipt -->
+                                <telerik:GridViewDataColumn Header="Action" Width="100">
+                                    <telerik:GridViewDataColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.OpenSchemeReceiptCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#2010B981"
+                                                    BorderBrush="#5010B981"
+                                                    BorderThickness="1"
+                                                    Cursor="Hand"
+                                                    Padding="6,3"
+                                                    ToolTip="Open Scheme Receipt Window">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="&#xE8CA;" FontFamily="Segoe MDL2 Assets" FontSize="10" Foreground="#10B981" VerticalAlignment="Center" />
+                                                    <TextBlock Text=" Receipt" FontSize="11" FontWeight="Bold" Foreground="#10B981" Margin="3,0,0,0" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </telerik:GridViewDataColumn.CellTemplate>
+                                </telerik:GridViewDataColumn>
+                            </telerik:RadGridView.Columns>
+                        </telerik:RadGridView>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ========================================== -->
+            <!-- RIGHT COLUMN: CELEBRATIONS, STATUS & LAUNCH -->
+            <!-- ========================================== -->
+            <Grid Grid.Column="1" Margin="6,0,0,0">
+                <Grid.RowDefinitions>
+                    <!-- Section 3: Today's Birthdays & Anniversaries -->
+                    <RowDefinition Height="1.15*" />
+                    <!-- Section 5: System Status & Health Monitor -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Section 6: Quick Action Launchpad -->
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- SECTION 3: BIRTHDAYS & ANNIVERSARIES CRM -->
+                <Border Grid.Row="0" Style="{StaticResource DashboardCardStyle}" Margin="0,0,0,8" Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header & Filters -->
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#EC4899" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="Birthdays &amp; Anniversaries"
+                                           FontSize="13.5"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                                <Border Background="{DynamicResource PanelBrush}" CornerRadius="10" Padding="8,2" Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding FilteredCelebrations.Count, StringFormat='{}{0}'}"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="#EC4899" />
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Filters: All / Today / Birthdays / Anniversaries -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <RadioButton Content="All"
+                                             GroupName="CelebrationFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedCelebrationFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='All'}" />
+                                <RadioButton Content="Today"
+                                             GroupName="CelebrationFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedCelebrationFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Today Only'}" />
+                                <RadioButton Content="Birthdays"
+                                             GroupName="CelebrationFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedCelebrationFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Birthdays'}" />
+                                <RadioButton Content="Anniversaries"
+                                             GroupName="CelebrationFilter"
+                                             Style="{StaticResource FilterPillStyle}"
+                                             IsChecked="{Binding SelectedCelebrationFilter, Converter={StaticResource EqualityToBoolConverter}, ConverterParameter='Anniversaries'}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Celebrations List -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding FilteredCelebrations}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,6"
+                                                Padding="10,8"
+                                                CornerRadius="8"
+                                                Background="{DynamicResource PanelBrush}"
+                                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                                BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Event Type Badge / Icon -->
+                                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#20EC4899" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EventType}" Value="Anniversary">
+                                                                    <Setter Property="Background" Value="#20F59E0B" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="🎂" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding EventType}" Value="Anniversary">
+                                                                        <Setter Property="Text" Value="💍" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+
+                                                <!-- Customer Details -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding CustomerName}" FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource PrimaryTextBrush}" TextTrimming="CharacterEllipsis" />
+                                                        <!-- Today Pill -->
+                                                        <Border Background="#3010B981" CornerRadius="4" Padding="4,1" Margin="6,0,0,0" Visibility="{Binding IsToday, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                            <TextBlock Text="TODAY" FontSize="9.5" FontWeight="Bold" Foreground="#10B981" />
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                        <TextBlock Text="{Binding EventBadge}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" FontWeight="SemiBold" />
+                                                        <TextBlock Text=" • " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                        <TextBlock Text="{Binding BestContactNumber}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                        <TextBlock Text=" • " FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                        <TextBlock Text="{Binding City}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- WhatsApp Greeting Button -->
+                                                <Button Grid.Column="2"
+                                                        Command="{Binding DataContext.SendWhatsAppGreetingCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#2025D366"
+                                                        BorderBrush="#5025D366"
+                                                        BorderThickness="1"
+                                                        Cursor="Hand"
+                                                        Padding="8,4"
+                                                        ToolTip="Send WhatsApp Greeting Message">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="&#xE717;" FontFamily="Segoe MDL2 Assets" FontSize="11" Foreground="#25D366" VerticalAlignment="Center" />
+                                                        <TextBlock Text=" Wish" FontSize="11" FontWeight="Bold" Foreground="#25D366" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- SECTION 5: SYSTEM STATUS & HEALTH MONITOR -->
+                <Border Grid.Row="1" Style="{StaticResource DashboardCardStyle}" Margin="0,0,0,8" Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header & System Online Badge -->
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#3B82F6" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="System Status &amp; Database Health"
+                                           FontSize="13.5"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Online Status Pill -->
+                            <Border Grid.Column="2" CornerRadius="10" Padding="8,2">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#2010B981" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SystemStatus.IsSystemOnline}" Value="False">
+                                                <Setter Property="Background" Value="#20EF4444" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#x25cf;" FontSize="11" Margin="0,0,4,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#10B981" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SystemStatus.IsSystemOnline}" Value="False">
+                                                        <Setter Property="Foreground" Value="#EF4444" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding SystemStatus.IsSystemOnline, ConverterParameter='ONLINE|OFFLINE', Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               FontSize="10.5"
+                                               FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="SYSTEM ONLINE" />
+                                                <Setter Property="Foreground" Value="#10B981" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SystemStatus.IsSystemOnline}" Value="False">
+                                                        <Setter Property="Text" Value="OFFLINE / ERROR" />
+                                                        <Setter Property="Foreground" Value="#EF4444" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- System Details Grid -->
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- User & Counter Info -->
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,6,6">
+                                <TextBlock Text="LOGGED USER &amp; COUNTER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                    <TextBlock Text="{Binding SystemStatus.LoggedUser}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                    <TextBlock Text=" (" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding SystemStatus.UserRole}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text=")" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding SystemStatus.CounterName}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                            </StackPanel>
+
+                            <!-- Database Engine & Ping -->
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="6,0,0,6">
+                                <TextBlock Text="DATABASE &amp; LATENCY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding SystemStatus.DatabaseType}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,2,0,0" />
+                                <TextBlock Text="{Binding SystemStatus.ResponseTimeMs, StringFormat='{}Response: {0:F1} ms'}" FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,1,0,0" />
+                            </StackPanel>
+
+                            <!-- Last Backup Information with 1-Click Backup Now Button -->
+                            <Border Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" Padding="10,6" Background="{DynamicResource PanelBrush}" CornerRadius="6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="LAST BACKUP" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                                            <TextBlock Text="{Binding SystemStatus.FormattedBackupTime}" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                                            <TextBlock Text=" (" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Text="{Binding SystemStatus.FormattedBackupSize}" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                            <TextBlock Text=")" FontSize="10.5" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- 1-Click Backup Now Button -->
+                                    <Button Grid.Column="1"
+                                            Command="{Binding BackupNowCommand}"
+                                            Background="{DynamicResource AccentBrush}"
+                                            Foreground="{DynamicResource AccentTextBrush}"
+                                            BorderThickness="0"
+                                            Padding="10,4"
+                                            Cursor="Hand"
+                                            ToolTip="Create Instant Database Backup Now">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xEA35;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" />
+                                            <TextBlock Text=" Backup Now" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- SECTION 6: QUICK ACTION LAUNCHPAD -->
+                <Border Grid.Row="2" Style="{StaticResource DashboardCardStyle}" Margin="0" Padding="14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Quick Action Launchpad"
+                                       FontSize="13.5"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Shortcut Buttons Grid -->
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- F7 New Invoice -->
+                            <Button Grid.Row="0" Grid.Column="0"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding NavigateModuleCommand}"
+                                    CommandParameter="Invoice"
+                                    ToolTip="Create New Sales Tax Invoice (F7)">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#10B981" VerticalAlignment="Center" />
+                                        <TextBlock Text=" New Bill" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Press F7" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- F3 Barcode Creation -->
+                            <Button Grid.Row="0" Grid.Column="1"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding NavigateModuleCommand}"
+                                    CommandParameter="Barcode Creation"
+                                    ToolTip="Create Barcode Tags (F3)">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8FE;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#F59E0B" VerticalAlignment="Center" />
+                                        <TextBlock Text=" Barcode" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Press F3" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- New Customer -->
+                            <Button Grid.Row="0" Grid.Column="2"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding NavigateModuleCommand}"
+                                    CommandParameter="Customer Creation"
+                                    ToolTip="Add New Customer Profile">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#3B82F6" VerticalAlignment="Center" />
+                                        <TextBlock Text=" Customer" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Add Profile" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- New Order -->
+                            <Button Grid.Row="1" Grid.Column="0"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding NavigateModuleCommand}"
+                                    CommandParameter="Order Requirement"
+                                    ToolTip="Create Customer Order">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#8B5CF6" VerticalAlignment="Center" />
+                                        <TextBlock Text=" New Order" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Requirement" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- F5 Scheme Receipt -->
+                            <Button Grid.Row="1" Grid.Column="1"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding NavigateModuleCommand}"
+                                    CommandParameter="Scheme Receipts"
+                                    ToolTip="Collect Scheme Monthly Installment (F5)">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8CA;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="DarkGoldenrod" VerticalAlignment="Center" />
+                                        <TextBlock Text=" Scheme" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Receipt (F5)" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- F2 Daily Metal Rates -->
+                            <Button Grid.Row="1" Grid.Column="2"
+                                    Style="{StaticResource QuickLaunchButtonStyle}"
+                                    Command="{Binding OpenRateUpdateCommand}"
+                                    ToolTip="Update Daily Metal Rates (F2)">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xEC05;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text=" Rates" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="Master (F2)" FontSize="9.5" Foreground="{DynamicResource SecondaryTextBrush}" Margin="17,1,0,0" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

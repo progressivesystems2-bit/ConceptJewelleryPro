@@ -1,0 +1,209 @@
+<FlowDocument xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              PageWidth="1122.5"
+              PageHeight="793.7"
+              PagePadding="30,80,30,25"
+              ColumnWidth="1122.5"
+              FontFamily="Segoe UI, Arial, sans-serif"
+              FontSize="10"
+              LineHeight="1.2"
+              Background="White"
+              Foreground="Black">
+
+    <!-- ========================================================================= -->
+    <!-- A4 LANDSCAPE PRE-PRINTED STATIONERY INVOICE                               -->
+    <!-- Top padding 80pt reserved for pre-printed company logo & letterhead       -->
+    <!-- ========================================================================= -->
+    <Section Margin="0">
+        <!-- Customer & Invoice Header -->
+        <Table CellSpacing="0" Margin="0,0,0,8">
+            <Table.Columns>
+                <TableColumn Width="450" />
+                <TableColumn Width="250" />
+                <TableColumn Width="360" />
+            </Table.Columns>
+            <TableRowGroup>
+                <TableRow>
+                    <TableCell>
+                        <Paragraph Margin="0,0,0,3">
+                            <Run Text="M/s : " />
+                            <Bold><Run Text="{{CustomerName}}" FontSize="11" /></Bold>
+                        </Paragraph>
+                        <Paragraph Margin="0">
+                            <Run Text="Address: " />
+                            <Run Text="{{Address}}" /><Run Text=" " /><Run Text="{{Address2}}" />
+                            <Run Text=", " /><Bold><Run Text="{{City}}" /></Bold>
+                        </Paragraph>
+                    </TableCell>
+                    <TableCell>
+                        <Paragraph Margin="0,0,0,3">
+                            <Run Text="Mobile: " /><Bold><Run Text="{{Phone}}" /></Bold>
+                        </Paragraph>
+                    </TableCell>
+                    <TableCell>
+                        <Paragraph Margin="0,0,0,3" TextAlignment="Right">
+                            <Bold><Run Text="TAX INVOICE" FontSize="12" /></Bold>
+                        </Paragraph>
+                        <Paragraph Margin="0" TextAlignment="Right">
+                            <Run Text="Invoice No: " /><Bold><Run Text="{{VouNo}}" FontSize="11" /></Bold>
+                            <Run Text="   Date: " /><Bold><Run Text="{{BillDate}}" /></Bold>
+                        </Paragraph>
+                    </TableCell>
+                </TableRow>
+            </TableRowGroup>
+        </Table>
+
+        <!-- Line Items Table (A4 Landscape Wide Table) -->
+        <!-- MinRows: 8 -->
+        <Table CellSpacing="0" Margin="0,4,0,8">
+            <Table.Columns>
+                <TableColumn Width="40" />  <!-- S.No -->
+                <TableColumn Width="100" /> <!-- Barcode -->
+                <TableColumn Width="240" /> <!-- Item -->
+                <TableColumn Width="70" />  <!-- HSN -->
+                <TableColumn Width="70" />  <!-- Purity -->
+                <TableColumn Width="50" />  <!-- Qty -->
+                <TableColumn Width="80" />  <!-- Gr.Wt -->
+                <TableColumn Width="80" />  <!-- Nt.Wt -->
+                <TableColumn Width="100" /> <!-- Rate -->
+                <TableColumn Width="100" /> <!-- Making -->
+                <TableColumn Width="130" /> <!-- Amount -->
+            </Table.Columns>
+
+            <!-- Table Header Row -->
+            <TableRowGroup>
+                <TableRow FontWeight="Bold">
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Center">S.No</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Center">BARCODE</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Left">ITEM DESCRIPTION</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Center">HSN</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Center">PURITY</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">QTY</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">GR.WT</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">NT.WT</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">RATE</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">MAKING</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right">TAXABLE VALUE</Paragraph></TableCell>
+                </TableRow>
+            </TableRowGroup>
+
+            <!-- Dynamic Items Row Template -->
+            <TableRowGroup>
+                <!-- <ItemsRows> -->
+                <TableRow>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Center"><Run Text="{{SNo}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Center"><Run Text="{{Barcode}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3">
+                        <Paragraph Margin="0">
+                            <Bold><Run Text="{{ItemName}}" /></Bold>
+                            <Run Text=" " /><Run Text="{{OldBarcode}}" FontSize="8.5" />
+                        </Paragraph>
+                    </TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Center"><Run Text="{{HSN}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Center"><Run Text="{{Purity}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{Qty}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{GrWt}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{NtWt}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{Rate}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{Making}}" /></Paragraph></TableCell>
+                    <TableCell Padding="0,3"><Paragraph TextAlignment="Right"><Run Text="{{Amount}}" /></Paragraph></TableCell>
+                </TableRow>
+                <!-- </ItemsRows> -->
+            </TableRowGroup>
+
+            <!-- Subtotals Row -->
+            <TableRowGroup>
+                <TableRow FontWeight="Bold">
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph>TOTALS</Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right"><Run Text="{{TotalQty}}" /></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right"><Run Text="{{TotalGrWt}}" /></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right"><Run Text="{{TotalNtWt}}" /></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right"><Run Text="{{TotalMaking}}" /></Paragraph></TableCell>
+                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,4"><Paragraph TextAlignment="Right"><Run Text="{{TotalAmount}}" /></Paragraph></TableCell>
+                </TableRow>
+            </TableRowGroup>
+        </Table>
+
+        <!-- Lower Section (Wide Landscape Format) -->
+        <Table CellSpacing="0" Margin="0,10,0,0">
+            <Table.Columns>
+                <TableColumn Width="680" />
+                <TableColumn Width="380" />
+            </Table.Columns>
+            <TableRowGroup>
+                <TableRow>
+                    <TableCell Padding="0,0,30,0">
+                        <Paragraph Margin="0,0,0,4">
+                            <Bold><Run Text="NOTE : CHANGED PHONE NO : 2519343, 2519977" /></Bold>
+                        </Paragraph>
+                        <Paragraph Margin="0,0,0,20" FontSize="9">
+                            <Run Text="* Weight &amp; pieces verified and found correct. I hereby agree to the terms stated overleaf. E.&amp; O.E." />
+                        </Paragraph>
+                        <Table CellSpacing="0">
+                            <Table.Columns>
+                                <TableColumn Width="300" />
+                                <TableColumn Width="350" />
+                            </Table.Columns>
+                            <TableRowGroup>
+                                <TableRow>
+                                    <TableCell><Paragraph><Bold><Run Text="Customer's Signature" /></Bold></Paragraph></TableCell>
+                                    <TableCell><Paragraph TextAlignment="Right"><Bold><Run Text="For " /><Run Text="{{StoreName}}" /></Bold></Paragraph></TableCell>
+                                </TableRow>
+                            </TableRowGroup>
+                        </Table>
+                    </TableCell>
+
+                    <TableCell>
+                        <Table CellSpacing="0">
+                            <Table.Columns>
+                                <TableColumn Width="220" />
+                                <TableColumn Width="160" />
+                            </Table.Columns>
+                            <TableRowGroup>
+                                <TableRow>
+                                    <TableCell><Paragraph Margin="0,1.5"><Bold><Run Text="CGST (1.5%)" /></Bold></Paragraph></TableCell>
+                                    <TableCell><Paragraph Margin="0,1.5" TextAlignment="Right"><Bold><Run Text="{{CgstAmt}}" /></Bold></Paragraph></TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><Paragraph Margin="0,1.5"><Bold><Run Text="SGST (1.5%)" /></Bold></Paragraph></TableCell>
+                                    <TableCell><Paragraph Margin="0,1.5" TextAlignment="Right"><Bold><Run Text="{{SgstAmt}}" /></Bold></Paragraph></TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,3">
+                                        <Paragraph><Bold><Run Text="NET TOTAL :" FontSize="11" /></Bold></Paragraph>
+                                    </TableCell>
+                                    <TableCell BorderThickness="0,1.5,0,1.5" BorderBrush="Black" Padding="0,3">
+                                        <Paragraph TextAlignment="Right"><Bold><Run Text="{{NetAmt}}" FontSize="11.5" /></Bold></Paragraph>
+                                    </TableCell>
+                                </TableRow>
+                            </TableRowGroup>
+                            <TableRowGroup>
+                                <!-- <PaymentRows> -->
+                                <TableRow>
+                                    <TableCell>
+                                        <Paragraph Margin="0,2,0,1">
+                                            <Bold><Run Text="{{AccountName}}" /></Bold>
+                                            <LineBreak />
+                                            <Run Text="{{DetailsSummary}}" FontSize="8.5" />
+                                        </Paragraph>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Paragraph Margin="0,2,0,1" TextAlignment="Right">
+                                            <Bold><Run Text="{{Amount}}" FontSize="10" /></Bold>
+                                        </Paragraph>
+                                    </TableCell>
+                                </TableRow>
+                                <!-- </PaymentRows> -->
+                            </TableRowGroup>
+                        </Table>
+                    </TableCell>
+                </TableRow>
+            </TableRowGroup>
+        </Table>
+    </Section>
+</FlowDocument>
