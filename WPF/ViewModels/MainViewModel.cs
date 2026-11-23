@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using ConceptJewelleryPro.Application.Licensing;
 using ConceptJewelleryPro.Data.Access.Repositories;
 using ConceptJewelleryPro.Domain.Entities;
 using ConceptJewelleryPro.Shared;
@@ -62,6 +63,7 @@ public sealed class MainViewModel : ViewModelBase
     private readonly Lazy<CouponEngineViewModel>? _couponEngineViewModel;
     private readonly Lazy<SoftwareUpdateViewModel>? _softwareUpdateViewModel;
     private readonly Lazy<LicenseInfoViewModel>? _licenseInfoViewModel;
+    private readonly ILicenseValidationService? _licenseValidationService;
     private readonly List<MenuEntry> _allMenuItems = new();
     private CancellationTokenSource? _globalSearchCts;
     private IReadOnlyList<Account>? _searchAccounts;
@@ -122,6 +124,7 @@ public sealed class MainViewModel : ViewModelBase
         Lazy<CouponEngineViewModel>? couponEngineViewModel = null,
         Lazy<SoftwareUpdateViewModel>? softwareUpdateViewModel = null,
         Lazy<LicenseInfoViewModel>? licenseInfoViewModel = null,
+        ILicenseValidationService? licenseValidationService = null,
         IAccountRepository? accountRepository = null,
         ICustomerRepository? customerRepository = null,
         IItemRepository? itemRepository = null,
@@ -183,6 +186,7 @@ public sealed class MainViewModel : ViewModelBase
         _couponEngineViewModel = couponEngineViewModel;
         _softwareUpdateViewModel = softwareUpdateViewModel ?? new Lazy<SoftwareUpdateViewModel>(() => new SoftwareUpdateViewModel());
         _licenseInfoViewModel = licenseInfoViewModel;
+        _licenseValidationService = licenseValidationService;
 
         SelectModuleCommand = new RelayCommand(parameter => SelectModule(parameter as string));
         OpenGlobalSearchResultCommand = new RelayCommand(parameter => OpenGlobalSearchResult(parameter as GlobalSearchResultViewModel ?? SelectedSearchResult));
@@ -350,6 +354,19 @@ public sealed class MainViewModel : ViewModelBase
         else if (moduleTitle is "Barcode Reports" or "Barcode Stock Reports" or "Barcode Stock" or "Barcode Report" or "BARCODE STOCK REPORTS")
         {
             moduleTitle = "Barcode Stock Reports";
+        }
+
+        if (!IsModuleLicensed(moduleTitle))
+        {
+            var requiredCode = JewelleryModuleCatalog.ResolveModuleForScreen(moduleTitle);
+            var requiredName = JewelleryModuleCatalog.GetDisplayName(requiredCode);
+            MessageBox.Show(
+                $"The \"{moduleTitle}\" feature belongs to the \"{requiredName}\" module, which is not enabled in your current license.\n\n" +
+                "Please contact your software provider to enable this module in Concept License Manager, then refresh your license under Settings -> License Information.",
+                "Module Locked - Upgrade Required",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
         }
 
         if (!IsPermitted(moduleTitle))
@@ -1552,9 +1569,14 @@ public sealed class MainViewModel : ViewModelBase
         return menus;
     }
 
+    private bool IsModuleLicensed(string? moduleTitle)
+    {
+        return _licenseValidationService is null || _licenseValidationService.IsScreenLicensed(moduleTitle);
+    }
+
     private IReadOnlyList<MenuEntry> FilterEntries(IEnumerable<MenuEntry> entries)
     {
-        var list = entries.Where(e => IsPermitted(e.Title)).ToList();
+        var list = entries.Where(e => IsModuleLicensed(e.Title) && IsPermitted(e.Title)).ToList();
         _allMenuItems.AddRange(list);
         return list;
     }

@@ -339,6 +339,7 @@ public partial class App : System.Windows.Application
                 couponEngineViewModel: new Lazy<CouponEngineViewModel>(() => new CouponEngineViewModel(couponRepo, couponEngineService, user.Username)),
                 softwareUpdateViewModel: new Lazy<SoftwareUpdateViewModel>(() => new SoftwareUpdateViewModel()),
                 licenseInfoViewModel: new Lazy<LicenseInfoViewModel>(() => new LicenseInfoViewModel(licenseService)),
+                licenseValidationService: licenseService,
                 accountRepository: accountRepo,
                 customerRepository: customerRepo,
                 itemRepository: itemRepo,

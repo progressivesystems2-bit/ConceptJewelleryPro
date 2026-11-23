@@ -43,6 +43,9 @@ public sealed class CompanyLicenseRecord
     [JsonPropertyName("notes")]
     public string? Notes { get; set; }
 
+    [JsonPropertyName("enabled_modules")]
+    public string? EnabledModules { get; set; }
+
     [JsonPropertyName("signature")]
     public string Signature { get; set; } = string.Empty;
 }

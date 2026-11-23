@@ -188,6 +188,11 @@
                                 <TextBlock Text="Authorized Computers / Nodes" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
                                 <TextBlock Text="{Binding RegisteredMachinesText}" FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
                             </StackPanel>
+
+                            <StackPanel Margin="0,14,0,0">
+                                <TextBlock Text="Unlocked Feature Modules" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding EnabledModulesText}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>

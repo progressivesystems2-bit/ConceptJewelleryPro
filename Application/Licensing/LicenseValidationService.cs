@@ -47,6 +47,17 @@ public sealed class LicenseValidationService : ILicenseValidationService
         true;
 #endif
 
+    public bool IsScreenLicensed(string? screenTitle)
+    {
+        if (!IsLicensingEnforced)
+            return true;
+
+        if (CurrentStatus is null)
+            return true;
+
+        return CurrentStatus.IsScreenLicensed(screenTitle);
+    }
+
     public async Task<string> GetActiveCompanyNameAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -175,13 +186,14 @@ public sealed class LicenseValidationService : ILicenseValidationService
 
         var record = records[0];
 
-        // 1. Verify Digital Signature against Vendor RSA Public Key
+        // 1. Verify Digital Signature against Vendor RSA Public Key (includes EnabledModules tamper lock)
         var isSignatureValid = LicenseSigner.VerifySignature(
             record.CompanyName,
             record.ValidFrom,
             record.ValidTo,
             record.LicenseType,
             record.Edition,
+            record.EnabledModules,
             record.Signature);
 
         if (!isSignatureValid)
@@ -238,6 +250,7 @@ public sealed class LicenseValidationService : ILicenseValidationService
             AuthorizedMachineId = currentMachineId,
             AuthorizedMachineName = currentMachineName,
             IsNodeAuthorized = true,
+            EnabledModules = record.EnabledModules,
             Signature = record.Signature,
             LastVerifiedOnlineUtc = DateTime.UtcNow,
             HighestClockUtc = DateTime.UtcNow
@@ -267,6 +280,7 @@ public sealed class LicenseValidationService : ILicenseValidationService
             cached.ValidTo,
             cached.LicenseType,
             cached.Edition,
+            cached.EnabledModules,
             cached.Signature);
 
         if (!isCachedSigValid)
@@ -341,7 +355,8 @@ public sealed class LicenseValidationService : ILicenseValidationService
             cached.Edition,
             cached.MaxBranches,
             cached.MaxNodes > 0 ? cached.MaxNodes : 1,
-            currentMachineName);
+            currentMachineName,
+            cached.EnabledModules);
     }
 
     private async Task<(bool Success, LicenseValidationResult? FailureResult, int RegisteredCount, string RegisteredMachines)> ValidateAndRegisterNodeAsync(
@@ -554,6 +569,7 @@ public sealed class LicenseValidationService : ILicenseValidationService
         public string AuthorizedMachineId { get; set; } = string.Empty;
         public string AuthorizedMachineName { get; set; } = string.Empty;
         public bool IsNodeAuthorized { get; set; } = true;
+        public string? EnabledModules { get; set; }
         public string Signature { get; set; } = string.Empty;
         public DateTime LastVerifiedOnlineUtc { get; set; }
         public DateTime HighestClockUtc { get; set; }

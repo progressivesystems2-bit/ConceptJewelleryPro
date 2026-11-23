@@ -33,8 +33,26 @@ public sealed class LicenseValidationResult
     public int RegisteredNodesCount { get; init; } = 1;
     public string CurrentNodeMachineName { get; init; } = string.Empty;
     public string RegisteredMachines { get; init; } = string.Empty;
+    public string? EnabledModules { get; init; }
 
     public bool IsMultiBranchAllowed => string.Equals(Edition, "MultiBranch", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsModuleEnabled(string moduleCode)
+    {
+        if (string.Equals(moduleCode, JewelleryModuleCatalog.Core, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        var set = JewelleryModuleCatalog.ParseEnabledModules(EnabledModules);
+        return set.Contains(moduleCode);
+    }
+
+    public bool IsScreenLicensed(string? screenTitle)
+    {
+        var moduleCode = JewelleryModuleCatalog.ResolveModuleForScreen(screenTitle);
+        return IsModuleEnabled(moduleCode);
+    }
+
+    public string EnabledModulesDisplay => JewelleryModuleCatalog.FormatModulesForDisplay(EnabledModules);
 
     public static LicenseValidationResult SuccessOnline(
         CompanyLicenseRecord record,
@@ -59,7 +77,8 @@ public sealed class LicenseValidationResult
             MaxNodes = record.MaxNodes > 0 ? record.MaxNodes : 1,
             RegisteredNodesCount = registeredNodesCount,
             CurrentNodeMachineName = currentNodeMachineName,
-            RegisteredMachines = registeredMachines
+            RegisteredMachines = registeredMachines,
+            EnabledModules = record.EnabledModules
         };
 
     public static LicenseValidationResult SuccessOffline(
@@ -73,7 +92,8 @@ public sealed class LicenseValidationResult
         string edition = "SingleHO",
         int maxBranches = 1,
         int maxNodes = 1,
-        string currentNodeMachineName = "") =>
+        string currentNodeMachineName = "",
+        string? enabledModules = null) =>
         new()
         {
             IsValid = true,
@@ -90,7 +110,8 @@ public sealed class LicenseValidationResult
             MaxBranches = maxBranches > 0 ? maxBranches : 1,
             MaxNodes = maxNodes > 0 ? maxNodes : 1,
             RegisteredNodesCount = 1,
-            CurrentNodeMachineName = currentNodeMachineName
+            CurrentNodeMachineName = currentNodeMachineName,
+            EnabledModules = enabledModules
         };
 
     public static LicenseValidationResult Failed(
@@ -117,6 +138,7 @@ public interface ILicenseValidationService
 {
     LicenseValidationResult? CurrentStatus { get; }
     bool IsLicensingEnforced { get; }
+    bool IsScreenLicensed(string? screenTitle);
     Task<string> GetActiveCompanyNameAsync(CancellationToken cancellationToken = default);
     Task<LicenseValidationResult> ValidateLicenseAsync(bool forceOnline = false, CancellationToken cancellationToken = default);
 }
